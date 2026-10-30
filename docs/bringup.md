@@ -410,3 +410,9 @@ timer table overflowing (one timeSetEvent caller, two KeSetTimerEx sites), the 4
 (the tick event is set, not pulsed), a timer restart per movie (start/stop only at engine init/shutdown). Fix
 (3e7e884, toolkit `src/kernel/kernel_bridge.c`): reset + arm in one step under the lock, and an expiry signals under
 the lock before its DPC (KiTimerExpiration's order). To confirm with runs once the PC is free.
+
+**Confirmation runs conf1-conf6 (2026-10-30 12:2x, exe CF685B849B99 = 3e7e884, test\PoA_USA).** conf1-conf5 all
+pass the first movie: each log opens `eac_usa.mad`, `wb.mad`, `poa_legal_eng.big`, `intro` and has `[FRAME]` lines,
+no stall. conf6 stopped during startup at 12:26:55, before any movie (the session driving it ended; no Windows
+Application Error for hppoa). 5/5 clean vs 3/7 stalled before the fix (chance of 5 clean in a row at the old rate
+~6%): the lost-KTIMER fix is confirmed.
