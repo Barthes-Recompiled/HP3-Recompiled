@@ -50,7 +50,9 @@ Harry in the Hogwarts Express corridor with the HUD, at a steady 30.0 fps, 0 cra
 4. **Pops on the main menu (user, run m3t3 at 60 fps).** Not visible in the 30 fps recordings of the front end (no
    full-scale samples there); recheck by ear at 30 fps. May be issue 1's sound.
 5. **Not yet checked:** Harry moving with the pad (the injector's stick), the pause menu, quit to title -> New Game
-   again (heap reuse), saves (Task 7; a DeepCode read is running/ran into `.superpowers/dc-m3-saves.txt`), the
+   again (heap reuse), saves (Task 7; DeepCode read in `.superpowers/dc-m3-saves.txt`, unverified: title ID 0x4541004C,
+   `sub_000116E0` XapiSetupPerTitleDriveLetters maps the per-title UDATA/TDATA paths, so saves should land in
+   `<exe dir>\saves\UDATA\4541004C\`, not `%LOCALAPPDATA%\xboxrecomp`; check in the code before Task 7's run), the
    immediate-mode effect in a level (`sub_00049F70`, Task 5 Step 3), the debug-menu key (Task 9).
 6. **Settings with no PoA hook (M5):** intro_skip, cutscene_skip, Quit To Desktop, 16:9 Hor+, menu/loading/text-icon
    2D handling. They show in the launcher/F10 but do nothing.
