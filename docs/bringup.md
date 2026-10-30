@@ -429,6 +429,17 @@ and whether the `debug_menu` setting lets a title-screen button open the debug m
   DSOUND float-to-volume helper: `fcomp`, returns 0xFFFFD8F0 = -10000) both on PoA 0x002B67CB, now unbound; with
   that contradiction gone, hp1 0x001A6FF0 (was callee-conflict) binds to PoA 0x002B777D (same prologue, calls the
   same 0x2B6710 counterpart). No override uses any of these addresses, so no binding changed.
-- `src/kernel/kernel_bridge.c` `kernel_set_timer`: the lazy `g_timer_lock` init and timer-thread start are unguarded
-  (two first callers at once would double-init). Move them to kernel init or use InitOnce.
+- **Done (M3 Task 2):** `src/kernel/kernel_bridge.c` `kernel_set_timer`: the lazy `g_timer_lock` init and
+  timer-thread start were unguarded (two first callers at once would double-init). Now `timer_init()` with
+  InitOnceExecuteOnce, as `g_dpc_lock` already does; `xbox_kernel_cancel_timer` uses it too.
 - `port/src/hle_dsound.c` `Play` does not clear `paused`: check what XDK Play does on a paused buffer before changing.
+
+## M3 runs
+
+Test folder `test\PoA_USA`, started by `poarun.ps1` (scratchpad helper: copies the exe, `HPPOA_LAUNCHER=1`,
+`debug.env` = launcher defaults, kills only its own PID).
+
+**m3t2 (Task 2, InitOnce timer init; 120 s, nothing pressed).** Hypothesis: the timer-init change keeps M2's boot.
+Result: `eac_usa.mad`, `wb.mad`, `intro.mad`, title (`poa_fe_eng.big`), `attract.mad`, back to the title; 23
+`[FRAME]` lines, 0 `MakeSpace from` / `ICALL` / `[CRASH]` / unknown handle; the two `not supported` immediate-mode
+lines as before; 50 `[UNIMPL]` = the same pushfd/popfd no-op notes as conf5 (44 in a shorter run).
