@@ -25,6 +25,10 @@ and XMV tooling, and the recompilation pipeline that ties them together.
 
 ## Contributors
 
+### barthes_recompiled
+The Harry Potter ports' QoL and fixes (cutscene skip, frame-rate caps, regions) and the Prisoner of Azkaban port
+(hp3_recomp): the cross-title XDK matcher (`tools/xdk_port`) and the PoA bring-up. Made with Claude Code.
+
 ### NoRain211 — [@NoRain211](https://github.com/NoRain211)
 A correctness batch across the disassembler, lifter and translator, found by
 stress-testing the pipeline against a real title. Almost all of it is the

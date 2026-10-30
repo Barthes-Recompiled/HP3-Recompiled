@@ -119,8 +119,8 @@ Consequences until they are bound:
 - hp1's renderer is fixed-function only (Philosopher's Stone has no vertex shaders); hp2's has vertex and pixel
   shader HLE (`hp2_recomp/port/src/renderer/xdk/hle_d3d8.cpp`: SetVertexShader, SetPixelShader,
   SetVertexShaderConstant*, LoadVertexShader, SetShaderConstantMode). PoA calls those (hp2 donor matched them, e.g.
-  SetPixelShader 0x00270D00, LoadVertexShader 0x00266D40, SetShaderConstantMode 0x00266E40). Port hp2's shader
-  path if the survey (docs/bringup.md, Task 8) confirms PoA draws with shaders.
+  SetPixelShader 0x00270D00, LoadVertexShader 0x00266D40, SetShaderConstantMode 0x00266E40). The survey below
+  confirms PoA draws with a programmable vertex shader: port hp2's vertex shader path in M2.
 
 ## Title facts so far
 

@@ -1,14 +1,19 @@
-# Developing the HP: Philosopher's Stone port
+# Developing the HP: Prisoner of Azkaban port
 
 Everything needed to go from a fresh clone to a built, running and packaged game. Players want
 [README.txt](README.txt) instead.
 
-The port is a static recompilation of the Xbox title (`default.xbe`, XDK 5659) built on the
+The port is a static recompilation of the Xbox title (`default.xbe`, XDK 5849) built on the
 **xboxrecomp** toolkit (repository root: `src/`, `tools/`, `templates/`, see
 [README.xboxrecomp.md](../README.xboxrecomp.md)), with the game project in `port/`.
 Rendering is the D3D8 HLE → Direct3D 12 renderer from
 [SCDA-XBERecomp](https://github.com/TGP482/SCDA-XBERecomp) (MIT, `port/src/scda/LICENSE.SCDA`),
-adapted to this title.
+adapted to this title. The project is a fork of the Philosopher's Stone port (hp1_recomp, MiddleDucky's
+work and barthes_recompiled's) with fixes from the Chamber of Secrets port (hp2_recomp); see
+[docs/toolkit-sync.md](../docs/toolkit-sync.md).
+
+**State (2026-10-30):** the recompiled code regenerates and links; the game has not been run yet. What the boot
+milestone has to finish is in [docs/bringup.md](../docs/bringup.md).
 
 **Nothing from the game is in this repository**: no game files, no disassembly, no recompiled code, no
 artwork. You need your own copy of the Xbox disc; the pipeline regenerates everything else from it.
@@ -18,7 +23,7 @@ artwork. You need your own copy of the Xbox disc; the pipeline regenerates every
 
 ```
 <repo>/
-  game/                   YOUR disc files (default.xbe, cut/, movies/, resource/) - ignored by git
+  game/                   YOUR disc files (default.xbe, data/) - ignored by git
   src/ tools/ templates/  xboxrecomp toolkit: runtime libraries (kernel, D3D, audio, input, video, USB...)
                           and the Python pipeline (xbe_parser, disasm, func_id, abi_analysis, recomp)
   cmake/ include/ docs/ tests/ LICENSES/   toolkit
@@ -87,13 +92,13 @@ target to `icall_seeds.json` and regenerate. `port/tools/scan_code_ptrs.py` list
 
 ### 3.1 Regions
 
-Both regional discs are supported. Their `default.xbe` files are the same program with code and data at shifted
-addresses.
+The USA disc is canonical. The European disc's `default.xbe` is the same program (same size, 534 bytes differ); its
+profile is not made yet (M4), so regen.sh refuses it for now and lists the supported SHA-1.
 
 | Disc | `default.xbe` SHA-1 | Profile |
 |---|---|---|
-| Europe (PAL, "Philosopher's Stone") | `6014a9e92f821416ecdb35020fb9987eaed3a17a` | `ps-eur` (canonical) |
-| USA (NTSC, "Sorcerer's Stone") | `82ecf164bfb1919d44e116d078c96f484972eb1b` | `ps-usa` |
+| USA (NTSC) | `51b09e01169fda86f2cb7e5ce45ee80a10268918` | `poa-usa` (canonical) |
+| Europe (PAL, En/Fr/De/Es/It/Nl/Sv) | `c8841e3c1d2d5ec20dbe286e5bec9bb5104b41f9` | not yet |
 
 The hand-written sources (overrides, `icall_seeds.json`, `tools/patch_gen.py`) always use the canonical XBE's
 addresses. `regen.sh` starts by running `tools/region/retarget.py`, which hashes `game/default.xbe` and picks the
@@ -200,16 +205,16 @@ docs/bringup.md). Frame timing follows the video standard (25 fps PAL, 30 fps NT
 
 | File | What it does |
 |---|---|
-| `scda/xdk/hle_d3d8.cpp` | the XDK's D3D8 entry points (≈90) onto the D3D12 backend; Swap, frame pacing, captures |
-| `hle_dsound.c` | DirectSound on XAudio2 (3D buffers: distance/pan), audio latency ~32 ms |
-| `hle_video.c` | XMV playback, the 16:9 camera (`sub_0016A4A0` widens 4:3 cameras, Hor+), menu movie / loading screen crop |
+| `scda/xdk/hle_d3d8.cpp` | the XDK's D3D8 entry points onto the D3D12 backend; Swap, frame pacing, captures (a few unbound, docs/bringup.md) |
+| `hle_dsound.c` | DirectSound on XAudio2; **off by default** (`RECOMP_HLE_DSOUND=1`) until all its entry points are bound |
+| `hle_video.c` | display timing for the HLE device (vblank overrides unbound for PoA); the renderer's screen hooks (answer 0) |
 | `hle_input.c` | XInput onto the PC pad (`app/input.cpp`: remap, deadzones, keyboard and mouse); rumble forwarded on change only |
-| `hle_xapi.c` | XAPI: the disc authentication check succeeds (it booted to the dashboard otherwise) |
-| `hle_frontend.c` | "Quit To Desktop" row in the main and pause menus |
-| `hle_anim.c` | animation start wrapper: door speed (`RECOMP_DOOR_SPEED`, default 1.8), anim/footstep traces |
-| `hle_trainer.c` | the debug trainer's game side, autoplay, checkpoints, debug report |
-| `hle_world.c` | characters taken out of the world (the cloisters pupil standing in the air at an authored height) |
-| `hle_debug.c` | debug hooks and traces (script, crabs, DS3D, file objects) |
+| `hle_xapi.c` | XAPI disc authentication (unbound for PoA) |
+| `hle_skip.c` | XAPI's QueryPerformanceCounter (the game clock) and the cutscene fast-forward (no PoA cutscene state yet) |
+| `hle_trainer.c` | the debug trainer's game side: input injection, debug report |
+
+Every address in these files must be a PoA function start: `tools/check_no_foreign_addrs.py` (run by regen.sh)
+fails otherwise. Addresses from another title are moved with `tools/xdk_port` (see its README).
 
 ### 6.3 Renderer notes (scda/gpu/d3d12.cpp)
 
@@ -248,21 +253,14 @@ bytes) over the block after the 24-byte header.
 ### 7.2 Trainer and reports
 
 `hppoa_trainer.exe` (beside hppoa.exe, either started first) talks to the game through the shared mapping
-`Local\hppoa_trainer` (`trainer_shm.h`): noclip (left stick flies, triggers up/down), health, spells, cards, beans,
-bag size, level warp (via the hub when needed), checkpoints (`checkpoints\*.bin`, the 0x4AE4-byte progress block),
-insta-kill (Ctrl+Shift+K), Undo. **Ctrl+Shift+R** writes `reports\<date_time>\`: report.txt, guest memory images,
-the progress block, logs, settings, all thread stacks and game state (from a separate thread, so a hung game still
-answers), plus a capture. `tools/memtool` (hppoa_mem.exe) reads/writes guest memory of a running game;
-`tools/warp` (hppoa_warp.exe <level>) warps.
-
-`RECOMP_BOOT_CHECKPOINT=<file>` restores a checkpoint on Harry's first frame; `RECOMP_AUTOPLAY=<file>` runs
-`<seconds> <command> [args]` lines (captures, quitafter, dump, diffsweep, ...; see the comment in hle_trainer.c).
+`Local\hppoa_trainer` (`trainer_shm.h`). For PoA only input injection and the report work so far; its other pages
+are still Philosopher's Stone's and do nothing. **Ctrl+Shift+R** writes `reports\<date_time>\`: report.txt, guest
+memory images, logs, settings, all thread stacks and a small state file (from a separate thread, so a hung game
+still answers), plus a capture. `tools/memtool` (hppoa_mem.exe) reads/writes guest memory of a running game.
 
 ### 7.3 Traces (debug.env)
 
-`[SPEECH]` is on with the debug logs (or `RECOMP_SPEECH_TRACE=1`): every PlaySpeech / Subtitle / FadeOutSpeech /
-WaitForSpeech with the cutscene flag and speech state, and each change of them (see `hle_debug.c`).
-`RECOMP_ANIM_TRACE`, `RECOMP_FOOTSTEP_TRACE`, `RECOMP_SCRIPT_TRACE`, `RECOMP_CRAB_TRACE`, `RECOMP_DS3D_TRACE`,
+`RECOMP_DS3D_TRACE`,
 `RECOMP_DSOUND_TRACE` (`RECOMP_DSOUND_WAV` records the mix), `RECOMP_XMV_TRACE`, `RECOMP_D3D_TRACE`,
 `RECOMP_PAD_TRACE`, `RECOMP_RUMBLE_TRACE`, `RECOMP_VSC_TRACE`, `RECOMP_WATCH`, `RECOMP_PROFILE` (sampling
 profiler). F11 writes every thread's native stack plus held guest locks and I/O queues to `stacks.txt`
@@ -274,20 +272,14 @@ profiler). F11 writes every thread's native stack plus held guest locks and I/O 
 Unicorn from the live state, then the lifted C, and compares registers, x87 and memory; needs `unicorn.dll`
 (Unicorn Engine 2.x, x64) beside it. F5 starts/stops a sweep, `RECOMP_DIFF_AUTO=start_s,len_s` runs one,
 `RECOMP_DIFF_ONLY=<addr,...>` restricts it, `RECOMP_DIFF_SAMPLES` / `RECOMP_DIFF_STRIDE` thin it; results in
-`difftest.txt`. Known noise: the rdtsc timer family (QPC 0x18DD83), the 16:9 camera HLE (0x12110), the FPU control
-word's IC bit, recursive functions (0x177E50, 0x1B6B0, 0x176BB0, 0x17A1C0), XMV MMX/x87 aliasing. Don't combine a
+`difftest.txt`. Known noise (from Philosopher's Stone; PoA's not collected yet): the rdtsc timer family, the FPU
+control word's IC bit, recursive functions. Don't combine a
 sweep with captures (it once overloaded the GPU driver).
 
 ### 7.5 Game facts for debugging
 
-Player entity `[0x3565B0]` (+0x0C name, +0x28 scene object, +0xDC controller); health/max floats
-0x329B90/0x329B94; progress/save block 0x3253B0 (0x4AE4 bytes; level byte at +0x49C2); spell buttons
-0x329DD5..7 (Flipendo 1, Lumos 2, Diffindo 5, Spongify 8, Incendio 10, Alohomora 12); cards 0x329BD4; beans
-0x329B8A; bag 0x329B8C; frame dt float 0x21B7BC. Levels 6..30 = 6 + index into the names at 0x21BB70 (level in play
-`[0x356CC4]`, load `sub_00146110(id)`); hubs (dayN/nightN) load the shared hogday/hognight.hog, sub-levels expect
-the hub's archive resident. Cutscenes are levels 32..75 (hpm01..hpm38, `game/cut`). Not on the retail disc
-(warping there crashes): night3library (18, the Restricted Section is inside night3) and day5quidditch (24).
-Animation start `sub_00142DB0(set, anim, first, last, fps, blend)`; AI types table 0x212078 (enter, update, exit).
+None proven yet for PoA. Formats and data: [docs/re-notes.md](../docs/re-notes.md); library state carried from hp1:
+[docs/bringup.md](../docs/bringup.md).
 
 
 ## 8. Working rules
@@ -312,25 +304,7 @@ Animation start `sub_00142DB0(set, anim, first, last, fps, blend)`; AI types tab
 
 ## 9. Open issues
 
-* *(Resolved, original behaviour)* **Fat Lady sometimes doesn't confirm the password.** After Harry answers, her
-  script rolls `randomi` and branches: either her line plus the hand gesture, or the gesture alone (both seen in
-  one traced session, 2026-10-20). Background for other "missing speech" reports: the PlaySpeech handler
-  (0x48220) skips every line while the cutscene flag `[0x331161]` is set (StartCutScene 0x4BC00 clears it when its
-  cutscene ends with no speech playing, speech state `[0x331770]`); the `[SPEECH]` trace (debug logs) shows the
-  flag, the speech state and every command of the scripts that speak, values included.
-
-* **Troll (Diffindo challenge, level 16):** walk animation looks broken and footsteps are missing. Footsteps come
-  from animation events (Walk frame 21 / Run 13 → script `Troll_Footstep_SFX`); in one report the second troll's
-  stand/walk/idle anim sets had no data (+0x14 == 0) - suspect the DeferredLoad attribute path in `sub_00027B30`.
-  `RECOMP_ANIM_TRACE=1 RECOMP_FOOTSTEP_TRACE=1` print set names and data pointers.
-* **Ground fog tiles (Diffindo challenge):** the fog looks squared. Fog = additive ONE/ONE layers, FVF 0x142,
-  texture 81085100 (128x128 P8 noise), second pass with a projected texture transform. Use
-  `RECOMP_CAP_VERTS=81085100` to see whether shared tile corners differ (game data) or not (renderer).
-* **Final duel (level 29):** Harry aims at the arena's middle rather than Quirrell; phase-2 QUIRRELL2 (type 0x63)
-  is never a target by the original's own candidate rules (`sub_00152E00`), so this may be original behaviour -
-  compare with the console.
-* **Forest pop-in (day3diffindo):** a gap shows sky at one spot; not streaming. Next step: difftest sweep there.
+* The game has not been run yet: [docs/bringup.md](../docs/bringup.md) lists what is unbound or unverified.
 * **Controllers:** only XInput pads (Xbox and XInput-mode pads). PS4/PS5/generic pads need Steam Input or
   DS4Windows; the toolkit's SDL2 backend (`src/input/xinput_device.c`, non-Windows today) could be enabled on
   Windows, statically linked.
-* Minimum specs in README.txt are estimates; the port has been played on a recent high-end PC only.

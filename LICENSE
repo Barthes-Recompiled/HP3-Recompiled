@@ -1,6 +1,7 @@
 MIT License
 
 Copyright (c) 2026 MiddleDucky
+Copyright (c) 2026 barthes_recompiled contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +28,7 @@ xboxrecomp (LICENSES/xboxrecomp-MIT.txt), SCDA-XBERecomp
 (port/src/scda/LICENSE.SCDA) and Dear ImGui (port/third_party/imgui), and
 LGPL-2.1-or-later for the parts taken from xemu (NOTICE, LICENSES/).
 
-This licence grants nothing in Harry Potter and the Philosopher's Stone or any
+This licence grants nothing in Harry Potter and the Prisoner of Azkaban or any
 other third-party property. No game data is included. The release build's
 game program contains code mechanically translated from the original game's
 executable; that code is not covered by this licence and remains the property

@@ -1,8 +1,12 @@
-HARRY POTTER AND THE PHILOSOPHER'S STONE - PC PORT
-==================================================
+HARRY POTTER AND THE PRISONER OF AZKABAN - PC PORT (WORK IN PROGRESS)
+=====================================================================
 
 A native Windows port of the original Xbox game, made by static recompilation.
 It contains no game data: you need the files from your own copy of the Xbox disc.
+
+NOT PLAYABLE YET. This readme is carried over from the Philosopher's Stone port and
+describes how the finished port will be installed and set up; the PoA-specific parts
+(controls, options that depend on the game) will be rewritten as they work.
 
 
 MINIMUM SYSTEM REQUIREMENTS

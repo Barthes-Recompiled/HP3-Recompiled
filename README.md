@@ -1,30 +1,26 @@
-# Harry Potter and the Philosopher's Stone (PAL) — Xbox to PC port
+# Harry Potter and the Prisoner of Azkaban — Xbox to PC port (work in progress)
 
-A native Windows port of the original Xbox game *Harry Potter and the Philosopher's Stone* (2003), made by
-**static recompilation**: the game's x86 code is translated to C and compiled for Windows, with the Xbox kernel,
-Direct3D 8, DirectSound and input replaced by native code. No emulator.
+A native Windows port of the original Xbox game *Harry Potter and the Prisoner of Azkaban* (2004) in the making,
+by **static recompilation**: the game's x86 code is translated to C and compiled for Windows, with the Xbox kernel,
+Direct3D 8, DirectSound and input replaced by native code. No emulator. It is the third of the barthes_recompiled
+Harry Potter ports, beside Philosopher's Stone (hp1_recomp) and Chamber of Secrets (hp2_recomp).
 
-Features beyond the original: resolutions up to 4K with MSAA/SMAA and anisotropic filtering, true 16:9
-(widened 3D, 2D kept in shape), windowed/borderless/fullscreen, keyboard and mouse with rebinding, controller
-remapping, deadzones and vibration strength, colour-blind correction filters, a 30 fps cap or unlocked frame
-rate, and "Quit To Desktop" in the game's menus.
+**State (2026-10-30): not playable yet.** The recompiled code regenerates from the USA disc and links; the game has
+not been started. Next: boot to the title screen ([docs/bringup.md](docs/bringup.md)). The first release aims at the
+sibling ports' features (4K, MSAA, true 16:9, 60 fps, keyboard and mouse, Quit To Desktop, cutscene skip), then
+more (higher frame rates, an in-game settings menu, an Archipelago randomizer).
 
-**This repository contains no game content.** To play or build it you need the files from your own copy of the
-Xbox disc. The build regenerates the recompiled code from your `default.xbe`.
-
-## Playing
-
-Download the repository, build the executables and put your disc's files or the .xiso in a `game` folder beside the executables and start
-`hppoa_launcher.exe`. Requirements, controls and every option are in [port/README.txt](port/README.txt).
+**This repository contains no game content.** To build it you need the files from your own copy of the Xbox disc
+(USA for now; the European disc later). The build regenerates the recompiled code from your `default.xbe`.
 
 ## Building
 
 See [port/DEVELOPING.md](port/DEVELOPING.md): MSYS2 (UCRT64) setup, regenerating the code from the XBE, building,
-debugging tools and how the port works.
+debugging tools and how the port works. The design and plans are in [docs/superpowers/](docs/superpowers/).
 
 ## Credits and licences
 
-The port's own code is MIT licensed, © 2026 MiddleDucky ([LICENSE](LICENSE)). The parts below keep their own
+The port's own code is MIT licensed, © 2026 MiddleDucky and barthes_recompiled contributors ([LICENSE](LICENSE)); it starts from MiddleDucky's Philosopher's Stone port. The parts below keep their own
 licences and copyright.
 
 * **xboxrecomp** — the static recompilation toolkit this port is built on (runtime, kernel layer, pipeline),

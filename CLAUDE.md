@@ -1,8 +1,10 @@
-# HP: Philosopher's Stone Xbox port
+# HP: Prisoner of Azkaban Xbox port
 
 Static recompilation of the original Xbox game on the xboxrecomp toolkit (repo root) with the game project in
 `port/`. **Read [port/DEVELOPING.md](port/DEVELOPING.md) first**: setup, regenerating `port/src/recomp/gen/` from
 `game/default.xbe`, building, the run folder, debugging tools, engine facts and open issues.
+
+State: regenerates and links on the USA disc, not run yet; start from [docs/bringup.md](docs/bringup.md) and the plans in `docs/superpowers/`.
 
 Essentials:
 
@@ -21,3 +23,7 @@ Essentials:
   original console before "fixing" odd behaviour.
 - Nothing from the game goes into the repository (game files, gen/, tools/*/output/, captures, reports,
   artwork). Don't delete whole output folders (dist/, run/).
+- Every address in hand-written code must be a PoA function start (`port/tools/check_no_foreign_addrs.py`, run by
+  regen.sh). Move addresses from another title with `tools/xdk_port`, never by hand; record evidence in
+  docs/bringup.md or docs/re-notes.md (randomizer-relevant finds: pickups, collectibles, spells, scripts).
+- Bulk reading (generated code, logs, diffs) goes to Codex or agy, read-only.
