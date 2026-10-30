@@ -103,3 +103,61 @@ int hppoa_LoadingScreen(void) { return 0; }
 int hppoa_LoadingCount(void) { return 0; }
 int hppoa_TextIcon(uint32_t tex) { (void)tex; return 0; }
 void hppoa_TextIconDump(void) {}
+
+/* xboxrecomp: true 16:9 (Hor+). The engine's camera keeps a horizontal field of view (cam+0x6C, degrees) and derives
+ * the vertical one from the screen's aspect, 4 / 3 at display+0x34 (display = [0x30F948]+0x2E14, set by
+ * sub_00034750 and never changed): a 16:9 aspect there would crop the top and bottom (Vert-). Instead, in 16:9 the
+ * projections keep the vertical view and get 3/4 of their x scale, wider at the sides; the 640x480 frame is shown 16:9
+ * wide and d3d12.cpp's Squeeze2D keeps the 2D at its 4:3 shape. Three builders make a perspective projection:
+ *   sub_000376E0(this=cam, out, aspect): m[0] = cot(fov/2), m[5] = m[0] * aspect (its +0x80 flag set: orthographic)
+ *   sub_00037000(this=out, fovx, fovy, ...): the explicit pair, from sub_000377B0
+ *   sub_000518D0(): the camera's view * projection for the vertex programs, at 0x2FAA78 (copied into 0x3603A8)
+ * The camera's projection (cam+0x168, sub_00031B40) also builds the culling matrices after it, so what comes into view
+ * at the sides is drawn. Scaling a projection's x column (m[0], m[4], m[8], m[12]) is the same on a view * projection
+ * product. */
+extern int hppoa_Widescreen(void); /* scda/xdk/hle_d3d8.cpp: booted in 16:9 */
+
+static void hor_plus(uint32_t m)
+{
+    for (int i = 0; i < 16; i += 4) MEMF(m + 4 * i) *= 0.75f;
+}
+
+extern void sub_000376E0_gen(void);
+void sub_000376E0(void)
+{
+    uint32_t cam = ecx, out = ARG(0), caller = MEM32(g_esp);
+    float aspect = MEMF(g_esp + 8);
+    int persp = !MEM8(cam + 0x80);
+    {   /* [CAM] once per camera and caller: which cameras a screen uses */
+        static uint32_t seen[64][2];
+        static int n;
+        int i = 0;
+        while (i < n && !(seen[i][0] == cam && seen[i][1] == caller)) i++;
+        if (i == n && n < 64) {
+            seen[n][0] = cam, seen[n][1] = caller, n++;
+            fprintf(stderr, "[CAM] cam %08X from %08X %s fov %g aspect %g\n", cam, caller,
+                    persp ? "persp" : "ortho", MEMF(cam + 0x6C), aspect);
+        }
+    }
+    sub_000376E0_gen();
+    if (persp && hppoa_Widescreen()) hor_plus(out);
+}
+
+extern void sub_00037000_gen(void);
+void sub_00037000(void)
+{
+    uint32_t out = ecx, caller = MEM32(g_esp);
+    {
+        static int once;
+        if (!once++) fprintf(stderr, "[CAM] fov pair from %08X: %g x %g\n", caller, MEMF(g_esp + 4), MEMF(g_esp + 8));
+    }
+    sub_00037000_gen();
+    if (hppoa_Widescreen()) hor_plus(out);
+}
+
+extern void sub_000518D0_gen(void);
+void sub_000518D0(void)
+{
+    sub_000518D0_gen();
+    if (hppoa_Widescreen()) hor_plus(0x002FAA78u);
+}

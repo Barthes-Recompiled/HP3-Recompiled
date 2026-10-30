@@ -540,3 +540,23 @@ dropped. Fix: a buffer of more than two channels is folded to stereo (centre and
 output (`render6`) already sent each channel to its speaker. m3voice3: per-second RMS on the swear screen and in the
 first cutscene roughly doubles (e.g. 400-900 -> 950-1300), 0 full-scale samples. Clip for the user's ear:
 `Harry Potter Xbox Decomps\clips\poa_voice_check.wav` (swear screen 76-86 s, cutscenes 100-122 s).
+
+## Widescreen 16:9 Hor+ (2026-10-30)
+
+- **Camera.** The camera keeps a horizontal field of view (cam+0x6C, degrees; 87 on the Hogwarts Express) and makes
+  the vertical one from the screen's aspect: `sub_000264F0(w, h)` = (w/640)/(h/480) * display+0x34, with display =
+  [0x30F948]+0x2E14 and +0x34 = 4/3 written once by `sub_00034750` (`mov [ebx+0x34], 0x3FAAAAAB`). A 16:9 value there
+  would be Vert- (top and bottom cut), so it is left alone.
+- **Projections** (all D3D row-vector, x scale in m[0]): `sub_000376E0(this=cam, out, aspect)` (perspective when
+  cam+0x80 is 0: m[0] = 1/tan(fov*pi/360), m[5] = m[0]*aspect; called from `sub_00031B40` at 0x31BBB, which then builds
+  the culling and view*projection matrices from it), `sub_00037000(this=out, fovx, fovy, ...)` (from `sub_000377B0`)
+  and `sub_000518D0` (view*projection for the vertex programs at 0x2FAA78, copied to 0x3603A8 by `sub_00051DC0`).
+- **Hook** (hle_video.c): in 16:9 each perspective result gets its x column (m[0], m[4], m[8], m[12]) times 3/4:
+  same vertical view, wider sides. The frame stays 640x480 and is shown 16:9; d3d12.cpp's Squeeze2D (from hp1) keeps
+  the 2D 4:3-shaped and side-anchors the HUD. [CAM] logs each camera/caller once.
+- **Run ws1** (RECOMP_ASPECT=16:9, poa_newgame.pad, 140 s): New Game to the Hogwarts Express; only cam path
+  0x31BC0 used (two cameras, persp, fov 87, aspect 4/3); 0 crashes. Screenshot: corridor undistorted and wider,
+  spell/button HUD round and anchored bottom right.
+- **Not checked yet:** menus/APT GUI and loading screens in 16:9 (hppoa_MenuMovie / LoadingScreen hooks are still
+  stubs, so a full-frame picture over no scene shows 4:3 in the middle), cutscene bars, the inventory/map screens,
+  and whether any 3D-in-menu camera needs to stay 4:3 (hp1 needed that for its Remembrall).
