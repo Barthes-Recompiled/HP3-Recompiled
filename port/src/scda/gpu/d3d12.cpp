@@ -3220,7 +3220,13 @@ void D3D12Backend::CaptureTextures(const State& s, const DrawTextures& stages) {
     for (int i = 0; i < 4; i++) {
         ID3D12Resource* res = stages.res[i];
         TextureDesc d;
-        if (!s.textures[size_t(i)] || !Describe(s.textures[size_t(i)], d)) continue;
+        if (!s.textures[size_t(i)]) continue;
+        if (!Describe(s.textures[size_t(i)], d)) {
+            // xboxrecomp: a texture set but not one Describe reads (its Common type), so the stage samples nothing
+            fprintf(cap_, " | t%d header %08X common %08X not described", i, s.textures[size_t(i)],
+                    kernel::R32(s.textures[size_t(i)]));
+            continue;
+        }
         bool tg = targets_.count(TargetKey(d.data, Format(d.format).depth));
         fprintf(cap_, " | t%d %08X fmt %X %ux%u%s%s", i, d.data, d.format, d.width, d.height, tg ? " target" : "",
                 res ? "" : " unbound");
@@ -3325,6 +3331,7 @@ void D3D12Backend::CaptureDraw(const State& s, uint32_t prim, uint32_t count, co
             k.src, k.dst, k.zen, k.zfunc, k.zwrite, k.zbias, k.zslope, k.cull, k.wmask, c.pc[0][0], c.pc[0][1],
             c.pc[0][2], c.pc[0][3], s.rs[kRsTextureFactor], c.misc[1], c.misc[0], c.fog[0], c.fog[1], c.fog[2],
             c.fog[3], c.fog_color[0], c.fog_color[1], c.fog_color[2]);
+    if (s.caller) fprintf(cap_, " from %08X", s.caller);
     CaptureTextures(s, stages);
 }
 

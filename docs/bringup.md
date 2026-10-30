@@ -354,3 +354,20 @@ Where hp1's calls 0x00155251 right after storing a result to a global (hp1 0x374
 0x00011735. hp1's auth chain (0x0015519A, 0x00155251) has no PoA match, and Task 7's run never booted to the
 dashboard (no XLaunchNewImage / HalReturnToFirmware) and mapped partition1, TDATA and UDATA. hle_xapi.c's override
 stays disabled with that note.
+
+**Boot fix 1 (Task 9): flat-white frames = copy swaps (2026-10-30).** Cause, from captures that name each draw's
+caller (new `from` field in frame.txt): every present goes through the engine's `sub_000345B0`: BlockOnFence,
+**Swap(2)** (D3DSWAP_BYPASSCOPY), `sub_00034110` (a full-screen quad, FVF 0x144, texcoords 0..640 x 0..480, diffuse
+0x7F7F7F with MODULATE2X: the back buffer copied 1:1), **Swap(4)** (FINISH), InsertFence. The title creates its
+device with `MultiSampleType 0x11, SwapEffect 3` (D3DSWAPEFFECT_COPY), so XDK 5849's CDevice::Init (0x0026B380)
+sets device +8 bit 0x4000 and Swap (0x0026A610) takes its copy path, `sub_0026A2D0`: COPY/BYPASSCOPY count the swap
+and save the target, depth and textures (`sub_0026A050`); BYPASSCOPY then sets the front buffer (+0x1A18) as the
+render target with no depth and the back buffer (+0x1A14) as texture 0, stages 1-3 empty; FINISH (`sub_0026A0E0`)
+restores them and flips to the front buffer. The HLE Swap presented and rotated on every call, so Swap(2) showed the
+movie frame and Swap(4) showed the copy quad drawn with no texture (white). The HLE now does the same: copy swaps
+when the parameters ask for them, BYPASSCOPY binds and FINISH restores and shows the front buffer, flipping swaps do
+nothing until FINISH. Run 9 (45 s): each frame is the movie quads into the back buffer (0207C000) plus the copy
+quad into the front buffer (01F50000) with `t0 8207C000 fmt 12 640x480 target`; the captures at 15/26/37 s show the
+intro movie (train on the viaduct, a Dementor's hand, the snow scene); 59-60 fps. One earlier run of this build
+(run 7, with `RECOMP_DSOUND_WAV`) stopped logging ~2 s in and would not exit for minutes; not reproduced in runs 8-9
+(gdb stacks of run 8 showed nothing blocked). Watch for it in the done run.
