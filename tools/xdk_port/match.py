@@ -97,9 +97,13 @@ def _compared(dbr, cbr, matched):
 
 
 def _consistent(dbr, cbr, matched):
-    """No branch target of the candidate contradicts a donor target already mapped."""
+    """No branch target of the candidate contradicts a donor target already mapped, and none is the match of a
+    different donor function (a target function is the image of one donor function at most)."""
     pairs = _compared(dbr, cbr, matched)
-    return pairs is not None and all(m == t for m, t in pairs)
+    if pairs is None or not all(m == t for m, t in pairs):
+        return False
+    owner = {t: d for d, t in matched.items()}
+    return all(owner.get(t, d) == d for d, t in zip(dbr, cbr))
 
 
 def _by_callees(dbr, cands, cbr, matched):
@@ -113,7 +117,8 @@ def match_functions(donor, donor_addrs, donor_starts, target, target_starts, lim
     """{"matched": {donor_addr: target_addr}, "unmatched": {donor_addr: reason}, "anchored": {donor_addr, ...}}.
 
     reason: "no-match" (the whole body is nowhere), "ambiguous" (at more than one
-    function start), "not-function-start" (found, but only where no function starts).
+    function start), "not-function-start" (found, but only where no function starts),
+    "callee-conflict" (found, but it calls something other than its donor's mapped callees).
 
     A body found at several function starts is resolved when exactly one of them is
     as far from a matched neighbour (the nearest matched donor function before or
@@ -124,7 +129,9 @@ def match_functions(donor, donor_addrs, donor_starts, target, target_starts, lim
     what they call) is resolved when exactly one candidate's rel32 call/jump targets
     agree with the donor's, mapped through the matches so far, with at least one
     compared. Those are listed in "callee". Neither rule takes a candidate whose
-    calls contradict a mapped callee. Both repeat until nothing changes.
+    calls contradict a mapped callee. Both repeat until nothing changes. Last, any
+    match (unique ones too) whose calls contradict its donor's mapped callees is
+    dropped as "callee-conflict".
     """
     starts = sorted(set(donor_starts) | set(donor_addrs))
     tstarts = set(target_starts)
@@ -168,6 +175,21 @@ def match_functions(donor, donor_addrs, donor_starts, target, target_starts, lim
     for a in ambiguous:
         if a not in anchored and a not in callee:
             unmatched[a] = "ambiguous"
+    # every match, unique ones too: a function whose calls go elsewhere than its donor's mapped callees is a look-alike
+    # (DirectSoundCreateStream vs DirectSoundCreateBuffer are the same bytes calling different methods)
+    dropped = True
+    while dropped:
+        dropped = False
+        for a in sorted(matched):
+            t = matched[a]
+            dbr = branches[a] if a in branches else _branches(donor, a, lengths[a])
+            tbr = branches.get(("t", t)) or _branches(target, t, lengths[a])
+            if not _consistent(dbr, tbr, matched):
+                del matched[a]
+                anchored.discard(a)
+                callee.discard(a)
+                unmatched[a] = "callee-conflict"
+                dropped = True
     return {"matched": matched, "unmatched": unmatched, "anchored": anchored, "callee": callee}
 
 

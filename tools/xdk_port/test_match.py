@@ -234,6 +234,27 @@ def test_callee_chain_settles():
     assert r["matched"][TEXT + 0x20] == TEXT + 0x08, r
 
 
+def test_unique_match_rejected_on_callee_conflict():
+    # DirectSoundCreateStream in the donor, DirectSoundCreateBuffer in the target: the same bytes, another callee.
+    # The donor's callee X is matched elsewhere, so the target wrapper (calling Y') is not the donor's function.
+    donor = place({0x00: wrap(TEXT, TEXT + 0x100), 0x100: body(1), 0x140: body(2)})
+    target = place({0x30: wrap(TEXT + 0x30, TEXT + 0x190), 0x150: body(1), 0x190: body(2)})
+    r = match_functions(image(donor), {TEXT: "CreateStream", TEXT + 0x100: "X", TEXT + 0x140: "Y"},
+                        {TEXT, TEXT + 0x100, TEXT + 0x140}, image(target), {TEXT + 0x30, TEXT + 0x150, TEXT + 0x190})
+    assert TEXT not in r["matched"], r
+    assert r["unmatched"][TEXT] == "callee-conflict", r
+
+
+def test_unique_match_rejected_when_callee_belongs_to_another():
+    # the donor wrapper calls X, which the target lacks; the target wrapper calls Y', the match of the donor's Y
+    donor = place({0x00: wrap(TEXT, TEXT + 0x100), 0x100: body(1), 0x140: body(2)})
+    target = place({0x30: wrap(TEXT + 0x30, TEXT + 0x190), 0x190: body(2)})
+    r = match_functions(image(donor), {TEXT: "CreateStream", TEXT + 0x100: "X", TEXT + 0x140: "Y"},
+                        {TEXT, TEXT + 0x100, TEXT + 0x140}, image(target), {TEXT + 0x30, TEXT + 0x190})
+    assert r["matched"] == {TEXT + 0x140: TEXT + 0x190}, r
+    assert r["unmatched"][TEXT] == "callee-conflict", r
+
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     failed = 0

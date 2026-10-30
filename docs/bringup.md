@@ -309,3 +309,19 @@ ecx (the hardware register) and the data, so `VsConstants` writes only the rende
 instructions, type 2078` at renderer init, no unknown handle. Begin/End immediate mode: only `sub_00049A70` and its
 neighbour (both called from `sub_0004A3C0`) use it, two quads each after SetRenderTarget and SetVertexShader: a
 screen-space effect pass, not the menus. D3D coverage: 1 gap (SetVertexData4f).
+
+**DirectSound bound (Task 7, steps 1-2).** The M1 binding of 0x002B8791 as DirectSoundCreateStream was wrong: it is
+DirectSoundCreateBuffer (XbSymbolDatabase). hp1's CreateStream 0x001A89E9 is the same bytes but calls
+CDirectSound::CreateSoundStream, while PoA's calls 0x002B83A1, which is hp1's CDirectSound::CreateSoundBuffer
+0x001A8462 (body match) and XbSymbolDatabase's CDirectSound_CreateSoundBuffer. That explains baseline 2's 180
+"CreateStream" lines with a callback on the stack (0x00F7FB7C): buffer descriptions read as stream ones.
+`tools/xdk_port` now drops any match, unique ones too, whose calls contradict its donor's mapped callees, or whose
+callee is already another donor function's match (`callee-conflict`; hp1 known answer still 184/190 with 0 wrong;
+hp1 -> PoA drops 0x001A89E9, 0x001A6FF0, 0x001AACA4; no bound override lost its evidence). PoA creates no streams,
+so `STREAM_VTABLE` stays 0. Bound: SetLoopRegion 0x002B761F, GetStatus 0x002B763F, SetCurrentPosition 0x002B767B,
+SetFrequency 0x002B7A60, SetMixBins 0x002B7A7C (callee match by both donors + signature), GetCurrentPosition
+0x002B765B (hp2's handler), Pause 0x002B7603, PauseEx 0x002B75DF, SetFilter 0x002B756B and SetEG 0x002B754F (not
+reproduced, S_OK), IDirectSound_SetMixBinHeadroom 0x002B752F (S_OK), DirectSoundCreateBuffer 0x002B8791; each
+`ret n` checked. 0x002B9760 (CMcpxAPU's scalar deleting destructor, only reached through the vtable thunk
+`sub_002223E0`) is allowlisted. `check_hle_coverage.py --section DSOUND --strict` passes. Not yet run; the HLE is
+still off by default (steps 3-4).
