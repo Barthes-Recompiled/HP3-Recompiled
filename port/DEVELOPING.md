@@ -247,6 +247,8 @@ bytes) over the block after the 24-byte header.
   textures, shaders, 16:9 squeeze), textures. `RECOMP_CAP_DRAWS=1` also saves the target before every draw;
   `RECOMP_CAP_VERTS=<tex addr hex>` dumps the vertices of draws using that texture;
   `RECOMP_CAPTURE_AFTER=<s>[:<every>:<count>]` captures unattended.
+* **Debug menu:** `debug_menu = true` (F10 > Debug, or `RECOMP_DEBUG_MENU=1`), then the left trigger on the main
+  menu opens the developer CHAPTER SELECTION screen (docs/re-notes.md, Debug menu).
 * `RECOMP_DEBUG_KEYS=1`: F8 log depth for all draws, F9 alpha test off, F7 depth test always passes.
   F6 (non-release builds) moves Harry to the camera.
 

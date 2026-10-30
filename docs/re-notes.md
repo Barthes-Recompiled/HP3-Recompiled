@@ -38,6 +38,15 @@ DM_Selection `sub_0001F7B0`, DM_ChapterSelection `sub_0001F7D0`, DM_BackSelectio
 `FSCommand:StartGame`. A chapter/room select is the obvious test tool for M2-M4 and a candidate entry point for the
 randomizer's warps.
 
+**Opening it (run m3dbg, 2026-10-30, M3 Task 9).** With `debug_menu = true` (`RECOMP_DEBUG_MENU=1`) the front end logs
+"[DEBUG] front end asked for the debug menu: allowed"; on the main menu (New Game / Load Game / ...) the **left
+trigger** opens it: the log reads `poa_debugmenu.big` right after the LT press (B, X, Y, Black, White on the swear
+screen / main menu did nothing). It shows "CHAPTER SELECTION: 'X' - Select Room, 'D' - Start Chapter", "Build: May  8
+2004, 15:54:23", chapters Intro, Night0, Day1, Night1, Day2, Night2, and a block of developer placeholder text
+(captures 182353-182403). Choosing a chapter/room and the 0x376B44/48/4C writes are not checked yet (M4 level-warp tool).
+The static decode failed: the .apt bytecode refers to a per-function constant pool (u32 index lists into
+POA_STARTUP_XBOX.const: index 5 Key, 6 getCode, 7 POA_DEBUGMENU.swf) and its push opcodes are EA's own.
+
 How it opens (Explore trace, 2026-10-30, Task 10): `sub_00256C50` is a static constructor (CRT initializer table at
 .data 0x2F8F18) that fills the APT FSCommand table with `{name, handler}` pairs through `sub_001AE6C0`; the DM_*
 entries sit at 0x30F118-0x30F148 and "DebugMenu" at 0x30F180 (name 0x2C9360, handler `sub_00020310`). The front
