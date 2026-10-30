@@ -263,6 +263,8 @@ bool On() {
 // the generated XDK bodies this file wraps (tools/recomp/manual_scan.py reads this list)
 extern "C" {
 extern void sub_00264DD0_gen(void);
+extern void sub_00266A90_gen(void);
+extern void sub_00266BD0_gen(void);
 extern void sub_00269050_gen(void);
 extern void sub_00266190_gen(void);
 extern void sub_00266230_gen(void);
@@ -1016,6 +1018,35 @@ HLE(00266CB0, 3) {
 
 // shaders
 
+// D3DDevice_CreateVertexShader(declaration, function, handle*, usage) (from hp2); ret 0x10. PoA's renderer init
+// (sub_00030850) assembles its skinning program with XGRPH and creates it here.
+HLE(00266A90, 4) {
+    std::lock_guard<std::recursive_mutex> lock(g_lock);
+    uint32_t decl = A(0), func = A(1), out = A(2);
+    auto vs = std::make_shared<gpu::VertexShader>();
+    if (decl) {
+        for (uint32_t i = 0; i < 1024; i++) {
+            uint32_t t = R32(decl + i * 4);
+            vs->decl.push_back(t);
+            if (t == 0xFFFFFFFF) break;
+        }
+    }
+    if (func) {
+        uint32_t hdr = R32(func);
+        vs->program_type = hdr & 0xFFFF;
+        uint32_t n = hdr >> 16;
+        for (uint32_t i = 0; i < n * 4; i++) vs->program.push_back(R32(func + 4 + i * 4));
+    }
+    gpu::ParseDeclaration(*vs);
+    uint32_t rec = mem::AllocSystem(16, 16);
+    vs->handle = rec | 1;
+    g_vs[vs->handle] = vs;
+    W32(out, vs->handle);
+    LOG_FIRST(64, "d3d: vertex shader %08X, %zu decl tokens, %zu instructions, type %X", vs->handle, vs->decl.size(),
+              vs->program.size() / 4, vs->program_type);
+    return 0;
+}
+
 // D3DDevice_SetVertexShader(handle)
 HLE(00267090, 1) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
@@ -1056,6 +1087,14 @@ void VsConstants(uint32_t reg, uint32_t src, uint32_t count) {
     }
 }
 }  // namespace
+
+// D3DDevice_SetVertexShaderConstantNotInlineFast(register, data, dwords), __fastcall (ecx, edx); ret 4. In 5849 it
+// only pushes NV097 0x1EA4 (constant load: ecx, the hardware register) and the data; no memory mirror as in 5028.
+HLE(00266BD0, 1) {
+    std::lock_guard<std::recursive_mutex> lock(g_lock);
+    VsConstants(g_ecx, g_edx, A(0) / 4);
+    return 0;
+}
 
 // D3DDevice_LoadVertexShader(handle, address)
 HLE(00266D40, 2) {

@@ -299,3 +299,13 @@ kRsStencilFail) and push NV097 0x32C (stencil test enable) / 0x370 (stencil op f
 0x1710 (vertex cache invalidate). CreatePixelShader, SetPixelShaderConstant, GetRenderTarget2 and IsFencePending
 stay disabled (found by neither source, and no title push goes through them). Coverage now: D3D 2 gaps (Task 6),
 DSOUND 12.
+
+**Vertex shaders (Task 6).** CreateVertexShader 0x00266A90 (`ret 0x10`) and SetVertexShaderConstantNotInlineFast
+0x00266BD0 (`__fastcall`, `ret 4`) get hp2's HLE. PoA facts, from its D3D code: `m_VertexShader` is still device
++0x794 (SetVertexShader 0x00267090 stores the handle there, and +0x798 / +0x79C after it); XDK 5849's
+NotInlineFast keeps no constant mirror in memory (5028's, hp2 0x0013F7D0, does): it only pushes NV097 0x1EA4 with
+ecx (the hardware register) and the data, so `VsConstants` writes only the renderer's copy. SetVertexShaderConstant1
+/ 4 are not title-called. Run (2026-10-30, `RECOMP_HLE_DSOUND=1`): `d3d: vertex shader 01303381, 7 decl tokens, 59
+instructions, type 2078` at renderer init, no unknown handle. Begin/End immediate mode: only `sub_00049A70` and its
+neighbour (both called from `sub_0004A3C0`) use it, two quads each after SetRenderTarget and SetVertexShader: a
+screen-space effect pass, not the menus. D3D coverage: 1 gap (SetVertexData4f).
