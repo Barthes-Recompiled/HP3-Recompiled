@@ -410,8 +410,11 @@ void xbox_kernel_init(void)
         const char* dl = getenv("RECOMP_DEBUG_LOGS");
         g_log_off = dl && strcmp(dl, "0") == 0;
     }
-    if (!g_log_off)
-        g_log_file = fopen("xbox_kernel.log", "w");
+    if (!g_log_off) {
+        /* XBOX_KERNEL_LOG names the file (a launcher keeping one log per run; from hp2_recomp) */
+        const char* log_path = getenv("XBOX_KERNEL_LOG");
+        g_log_file = fopen(log_path && *log_path ? log_path : "xbox_kernel.log", "w");
+    }
 
     /* Set log level from environment variable if present */
     const char* log_env = getenv("XBOX_LOG_LEVEL");

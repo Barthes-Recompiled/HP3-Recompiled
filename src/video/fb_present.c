@@ -337,6 +337,14 @@ static LRESULT CALLBACK fb_wndproc(HWND h, UINT m, WPARAM w, LPARAM l)
             s_key_down[w] = 0;
         return m == WM_SYSKEYUP ? DefWindowProcA(h, m, w, l) : 0;
 
+    /* F10 or a bare Alt released: DefWindowProc puts the window in menu mode, a modal loop that holds this thread --
+     * the presenter with it, so the whole title stops -- until the next key or click. Alt+Space (l = ' ') still opens
+     * the system menu. (from hp2_recomp) */
+    case WM_SYSCOMMAND:
+        if ((w & 0xFFF0) == SC_KEYMENU && l == 0)
+            return 0;
+        break;
+
     /* Alt-tabbing away with a key held would leave it held for ever. */
     case WM_KILLFOCUS:
         memset((void *)s_key_down, 0, sizeof s_key_down);

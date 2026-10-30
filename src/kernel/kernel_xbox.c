@@ -267,6 +267,20 @@ NTSTATUS __stdcall xbox_ExQueryNonVolatileSetting(
         }
         break;
 
+    case XC_FACTORY_AV_REGION:
+        /* The console's video standard and refresh, the same word the AVPACK
+         * query carries (standard in 0x0000FF00, refresh in 0x00C00000):
+         * NTSC-M 60 Hz, to match AvSendTVEncoderOption. XGetVideoStandard
+         * reads this; unhandled, it returned 0 and a title timing its frames
+         * by the standard (HP: Prisoner of Azkaban, 25 fps PAL vs 30 fps NTSC)
+         * fell back to its PAL rate on an NTSC disc. (from hp2_recomp) */
+        if (ValueLength >= sizeof(ULONG)) {
+            *(PULONG)Value = (AV_STANDARD_NTSC_M << AV_STANDARD_SHIFT) | AV_REFRESH_60Hz;
+            if (Type) *Type = 4;
+            if (ResultLength) *ResultLength = sizeof(ULONG);
+        }
+        break;
+
     /* The console's time zone, as its dashboard stores it - here the PC's own (Windows' time zone settings), so the
      * title's local time (XAPI's GetLocalTime/FileTimeToLocalFileTime: the UTC clock, KeQuerySystemTime, less these
      * biases, daylight saving by these dates) is the PC's. Was a fixed -300 for XC_TIMEZONE_BIAS, meant as US Eastern

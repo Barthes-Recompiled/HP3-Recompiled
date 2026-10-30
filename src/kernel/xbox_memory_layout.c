@@ -2960,15 +2960,16 @@ static SRWLOCK g_heap_lock = SRWLOCK_INIT;
  * Reuse below hands a whole freed block to whatever asks next, however small,
  * and freeing skips over the empty slots that merging leaves behind, so a
  * title that allocates and frees a lot drains the heap far faster than it
- * uses it. Fixing that changes which address every later allocation gets, in
- * every title that ever frees, so it is off unless asked for. Read once: the
- * heap is hit constantly and the answer does not change. */
+ * uses it. On by default since 2026-10-24, as the console gives memory back:
+ * without it HP:CoS's RtlHeap failed to decommit and retried ~38k times a
+ * session, where the console decommits once (checked over xbdm).
+ * RECOMP_HEAP_RECLAIM=0 turns it off; it changes which address every later
+ * allocation gets. Read once: the heap is hit constantly and the answer does
+ * not change. */
 int xbox_HeapReclaimEnabled(void)
 {
     static int on = -1;
     if (on < 0) {
-        /* on unless RECOMP_HEAP_RECLAIM=0: the console gives memory back
-         * (xboxrecomp default since 2026-10-24) */
         const char *e = getenv("RECOMP_HEAP_RECLAIM");
         on = !(e && *e == '0');
     }
