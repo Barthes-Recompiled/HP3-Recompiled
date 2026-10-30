@@ -117,7 +117,7 @@ Graphics
     Resolution           the window's size, or the fullscreen mode; Desktop
                          uses the monitor's own
     Vsync                waits for the monitor's refresh (no tearing)
-    Frame rate           the game's rate (60 fps), 30 fps, or Unlocked
+    Frame rate           the game's rate (30 fps, as on the Xbox) or 30 fps; 60 fps needs more work
                          (experimental: the game was made for 60, some timing
                          may misbehave)
   Resolution

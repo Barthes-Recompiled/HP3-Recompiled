@@ -14,13 +14,13 @@ namespace app {
 enum class DisplayMode : uint32_t { Windowed, Borderless, Fullscreen };  // as xboxrecomp's XBOX_DISPLAY_*
 enum class AspectMode : uint32_t { Standard, Wide, Stretch };            // 4:3, 16:9, stretch
 constexpr uint32_t kFpsUnlocked = 1000;  // fps_limit 'unlocked' (experimental): Swap and vblank waits do not wait
-// fps_limit's choices (settings, F10 panel, launcher): 0 the game's own rate (59.94, the vblank grid), 30, caps above
-// the console's rate (paced by a high-resolution timer, hle_d3d8.cpp Pace), unlocked. The game's logic steps at a
-// fixed 25 Hz on its own clock whatever the frame rate, so a cap above 60 only draws more frames.
-inline constexpr uint32_t kFpsChoices[] = {0, 30, 120, 144, 165, 240, kFpsUnlocked};
-inline const char* const kFpsChoiceNames[] = {"Game's rate (60 fps)", "30 fps", "120 fps", "144 fps",
-                                             "165 fps", "240 fps", "Unlocked"};
-constexpr uint32_t kFpsChoiceCount = 7;
+// fps_limit's choices (settings, F10 panel, launcher): 0 the game's own rate, 30. PoA steps its logic once a frame and
+// asks for D3DPRESENT_INTERVAL_TWO_OR_IMMEDIATE, so its own rate is the console's 30 fps; the caps above 60 and
+// unlocked (Pace's host-clock paths) would skip that interval and run the game 2-4x fast, so they are not offered
+// until the 60 fps decoupling plan lands, and old settings files asking for them get the game's rate (app.cpp).
+inline constexpr uint32_t kFpsChoices[] = {0, 30};
+inline const char* const kFpsChoiceNames[] = {"Game's rate (30 fps)", "30 fps"};
+constexpr uint32_t kFpsChoiceCount = 2;
 inline int FpsChoice(uint32_t v) {
     for (uint32_t i = 0; i < kFpsChoiceCount; i++)
         if (kFpsChoices[i] == v) return int(i);

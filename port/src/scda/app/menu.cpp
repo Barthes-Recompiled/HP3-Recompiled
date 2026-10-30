@@ -345,9 +345,6 @@ void DrawPanel(bool start) {
         s.fps_limit = kFpsChoices[fl];
         Changed();
     }
-    if (s.fps_limit > 60)
-        ImGui::TextDisabled("Draws more frames than the Xbox did; the game itself still steps 25 times a second. "
-                            "With vsync on, the monitor's rate caps it.");
 
     Row("Resolution");
     int ir = IndexOf(kInternalValues, s.internal_height);

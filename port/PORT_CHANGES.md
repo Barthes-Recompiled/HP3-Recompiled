@@ -16,7 +16,7 @@ checked against PoA yet (the game has not run; docs/bringup.md).
 | Game clock: XAPI's QueryPerformanceCounter (rdtsc) answered by the host, scaled while a cutscene fast-forwards (never yet for PoA: no cutscene state found) | `src/hle_skip.c` over `sub_00195129` (the matched QPC) | `cutscene_skip = false` / `RECOMP_CUTSCENE_SKIP=0` | anything timed by the game clock |
 | Stick radial range compensation | input path | `RECOMP_STICK_RANGE` | walk/run thresholds, all stick input |
 | Settings: fps, keyboard/mouse, colour-blind, controller | `src/scda/app`, launcher | per setting | timing, input |
-| Frame-rate caps above 60 (120/144/165/240): Swap paced by a high-resolution waitable timer, BlockUntilVerticalBlank does not wait. Whether PoA's logic is frame-locked is not known yet (it picks 25/30 fps from the video standard) | `scda/xdk/hle_d3d8.cpp` `PaceAbove`, `scda/app`, launcher | `fps_limit = 0` (the game's rate) | game speed if PoA steps logic per frame |
+| Frame-rate caps above 60 and unlocked: **not offered for PoA** (M3). PoA steps its logic once a frame at its 30 fps presentation interval, so those paths (`PaceAbove`, which skips the interval) ran it 2-4x fast; old settings asking for them get the game's rate. The pacing code stays for the 60 fps decoupling plan | `scda/xdk/hle_d3d8.cpp` `PaceAbove`, `scda/app`, launcher | `fps_limit = 0` (the game's rate, 30 fps) | none: choices are the game's rate and 30 |
 
 ## Camera / 16:9
 

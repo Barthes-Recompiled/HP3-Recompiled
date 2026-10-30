@@ -193,10 +193,10 @@ bool Parse(Settings& s, const Entry& e, std::string v) {
             }
             return false;
         case Kind::Fps:
-            if (!_stricmp(v.c_str(), "unlocked")) return U(s, e) = kFpsUnlocked, true;
             for (uint32_t c : kFpsChoices)
-                if (c != kFpsUnlocked && v == std::to_string(c)) return U(s, e) = c, true;
-            if (v == "60") return U(s, e) = 0, true;  // the game's own rate
+                if (v == std::to_string(c)) return U(s, e) = c, true;
+            // the game's own rate; also caps above 60 and unlocked, which would run PoA fast (app.h kFpsChoices)
+            if (v == "60" || !_stricmp(v.c_str(), "unlocked") || std::atoi(v.c_str()) > 60) return U(s, e) = 0, true;
             return false;
         case Kind::ColorBlind:
             for (uint32_t i = 0; i < 4; i++) {
