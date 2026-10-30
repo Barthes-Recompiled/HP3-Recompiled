@@ -78,7 +78,7 @@ struct Settings {
     bool show_launcher = true;         // xboxrecomp: hppoa_launcher.exe shows its page; false starts the game straight away (Shift shows it)
     bool start_menu = false;           // xboxrecomp: the settings page before the game starts (RECOMP_START_MENU); hppoa_launcher.exe is the usual way
     // xboxrecomp: frame rate, accessibility and controls (input.cpp, the final pass)
-    uint32_t fps_limit = 0;            // kFpsChoices: 0 the game's own rate, 30: two vblanks a frame at least, 60 one, 120..240 a cap, kFpsUnlocked none
+    uint32_t fps_limit = 60;           // default 60 (Austin, 2026-10-30); kFpsChoices: 0 the game's own rate (30), 30: two vblanks a frame at least, 60 one, 120..240 a cap, kFpsUnlocked none
     uint32_t colorblind = 0;           // ColorBlind: correction filter over the finished frame
     uint32_t colorblind_strength = 100;  // 0 to 100 %
     uint32_t speakers = 2;             // xboxrecomp: 2 stereo, 6 5.1 surround (hle_dsound.c, at start)
