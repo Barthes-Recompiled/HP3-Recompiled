@@ -99,9 +99,9 @@ def main(argv=None):
     r = match_functions(donor, addrs, dstarts, target, load_starts(a.target_functions))
     out = {
         "donor_sha1": donor.sha1, "target_sha1": target.sha1,
-        "counts": {"names": len(names), "donor_functions": len(addrs), "matched": len(r["matched"]), "anchored": len(r["anchored"]),
+        "counts": {"names": len(names), "donor_functions": len(addrs), "matched": len(r["matched"]), "anchored": len(r["anchored"]), "callee": len(r["callee"]),
                    "unmatched": len(r["unmatched"]), "not_donor_functions": len(names) - len(addrs)},
-        "matched": {"0x%08X" % d: {"to": "0x%08X" % t, "name": addrs[d], "how": "anchored" if d in r["anchored"] else "unique"}
+        "matched": {"0x%08X" % d: {"to": "0x%08X" % t, "name": addrs[d], "how": "anchored" if d in r["anchored"] else "callee" if d in r["callee"] else "unique"}
                     for d, t in sorted(r["matched"].items())},
         "unmatched": {"0x%08X" % d: {"why": w, "name": addrs[d]} for d, w in sorted(r["unmatched"].items())},
         "not_donor_functions": ["0x%08X" % x for x in sorted(set(names) - set(addrs))],
@@ -110,8 +110,8 @@ def main(argv=None):
     with open(a.out, "w") as f:
         json.dump(out, f, indent=1)
     c = out["counts"]
-    print("xdk_port: %d of %d donor functions matched (%d by a neighbour), %d unmatched (%d names were not donor"
-          " functions) -> %s" % (c["matched"], c["donor_functions"], c["anchored"], c["unmatched"],
+    print("xdk_port: %d of %d donor functions matched (%d by a neighbour, %d by callees), %d unmatched (%d names were not donor"
+          " functions) -> %s" % (c["matched"], c["donor_functions"], c["anchored"], c["callee"], c["unmatched"],
                                  c["not_donor_functions"], a.out))
     return 0
 

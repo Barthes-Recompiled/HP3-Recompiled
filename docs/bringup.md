@@ -209,3 +209,214 @@ Static evidence (call sites in the title's code), not observed execution.
   planar YUV to YUY2 with MMX (`sub_0005D3C0`) and drawn as a textured quad with D3D's YUV path. Six movies:
   `attract`, `eac_usa`, `filmus`, `gallery`, `intro`, `wb` (`eac_usa`, `wb`, `intro` are the start-up skip candidates).
 - **Debug menu:** see docs/re-notes.md.
+
+## M2 runs
+
+Test folder `Harry Potter Xbox Decomps\test\PoA_USA` (exes, `game` junction, `hppoa.toml` with `debug_logs = true`,
+`debug.env` holding the launcher's `RECOMP_*` defaults from `launcher.cpp` StartGame plus the run's traces).
+
+**Baseline 1 (2026-10-30, m2-boot at 938f9d1, defaults: DirectSound HLE off).** Boots, reads `runtime.cfg`,
+`filesys.dat`, `data/packages/plfs/frontend-startup.pkg`, creates the D3D device (640x480, format 6, interval
+0x80000002) and opens the window, then crashes about 2 s in: `[APU] MMIO decode fail ... offset=0x2000` and an access
+violation reading 0xFE802000. That is the XDK's own DirectSound reading an APU register during DirectSoundCreate:
+guest stack 0x002BE040 <- ... <- 0x002B8761 (DSOUND) <- 0x0014ECA5 (`sub_0014EC90`, EA's audio init). The emulated
+APU cannot carry PoA's DirectSound, so the HLE is required, not optional (Task 7).
+
+**Baseline 2 (same build, `RECOMP_HLE_DSOUND=1`, the partly bound HLE).** Gets past audio init:
+`DirectSoundCreate`, `DownloadEffectsImage(13152 bytes)`, **180 `CreateStream` calls** (PCM, 1 channel, 48 kHz,
+1 packet each, same callback 0x00F7FB7C), one 6-channel buffer (SetBufferData + Play). So PoA plays through
+DirectSound *streams*, and the stream entry points and vtables (hp1's unbound IDirectSoundStream_* set,
+`STREAM_VTABLE` = 0) are on the boot path. Then: `data/gui/inkpot.ttf`, `quorumstd-medium.ttf`, `poa_base.big`,
+`poa_overlay.big`, `poa_startup_xbox.big`, the audio packages and `frontend0.sdt` / `gui_stream.sdt`, `ls_text.txt`,
+and `data/movie/eac_usa.mad` opens. One `[FRAME] 49.3 fps` line, then no more Swaps for the remaining ~70 s while
+the threads keep running (critical sections and waits in the kernel summary): it hangs in the first logo movie. No
+captures (they count from the first Swap and need 20 s of frames). First suspect: the `.mad` player paces itself on
+audio stream packets the unbound stream functions never complete.
+
+Other lines: `d3d: Begin/End immediate mode is not supported (from 00049DD4)` and `(from 00049EF8)`; hp1/hp2's
+renderer has no immediate mode (Begin/End + SetVertexData*). Missing files the console misses too (path joined
+without a separator, so not ours): `fontsfonts.ini`, `texturessymbols.xsh`, `variablesthingvars.txt`.
+Counts: 0 `MakeSpace from`, 0 `ICALL`, 0 `[CRASH]`, 0 unknown shader handles.
+
+**Static coverage (Task 2, `port/tools/check_hle_coverage.py`, run by regen.sh).** Title-called library functions
+the HLE does not replace, at m2-boot be2dd60+:
+
+- DSOUND, 12: 0x002B752F (7 callers), 0x002B754F, 0x002B756B, 0x002B75DF, 0x002B7603, 0x002B761F, 0x002B763F,
+  0x002B765B (4), 0x002B767B (3), 0x002B7A60, 0x002B7A7C, 0x002B9760. The Codex survey's unnamed set, except that
+  0x002B9760 appears and 0x002B8791 does not (not called directly from `.text`).
+- D3D, 7 that reach MakeSpace / MakeRequestedSpace / BeginStateBig: 0x00266190 (9 callers), 0x00266230 (3),
+  0x00266BD0 SetVertexShaderConstantNotInlineFast (2), 0x00268E10 (20), 0x00269050 (7), 0x00269640
+  DrawIndexedVerticesUP (1), 0x00269AC0 (32). No address-taken library functions.
+
+**Callee matching (Task 3).** Whole-library runs (every donor function in the library sections):
+hp1 -> PoA 899 of 1094 (40 anchored, 41 by callees), hp2 (CoS USA) -> PoA 554 of 944 (32 anchored, 25 by callees);
+maps `tools/xdk_port/output/lib2_hp{1,2}_to_poa.json`. Five of the "ambiguous" DirectSound buffer wrappers are
+now callee matches, each found by both donors at the same PoA address: SetLoopRegion 0x002B761F, GetStatus
+0x002B763F, SetCurrentPosition 0x002B767B, SetFrequency 0x002B7A60, SetMixBins 0x002B7A7C. Coverage gaps they
+explain: 0x002B9760 = hp1 0x001AA384 (both donors), 0x002B765B = hp2 0x00145337. D3D gaps: 0x00269AC0 (32 callers)
+= hp2's **D3DDevice_SetVertexData4f** (unique), so PoA draws a lot in Begin/End immediate mode, which the renderer
+lacks; 0x00268E10 = hp1 0x00197BC0 / hp2 0x00132E50 (unique in both, unnamed). The IDirectSoundStream methods and
+the other unnamed DirectSound entries are still unmatched.
+
+**XbSymbolDatabase signatures (Task 4, `tools/xdk_port/oovpa.py`, map `tools/xdk_port/output/oovpa_poa.json`).**
+104 D3D8, 72 DSOUND, 37 XAPILIB symbols in PoA. Against the body-match maps: 73 names agree, none differ (nine
+apparent differences were names misread from source comments: SetTransform, Lock2DSurface, ZBias, ...). Names for
+the coverage gaps:
+
+| PoA | Signature name | Body match |
+|---|---|---|
+| 0x002B752F | IDirectSound_SetMixBinHeadroom | - |
+| 0x002B754F | IDirectSoundBuffer_SetEG | - |
+| 0x002B756B | IDirectSoundBuffer_SetFilter | - |
+| 0x002B75DF | IDirectSoundBuffer_PauseEx | - |
+| 0x002B7603 | IDirectSoundBuffer_Pause | - |
+| 0x002B761F | IDirectSoundBuffer_SetLoopRegion | callee (hp1 and hp2) |
+| 0x002B763F | IDirectSoundBuffer_GetStatus | callee (hp1 and hp2) |
+| 0x002B765B | IDirectSoundBuffer_GetCurrentPosition | callee (hp2) |
+| 0x002B767B | IDirectSoundBuffer_SetCurrentPosition | callee (hp1 and hp2) |
+| 0x002B7A60 | IDirectSoundBuffer_SetFrequency | callee (hp1 and hp2) |
+| 0x002B7A7C | IDirectSoundBuffer_SetMixBins | callee (hp1 and hp2) |
+| 0x002B9760 | - | hp1 0x001AA384, hp2 (callee / anchored) |
+| 0x002B8791 | DirectSoundCreateBuffer | - |
+| 0x00269050 | D3DDevice_Clear | - |
+| 0x00268E10 | D3DVertexBuffer_Lock2 | unique (hp1 0x00197BC0, hp2 0x00132E50) |
+| 0x00266BD0 | D3DDevice_SetVertexShaderConstantNotInlineFast | unique (hp2) |
+| 0x00269640 | D3DDevice_DrawIndexedVerticesUP | - |
+| 0x00269AC0 | D3DDevice_SetVertexData4f | unique (hp2) |
+| 0x00266190, 0x00266230 | - | - |
+
+Also found: D3DDevice_CreateVertexShader 0x00266A90, SetVertexData2f 0x00269A80, Begin 0x00269B20, End 0x00269B60,
+XapiInitProcess 0x000117AB, DirectSoundCreate 0x002B874A, IDirectSound_CreateSoundBuffer 0x002B8560. Not found by
+either source: CreatePixelShader, SetPixelShaderConstant, GetRenderTarget2, IsFencePending,
+GetDisplayFieldStatus, GetOverlayUpdateStatus, SetVertexShaderConstant1/4 (none of them title-called), and the
+IDirectSoundStream / CDirectSoundStream methods.
+
+**D3D bound (Task 5).** D3DDevice_Clear -> 0x00269050 (XbSymbolDatabase; `ret 0x18`); hp1's two "unnamed"
+COMPLEX_STATE entries are SetRenderState_StencilEnable 0x00266190 and SetRenderState_StencilFail 0x00266230, by
+their bodies: they store D3D__RenderState[144] / [145] (0x275F90 / 0x275F94, the renderer's kRsStencilEnable /
+kRsStencilFail) and push NV097 0x32C (stencil test enable) / 0x370 (stencil op fail). DrawIndexedVerticesUP
+0x00269640 (`ret 0x14`) gets hp2's HLE. D3DVertexBuffer_Lock2 0x00268E10 is allowlisted: its one push is NV097
+0x1710 (vertex cache invalidate). CreatePixelShader, SetPixelShaderConstant, GetRenderTarget2 and IsFencePending
+stay disabled (found by neither source, and no title push goes through them). Coverage now: D3D 2 gaps (Task 6),
+DSOUND 12.
+
+**Vertex shaders (Task 6).** CreateVertexShader 0x00266A90 (`ret 0x10`) and SetVertexShaderConstantNotInlineFast
+0x00266BD0 (`__fastcall`, `ret 4`) get hp2's HLE. PoA facts, from its D3D code: `m_VertexShader` is still device
++0x794 (SetVertexShader 0x00267090 stores the handle there, and +0x798 / +0x79C after it); XDK 5849's
+NotInlineFast keeps no constant mirror in memory (5028's, hp2 0x0013F7D0, does): it only pushes NV097 0x1EA4 with
+ecx (the hardware register) and the data, so `VsConstants` writes only the renderer's copy. SetVertexShaderConstant1
+/ 4 are not title-called. Run (2026-10-30, `RECOMP_HLE_DSOUND=1`): `d3d: vertex shader 01303381, 7 decl tokens, 59
+instructions, type 2078` at renderer init, no unknown handle. Begin/End immediate mode: only `sub_00049A70` and its
+neighbour (both called from `sub_0004A3C0`) use it, two quads each after SetRenderTarget and SetVertexShader: a
+screen-space effect pass, not the menus. D3D coverage: 1 gap (SetVertexData4f).
+
+**DirectSound bound (Task 7, steps 1-2).** The M1 binding of 0x002B8791 as DirectSoundCreateStream was wrong: it is
+DirectSoundCreateBuffer (XbSymbolDatabase). hp1's CreateStream 0x001A89E9 is the same bytes but calls
+CDirectSound::CreateSoundStream, while PoA's calls 0x002B83A1, which is hp1's CDirectSound::CreateSoundBuffer
+0x001A8462 (body match) and XbSymbolDatabase's CDirectSound_CreateSoundBuffer. That explains baseline 2's 180
+"CreateStream" lines with a callback on the stack (0x00F7FB7C): buffer descriptions read as stream ones.
+`tools/xdk_port` now drops any match, unique ones too, whose calls contradict its donor's mapped callees, or whose
+callee is already another donor function's match (`callee-conflict`; hp1 known answer still 184/190 with 0 wrong;
+hp1 -> PoA drops 0x001A89E9, 0x001A6FF0, 0x001AACA4; no bound override lost its evidence). PoA creates no streams,
+so `STREAM_VTABLE` stays 0. Bound: SetLoopRegion 0x002B761F, GetStatus 0x002B763F, SetCurrentPosition 0x002B767B,
+SetFrequency 0x002B7A60, SetMixBins 0x002B7A7C (callee match by both donors + signature), GetCurrentPosition
+0x002B765B (hp2's handler), Pause 0x002B7603, PauseEx 0x002B75DF, SetFilter 0x002B756B and SetEG 0x002B754F (not
+reproduced, S_OK), IDirectSound_SetMixBinHeadroom 0x002B752F (S_OK), DirectSoundCreateBuffer 0x002B8791; each
+`ret n` checked. 0x002B9760 (CMcpxAPU's scalar deleting destructor, only reached through the vtable thunk
+`sub_002223E0`) is allowlisted. `check_hle_coverage.py --section DSOUND --strict` passes. Not yet run; the HLE is
+still off by default (steps 3-4).
+
+**DirectSound run (Task 7, step 3; 2026-10-30, m2-boot at 2c303b8, `RECOMP_HLE_DSOUND=1 RECOMP_DSOUND_TRACE=1
+RECOMP_DSOUND_WAV`, 90 s, no pad).** The logo-movie hang is gone: `eac_usa.mad`, `wb.mad`, `poa_legal_eng.big`,
+`intro.mad`, then `poa_transitional.big` and `poa_fe_eng.big` (the front end) about 65 s in; Swaps never stop
+(41-60 fps during the movies, 59-60 fps after). Trace: DirectSoundCreate, DownloadEffectsImage, 181
+CreateSoundBuffer (180 mono with SetEG + SetMixBins, never played: the front end's sound effects; one 6-channel buffer
+with SetBufferData + Play, then refilled by polling GetCurrentPosition, 8424 calls: the movie audio), 0 FALLBACK.
+The recorded mix (85 s) has RMS 3297 and changes like real audio through the logos and intro (5 s windows: RMS
+300-6000, zero crossings 270-1600 Hz, nothing clipped), and is silent from the front end on (65-85 s). Counts: 0
+`MakeSpace from`, 0 `ICALL`, 0 `[CRASH]`, 0 unknown handle; the two `Begin/End immediate mode` lines as before.
+**Open (Task 9):** all four captures (20/40/60/80 s, two in the intro, one after the front end loads) hold a single
+draw, a 640x480 screen-space quad (FVF 0x144, diffuse 0xFF7F7F7F, alpha blend, no texture listed, fixed-function
+pixel stage), and the final picture is flat white (254,254,254): no movie picture and no front end, and no music on
+the front end. The deferred Task 5/6 checks (cleared frames, skinned draws) are still open with it.
+
+**Display timing and XAPI (Task 8).** The CDevice vblank fields are where 5659 has them: PoA's
+BlockUntilVerticalBlank 0x00267470 is instruction for instruction hp1's 0x00192090 (waits on the KEVENT at device
++0x1DBC after clearing its SignalState +0x1DC0), and VBlankCount +0x1DE8 is written only by the vblank interrupt
+handler 0x00269C90 (hp1 0x0019DA10, unique match; it increments the count when the interrupt's field bit says so).
+Nothing in PoA reads +0x1DE8 and nothing touches +0x1DB8: SetVerticalBlankCallback, GetDisplayFieldStatus and
+GetOverlayUpdateStatus are not linked into this XBE, so their overrides stay disabled (comments say why) and
+`kDevVBlankCallback` stays 0x1DB8. The HLE's Swap paces on the runtime's vblank count, which Task 7's run showed at
+59-60 fps on the front end. **XAPI:** PoA's XapiInitProcess 0x000117AB (XDK 5849) has no disc authentication.
+Where hp1's calls 0x00155251 right after storing a result to a global (hp1 0x374F74, PoA 0x3CB6D4), PoA maps
+`\Device\Harddisk0\partition1\` (sub_0001179A on the ANSI_STRING at 0x2F9BC8), then checks the cache drive
+(sub_000116E0), the utility drive (sub_00012BCD) and a version (sub_00012869), each failing to XapiBootToDash
+0x00011735. hp1's auth chain (0x0015519A, 0x00155251) has no PoA match, and Task 7's run never booted to the
+dashboard (no XLaunchNewImage / HalReturnToFirmware) and mapped partition1, TDATA and UDATA. hle_xapi.c's override
+stays disabled with that note.
+
+**Boot fix 1 (Task 9): flat-white frames = copy swaps (2026-10-30).** Cause, from captures that name each draw's
+caller (new `from` field in frame.txt): every present goes through the engine's `sub_000345B0`: BlockOnFence,
+**Swap(2)** (D3DSWAP_BYPASSCOPY), `sub_00034110` (a full-screen quad, FVF 0x144, texcoords 0..640 x 0..480, diffuse
+0x7F7F7F with MODULATE2X: the back buffer copied 1:1), **Swap(4)** (FINISH), InsertFence. The title creates its
+device with `MultiSampleType 0x11, SwapEffect 3` (D3DSWAPEFFECT_COPY), so XDK 5849's CDevice::Init (0x0026B380)
+sets device +8 bit 0x4000 and Swap (0x0026A610) takes its copy path, `sub_0026A2D0`: COPY/BYPASSCOPY count the swap
+and save the target, depth and textures (`sub_0026A050`); BYPASSCOPY then sets the front buffer (+0x1A18) as the
+render target with no depth and the back buffer (+0x1A14) as texture 0, stages 1-3 empty; FINISH (`sub_0026A0E0`)
+restores them and flips to the front buffer. The HLE Swap presented and rotated on every call, so Swap(2) showed the
+movie frame and Swap(4) showed the copy quad drawn with no texture (white). The HLE now does the same: copy swaps
+when the parameters ask for them, BYPASSCOPY binds and FINISH restores and shows the front buffer, flipping swaps do
+nothing until FINISH. Run 9 (45 s): each frame is the movie quads into the back buffer (0207C000) plus the copy
+quad into the front buffer (01F50000) with `t0 8207C000 fmt 12 640x480 target`; the captures at 15/26/37 s show the
+intro movie (train on the viaduct, a Dementor's hand, the snow scene); 59-60 fps. One earlier run of this build
+(run 7, with `RECOMP_DSOUND_WAV`) stopped logging ~2 s in and would not exit for minutes; not reproduced in runs 8-9
+(gdb stacks of run 8 showed nothing blocked). Watch for it in the done run.
+
+**Done run (Task 9, 2026-10-30, m2-boot at 73ddeb7, 180 s, launcher defaults + `RECOMP_D3D_TRACE`,
+`RECOMP_CAPTURE_AFTER=10:10:17`, `RECOMP_DSOUND_WAV`; nothing pressed, though a pad was connected).** The log
+grew steadily the whole run (no repeat of run 7's stall). Sequence: `eac_usa.mad`, `wb.mad`, `poa_legal_eng.big`,
+`intro.mad`, then `poa_transitional.big` / `poa_fe_eng.big` (about 60 s in): the title screen ("Harry Potter and
+the Prisoner of Azkaban", "Press START") in the 60 s and 70 s captures; after its idle timeout `attract.mad` plays
+(captures 80-130 s: Harry in bed, a spell flash, the Knight Bus / Patronus scenes, Ron with the Monster Book, a
+library troll, Harry) and returns to the title (140 s, 150 s), then attract again (160-170 s). The 10 s capture is
+black (between logos). 59-60 fps outside movie starts. Counts: 0 `MakeSpace from`, 0 `ICALL`, 0 `[CRASH]`, 0
+unknown handle, 0 DSOUND FALLBACK. Audio RMS per 10 s: 950-5500 through the logos, intro and attract, **0 on the
+title screen** (60 s and 140 s windows): whether the console's title screen has music is for the user check (Task
+11). `check_hle_coverage.py --strict --section D3D --section DSOUND`: DSOUND 0, D3D 1 gap, SetVertexData4f
+0x00269AC0. Its only Begin/End use ran exactly twice in the run, both at start-up before the first movie
+(`sub_00049A70` and its neighbour from `sub_0004A3C0`: SetRenderTarget, then two immediate-mode quads), so nothing on
+the boot path to the title is drawn through it; what that start-up pass renders (and whether a level samples it) is
+an M3 item, with immediate mode in the renderer.
+
+**Boot fix 2 (Task 9): the stall at the first movie = a lost KTIMER expiry (static analysis, 2026-10-30).** The movie
+loop at 0x0005E6E4 (`sub_0005E6D0`) spins on the timer-callback dispatcher `sub_00147BC0`, which runs callbacks as
+the game clock 0x3836C4 passes their due ticks; it leaves only when a callback produces work, so a clock that stops
+is an endless spin with no kernel calls (no log output), as runs 7, 8 and 11 show. The clock: engine init
+(`sub_001A6D30` -> `sub_001A8AB0` -> `sub_00222C40(rate)`) starts a tick thread `sub_00222B10` that waits on the NT
+event at 0x3C2C58 and increments 0x3836C0 / 0x3836C4; the event is set (`sub_00222570`, NtSetEvent) by the callback
+`sub_00222B90`, which re-arms itself each time through XAPI's `timeSetEvent` (0x00247768, the only caller) with a
+1 ms relative delay (its floor, 0x00222C03). XAPI's timer service thread (0x00247580) keeps 63 KTIMERs (type 1),
+waits on them and a control KEVENT with KeWaitForMultipleObjects, and runs the callback on itself; `timeSetEvent`
+arms one KTIMER (KeSetTimerEx, due = -delay x 10000 via `_allmul` `sub_0013E2B0`) and sets the control event. The
+runtime's KeSetTimerEx (`kernel_set_timer`) armed the slot under its timer lock but reset the timer's shadow event
+after dropping it; its timer thread (1 ms loop, due times in GetTickCount64 steps of ~15.6 ms, pinned to the guest
+core like every guest thread) could fire the timer in between, and the late ResetEvent erased the expiry of a
+one-shot whose slot was already free: the timer never fires again, XAPI's thread and the tick thread wait forever.
+The window is a whole scheduler quantum when the arming thread is preempted there, which is what happens once the
+main thread starts busy-spinning in the movie loop on the same core: hence the first movie. gdb of run 8 matches:
+tick thread in NtWaitForSingleObjectEx (`sub_00222580`), XAPI timer thread in KeWaitForMultipleObjects, the runtime
+timer thread idle in Sleep(1), main thread in `sub_00147BC0` under `sub_001AC0A0`. Ruled out: the 32-entry armed
+timer table overflowing (one timeSetEvent caller, two KeSetTimerEx sites), the 4096-entry shadow table, NtPulseEvent
+(the tick event is set, not pulsed), a timer restart per movie (start/stop only at engine init/shutdown). Fix
+(3e7e884, toolkit `src/kernel/kernel_bridge.c`): reset + arm in one step under the lock, and an expiry signals under
+the lock before its DPC (KiTimerExpiration's order). To confirm with runs once the PC is free.
+
+**Confirmation runs conf1-conf6 (2026-10-30 12:2x, exe CF685B849B99 = 3e7e884, test\PoA_USA).** conf1-conf5 all
+pass the first movie: each log opens `eac_usa.mad`, `wb.mad`, `poa_legal_eng.big`, `intro` and has `[FRAME]` lines,
+no stall. conf6 stopped during startup at 12:26:55, before any movie (the session driving it ended; no Windows
+Application Error for hppoa). 5/5 clean vs 3/7 stalled before the fix (chance of 5 clean in a row at the old rate
+~6%): the lost-KTIMER fix is confirmed.
+
+**Task 11 user check (2026-10-30, exe CF685B849B99, test\PoA_USA).** The user ran it and confirmed that logos,
+title, front-end menu, menu sounds and music work. Not answered: whether the console's title screen is also silent,
+and whether the `debug_menu` setting lets a title-screen button open the debug menu (both carried to M3).

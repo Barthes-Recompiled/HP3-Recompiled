@@ -16,7 +16,8 @@
  * XbSymbolDatabase, argument counts from each function's `ret n`.
  *
  * Every entry point keeps the generated XDK body as sub_X_gen, so
- * RECOMP_HLE_DSOUND=0 runs the original DirectSound on the emulated APU.
+ * RECOMP_HLE_DSOUND=0 runs the original DirectSound on the emulated APU (for
+ * PoA, XDK 5849, that crashes at init; the HLE is on by default).
  * RECOMP_DSOUND_TRACE=1 logs the calls.
  *
  * Built into the recompile with --exclude-manual pointing at this file.
@@ -49,7 +50,7 @@ void xbox_HeapFree(uint32_t xbox_va);
 
 /* ── Guest addresses (XDK 5659 DSOUND in this XBE) ───────────────────────── */
 
-#define STREAM_VTABLE   0x00000000u  /* CDirectSoundStream, XMediaObject part: PoA's not found yet (hp1 0x0020F098) */
+#define STREAM_VTABLE   0x00000000u  /* CDirectSoundStream, XMediaObject part: unused, PoA creates no streams (hp1 0x0020F098) */
 #define STREAM_VTABLE2  0x00000000u  /* its second base, at object + 4 (hp1 0x0020F08C) */
 
 #define S_OK_           0x00000000u
@@ -75,9 +76,9 @@ static int hle_on(void)
     if (g_hle < 0) {
         const char *e = getenv("RECOMP_HLE_DSOUND");
         const char *t = getenv("RECOMP_DSOUND_TRACE");
-        /* PoA: off unless RECOMP_HLE_DSOUND=1 until every entry point is bound (docs/bringup.md): part host
-         * mixer, part XDK DirectSound would share voices between the two */
-        g_hle = e && *e == '1';
+        /* On unless RECOMP_HLE_DSOUND=0. PoA's own DirectSound crashes on the emulated APU at DirectSoundCreate
+         * (docs/bringup.md, M2 baseline 1), so =0 is only for comparing the two at init. */
+        g_hle = !(e && *e == '0');
         g_trace = t && *t && *t != '0';
         fprintf(stderr, "[DSOUND] %s\n", g_hle ? "host mixer (HLE)" : "XDK DirectSound on the emulated APU");
     }
@@ -860,6 +861,11 @@ void sub_001A87B8(void)
 void sub_001A6DF2(void) { FALLBACK(001A6DF2); ret_stdcall(S_OK_, 1); }
 #endif
 
+/* IDirectSound_SetMixBinHeadroom(this, dwMixBin, dwHeadroom): per-bin headroom is not reproduced */
+extern void sub_002B752F_gen(void);
+// xdk_port: XbSymbolDatabase signature match; ret 0xC
+void sub_002B752F(void) { FALLBACK(002B752F); ret_stdcall(S_OK_, 3); }
+
 /* IDirectSound_SetI3DL2Listener(this, pds3dl, dwApply): no room reverb here */
 extern void sub_002B8584_gen(void);
 // xdk_port: anchored match (not a unique body): suspect this binding first (docs/bringup.md)
@@ -1005,6 +1011,32 @@ BUFFER(GetStatus)
     return S_OK_;
 }
 
+/* GetCurrentPosition(this, pdwPlayCursor, pdwWriteCursor) (from hp2, without its [AUDIO] poll statistics) */
+BUFFER(GetCurrentPosition)
+{
+    uint32_t p = bytes_of(v, (uint32_t)v->pos);
+    if (ARG(1)) MEM32(ARG(1)) = p;
+    if (ARG(2)) MEM32(ARG(2)) = v->bytes ? (p + bytes_of(v, ADPCM_FRAMES * 4)) % v->bytes : 0;
+    return S_OK_;
+}
+
+/* Pause(this, dwPause), PauseEx(this, rtTimestamp (64-bit), dwPause): DSBPAUSE_RESUME = 0, DSBPAUSE_PAUSE = 1,
+ * DSBPAUSE_SYNCHPLAYBACK = 2 (starts with the others; here at once). PauseEx's timestamp is not waited for. */
+BUFFER(Pause)
+{
+    v->paused = ARG(1) == 1;
+    return S_OK_;
+}
+BUFFER(PauseEx)
+{
+    v->paused = ARG(3) == 1;
+    return S_OK_;
+}
+
+/* SetFilter(this, pFilterDesc), SetEG(this, pEnvelopeDesc): the voice processor's filter and envelopes are not
+ * reproduced (as hp2's SetFilter) */
+BUFFER(Ignore) { (void)v; return S_OK_; }
+
 BUFFER(SetCurrentPosition)
 {
     v->pos = frames_of(v, ARG(1));
@@ -1106,41 +1138,11 @@ BUFFER(SetFormat)
 
 /* ── Streams: the object carries the XDK's own vtables ──────────────────── */
 
-/* DirectSoundCreateStream(pdssd, ppStream)
- * DSSTREAMDESC { dwFlags, dwMaxAttachedPackets, lpwfxFormat, lpfnCallback,
- *                lpvContext, lpMixBins } */
+/* DirectSoundCreateBuffer(pdsbd, ppBuffer). M1 bound this address as DirectSoundCreateStream: hp1's CreateStream
+ * is the same bytes calling CDirectSound::CreateSoundStream, while PoA's calls CreateSoundBuffer 0x002B83A1
+ * (XbSymbolDatabase names both; xdk_port now drops such look-alikes as callee-conflict). PoA creates no streams. */
 extern void sub_002B8791_gen(void);
-void sub_002B8791(void)
-{
-    uint32_t desc, flags;
-    Voice *v;
-    FALLBACK(002B8791);
-    desc = ARG(0);
-    flags = MEM32(desc);
-    EnterCriticalSection(&g_lock);
-    start();
-    v = new_voice(0x80);
-    if (!v) {
-        LeaveCriticalSection(&g_lock);
-        ret_stdcall(E_FAIL_, 2);
-        return;
-    }
-    MEM32(v->obj) = STREAM_VTABLE;
-    MEM32(v->obj + 4) = STREAM_VTABLE2;
-    v->stream = 1;
-    v->max_packets = MEM32(desc + 4) ? MEM32(desc + 4) : 1;
-    if (v->max_packets > MAX_PACKETS) v->max_packets = MAX_PACKETS;
-    read_format(v, MEM32(desc + 8));
-    v->callback = MEM32(desc + 12);
-    v->context = MEM32(desc + 16);
-    set_bins(v, MEM32(desc + 20));
-    v->headroom = default_headroom(flags);
-    MEM32(ARG(1)) = v->obj;
-    LeaveCriticalSection(&g_lock);
-    TRACE("CreateStream flags=%X packets=%u tag=%X ch=%u rate=%u cb=%08X -> %08X",
-          flags, v->max_packets, v->tag, v->channels, v->rate, v->callback, v->obj);
-    ret_stdcall(S_OK_, 2);
-}
+void sub_002B8791(void) { FALLBACK(002B8791); ret_stdcall(new_buffer(ARG(0), ARG(1)), 2); }
 
 /* Flush: every queued packet completes as flushed, and the stream's pending
  * callbacks go to the calling thread before the call returns. */
@@ -1305,24 +1307,24 @@ extern void sub_002B75A3_gen(void);
 void sub_002B75A3(void) { buffer_call(sub_002B75A3_gen, buf_Play, "Play", 4); }
 extern void sub_002B75C7_gen(void);
 void sub_002B75C7(void) { buffer_call(sub_002B75C7_gen, buf_Stop, "Stop", 1); }
-#if 0  /* PoA: hp1 001A6E62 has no match in PoA yet (docs/bringup.md) */
-void sub_001A6E62(void) { buffer_call(sub_001A6E62_gen, buf_SetLoopRegion, "SetLoopRegion", 3); }
-#endif
-#if 0  /* PoA: hp1 001A6E82 has no match in PoA yet (docs/bringup.md) */
-void sub_001A6E82(void) { buffer_call(sub_001A6E82_gen, buf_GetStatus, "GetStatus", 2); }
-#endif
-#if 0  /* PoA: hp1 001A6E9E has no match in PoA yet (docs/bringup.md) */
-void sub_001A6E9E(void) { buffer_call(sub_001A6E9E_gen, buf_SetCurrentPosition, "SetCurrentPosition", 2); }
-#endif
+extern void sub_002B761F_gen(void);
+// xdk_port: callee match (hp1 and hp2) and XbSymbolDatabase signature agree (docs/bringup.md)
+void sub_002B761F(void) { buffer_call(sub_002B761F_gen, buf_SetLoopRegion, "SetLoopRegion", 3); }
+extern void sub_002B763F_gen(void);
+// xdk_port: callee match (hp1 and hp2) and XbSymbolDatabase signature agree (docs/bringup.md)
+void sub_002B763F(void) { buffer_call(sub_002B763F_gen, buf_GetStatus, "GetStatus", 2); }
+extern void sub_002B767B_gen(void);
+// xdk_port: callee match (hp1 and hp2) and XbSymbolDatabase signature agree (docs/bringup.md)
+void sub_002B767B(void) { buffer_call(sub_002B767B_gen, buf_SetCurrentPosition, "SetCurrentPosition", 2); }
 extern void sub_002B7587_gen(void);
 // xdk_port: anchored match (not a unique body): suspect this binding first (docs/bringup.md)
 void sub_002B7587(void) { buffer_call(sub_002B7587_gen, buf_SetVolume, "SetVolume", 2); }
-#if 0  /* PoA: hp1 001A77EF has no match in PoA yet (docs/bringup.md) */
-void sub_001A77EF(void) { buffer_call(sub_001A77EF_gen, buf_SetFrequency, "SetFrequency", 2); }
-#endif
-#if 0  /* PoA: hp1 001A780B has no match in PoA yet (docs/bringup.md) */
-void sub_001A780B(void) { buffer_call(sub_001A780B_gen, buf_SetMixBins, "SetMixBins", 2); }
-#endif
+extern void sub_002B7A60_gen(void);
+// xdk_port: callee match (hp1 and hp2) and XbSymbolDatabase signature agree (docs/bringup.md)
+void sub_002B7A60(void) { buffer_call(sub_002B7A60_gen, buf_SetFrequency, "SetFrequency", 2); }
+extern void sub_002B7A7C_gen(void);
+// xdk_port: callee match (hp1 and hp2) and XbSymbolDatabase signature agree (docs/bringup.md)
+void sub_002B7A7C(void) { buffer_call(sub_002B7A7C_gen, buf_SetMixBins, "SetMixBins", 2); }
 
 #if 0  /* PoA: hp1 001A7827 has no match in PoA yet (docs/bringup.md) */
 void sub_001A7827(void) { buffer_call(sub_001A7827_gen, buf_SetMaxDistance, "SetMaxDistance", 3); }
@@ -1351,6 +1353,23 @@ void sub_001A7945(void) { buffer_call(sub_001A7945_gen, buf_SetPlayRegion, "SetP
 #if 0  /* PoA: hp1 001A7F37 has no match in PoA yet (docs/bringup.md) */
 void sub_001A7F37(void) { buffer_call(sub_001A7F37_gen, buf_SetFormat, "SetFormat", 2); }
 #endif
+
+/* by XbSymbolDatabase 5849 signatures; each ret n checked (docs/bringup.md) */
+extern void sub_002B765B_gen(void);
+// xdk_port: XbSymbolDatabase signature, callee match (hp2) agrees
+void sub_002B765B(void) { buffer_call(sub_002B765B_gen, buf_GetCurrentPosition, "GetCurrentPosition", 3); }
+extern void sub_002B7603_gen(void);
+// xdk_port: XbSymbolDatabase signature match
+void sub_002B7603(void) { buffer_call(sub_002B7603_gen, buf_Pause, "Pause", 2); }
+extern void sub_002B75DF_gen(void);
+// xdk_port: XbSymbolDatabase signature match
+void sub_002B75DF(void) { buffer_call(sub_002B75DF_gen, buf_PauseEx, "PauseEx", 4); }
+extern void sub_002B756B_gen(void);
+// xdk_port: XbSymbolDatabase signature match
+void sub_002B756B(void) { buffer_call(sub_002B756B_gen, buf_Ignore, "SetFilter", 2); }
+extern void sub_002B754F_gen(void);
+// xdk_port: XbSymbolDatabase signature match
+void sub_002B754F(void) { buffer_call(sub_002B754F_gen, buf_Ignore, "SetEG", 2); }
 
 /* CDirectSoundStream_*, reached through the stream vtable */
 #if 0  /* PoA: hp1 001A6696 has no match in PoA yet (docs/bringup.md) */

@@ -68,6 +68,8 @@ constexpr uint32_t kSimpleEncode = 0x002C7AD8; // D3DSIMPLERENDERSTATEENCODE, Se
 // recompiled D3D helpers kept as guest code
 constexpr uint32_t kDestroyResource = 0x0026A810;  // D3D_DestroyResource
 constexpr uint32_t kInitDefaultState = 0x0026B180; // called by CDevice::Init after SetRenderTarget
+constexpr uint32_t kSetRenderTarget = 0x00267720;  // D3DDevice_SetRenderTarget (HLE below), for Swap's BYPASSCOPY
+constexpr uint32_t kSetTexture = 0x00268400;       // D3DDevice_SetTexture (HLE below)
 
 // CDevice fields mirrored so the recompiled getters and resource code see what the XDK would (5659 layout)
 constexpr uint32_t kDevPush = 0x00, kDevThreshold = 0x04;
@@ -86,6 +88,7 @@ constexpr uint32_t kDevDepth = 0x1A08;           // GetDepthStencilSurface2
 constexpr uint32_t kDevFrameBuffers = 0x1A14;    // CDevice::Init: back buffer, front buffer, ..., +0xC auto depth
 constexpr uint32_t kDevVBlankCallback = 0x1DB8;  // m_VBlankCallback, by XbSymbolDatabase
 constexpr uint32_t kDevSwapCount = 0x2478;       // Swap's return
+constexpr uint32_t kDevFlags = 0x8;              // state flags; 0x4000 copy swaps (CDevice::Init 0x0026B380)
 
 gpu::State g_state;
 std::unique_ptr<gpu::Backend> g_backend;
@@ -98,6 +101,10 @@ uint32_t g_buffer_count = 2;
 uint32_t g_depth = 0;
 uint32_t g_scratch_push = 0;
 uint32_t g_interval = 1;  // vertical blanks a frame is shown for, from the presentation parameters
+// XDK 5849 CDevice::Init (0x0026B380) sets device +8 bit 0x4000 when the presentation parameters ask for
+// multisampling (MultiSampleType bits 0x3000) or D3DSWAPEFFECT_COPY (3). Swap then keeps one front buffer and
+// copies into it (sub_0026A2D0): see the Swap HLE.
+bool g_copy_swap = false;
 
 // ── Guest calls ─────────────────────────────────────────────────────────────
 
@@ -263,6 +270,12 @@ bool On() {
 // the generated XDK bodies this file wraps (tools/recomp/manual_scan.py reads this list)
 extern "C" {
 extern void sub_00264DD0_gen(void);
+extern void sub_00266A90_gen(void);
+extern void sub_00266BD0_gen(void);
+extern void sub_00269050_gen(void);
+extern void sub_00266190_gen(void);
+extern void sub_00266230_gen(void);
+extern void sub_00269640_gen(void);
 extern void sub_0026C8F0_gen(void);
 extern void sub_00266410_gen(void);
 extern void sub_00267230_gen(void);
@@ -388,6 +401,10 @@ HLE(00264DD0, 6) {
     if (!h) h = 480;
     LOGI("d3d: CreateDevice %ux%u format %X buffers %u depth %u format %X interval %X flags %X", w, h, fmt, count,
          auto_depth, depth_fmt, interval, R32(pp + 0x28));
+    uint32_t multisample = R32(pp + 0x10), swap_effect = R32(pp + 0x14);
+    g_copy_swap = (multisample >> 8 & 0x30) || swap_effect == 3;
+    LOGI("d3d: CreateDevice multisample %X swap effect %u: %s", multisample, swap_effect,
+         g_copy_swap ? "copy swaps (one front buffer)" : "flipping swaps");
     g_interval = interval == 2 ? 2 : interval == 3 ? 3 : interval == 4 ? 4 : 1;
     if (interval == 0x80000000u) g_interval = 1;
     std::memset(HostPtr(kDevice), 0, kDeviceBytes);
@@ -432,6 +449,7 @@ HLE(00264DD0, 6) {
     SetDev(kDevFrameBuffers + 0, g_buffers[1]);
     SetDev(kDevFrameBuffers + 4, g_buffers[0]);
     SetDev(kDevFrameBuffers + 0xC, g_depth);
+    if (g_copy_swap) SetDev(kDevFlags, Dev(kDevFlags) | 0x4000);
     float one = 1.0f, zs = g_depth && (R32(g_depth + 12) >> 8 & 0xFF) == 0x30 ? 65535.0f : 16777215.0f;
     std::memcpy(HostPtr(kDevice + kDevSuperX), &one, 4);
     std::memcpy(HostPtr(kDevice + kDevSuperY), &one, 4);
@@ -551,7 +569,7 @@ HLE(00267550, 0) {
     return g_backend ? g_backend->Fence() : 0;
 }
 // D3DDevice_IsFencePending(fence)
-#if 0  /* PoA: hp1 00195B90 has no match in PoA yet (docs/bringup.md) */
+#if 0  /* PoA: hp1 00195B90 not found in PoA by body match or XbSymbolDatabase 5849; no title push through it (check_hle_coverage) */
 HLE(00195B90, 1) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     return g_backend && g_backend->FencePending(A(0)) ? 1 : 0;
@@ -592,7 +610,10 @@ void VblankHook() {
     CallGuest(cb, {g_vblank_data});
 }
 }  // namespace
-#if 0  /* PoA: hp1 00192070 has no match in PoA yet (docs/bringup.md) */
+// PoA: SetVerticalBlankCallback is not linked (nothing in PoA's D3D reads or writes device +0x1DB8); the CDevice
+// layout here matches 5659's (BlockUntilVerticalBlank 0x00267470 waits on the same +0x1DBC event), so the constant
+// stands for titles that do call it.
+#if 0  /* PoA: not linked, see above */
 HLE(00192070, 1) {
     if (!g_vblank_data) {
         g_vblank_data = mem::AllocSystem(16, 16);
@@ -654,7 +675,7 @@ HLE(002679A0, 1) {
     return s;
 }
 // D3DDevice_GetRenderTarget2
-#if 0  /* PoA: hp1 00192BC0 has no match in PoA yet (docs/bringup.md) */
+#if 0  /* PoA: hp1 00192BC0 not found in PoA by body match or XbSymbolDatabase 5849; no title push through it (check_hle_coverage) */
 HLE(00192BC0, 0) {
     uint32_t s = Dev(kDevRenderTarget);
     if (s) W32(s, R32(s) + 1);
@@ -687,7 +708,59 @@ extern "C" void hle_d3d8_overlay_present(void) {
     if (g_backend && g_buffers[1]) g_backend->Present(SurfaceOf(g_buffers[1]), false);
 }
 
+// Swap(flags): 0 means COPY | FINISH (5). Flipping swaps (the XDK's path without device flag 0x4000) do nothing
+// until FINISH (4), which shows the back buffer. Copy swaps (sub_0026A2D0) keep one front buffer: COPY (1) or
+// BYPASSCOPY (2) counts the swap; COPY copies the back buffer into the front buffer itself (shown here by presenting
+// the back buffer), while BYPASSCOPY saves the render target, depth and textures (sub_0026A050) and makes the front
+// buffer the render target (no depth) and the back buffer texture 0 (stages 1-3 empty) for the title to copy it (PoA: a full-screen quad,
+// sub_00034110 from its present routine sub_000345B0, between Swap(2) and Swap(4)). FINISH (sub_0026A0E0) puts the
+// saved target, depth and textures back and shows the front buffer.
+namespace {
+struct SavedTargets {
+    bool active = false;
+    uint32_t rt = 0, zs = 0, tex[4] = {};
+} g_bypass;
+
+void SaveTargets() {
+    g_bypass.active = true;
+    g_bypass.rt = Dev(kDevRenderTarget);
+    g_bypass.zs = Dev(kDevDepth);
+    AddRef(g_bypass.rt);
+    AddRef(g_bypass.zs);
+    for (uint32_t i = 0; i < 4; i++) {
+        g_bypass.tex[i] = Dev(kDevTextures + i * 4);
+        AddRef(g_bypass.tex[i]);
+    }
+}
+
+void RestoreTargets() {
+    CallGuest(kSetRenderTarget, {g_bypass.rt, g_bypass.zs});
+    for (uint32_t i = 0; i < 4; i++) CallGuest(kSetTexture, {i, g_bypass.tex[i]});
+    Release(g_bypass.rt);
+    Release(g_bypass.zs);
+    for (uint32_t t : g_bypass.tex) Release(t);
+    g_bypass = {};
+}
+}  // namespace
+
 HLE(0026A610, 1) {
+    uint32_t flags = A(0) ? A(0) : 5;
+    bool show_front = false;
+    if (g_copy_swap) {
+        if ((flags & 2) && !g_bypass.active) {
+            SaveTargets();
+            CallGuest(kSetRenderTarget, {g_buffers[0], 0});  // the front buffer, no depth
+            CallGuest(kSetTexture, {0, g_buffers[1]});       // the back buffer
+            for (uint32_t i = 1; i < 4; i++) CallGuest(kSetTexture, {i, 0});
+        }
+        if (flags & 3) SetDev(kDevSwapCount, Dev(kDevSwapCount) + 1);
+        if (!(flags & 4)) return Dev(kDevSwapCount);
+        // COPY: the XDK draws the copy itself, so the back buffer is the picture; BYPASSCOPY: the title drew it
+        show_front = !(flags & 1) && g_bypass.active;
+        if (g_bypass.active) RestoreTargets();
+    } else if (!(flags & 4)) {
+        return Dev(kDevSwapCount);
+    }
     g_last_swap_ms.store(GetTickCount64());
     {   // xboxrecomp debug: F12 down starts a [HUD] trace of the next frame, this Swap ends one
         static bool was_down;
@@ -742,7 +815,10 @@ HLE(0026A610, 1) {
             t0 = now;
         }
     }
-    {
+    if (g_copy_swap) {
+        std::lock_guard<std::recursive_mutex> lock(g_lock);
+        if (g_backend) g_backend->Present(SurfaceOf(g_buffers[show_front ? 0 : 1]), false);
+    } else {
         std::lock_guard<std::recursive_mutex> lock(g_lock);
         if (g_backend) g_backend->Present(SurfaceOf(g_buffers[1]), false);
         // like the XDK, the surfaces stay put and their memory rotates: titles keep back buffer pointers
@@ -758,20 +834,20 @@ HLE(0026A610, 1) {
     xbox_FramebufferWindowFlipped();
     xbox_FramebufferWindowFrameStats(0);
     Pace();
+    if (g_copy_swap) return Dev(kDevSwapCount);  // counted by COPY / BYPASSCOPY above
     uint32_t n = Dev(kDevSwapCount) + 1;
     SetDev(kDevSwapCount, n);
     return n;
 }
 
 // D3DDevice_Clear(count, rects, flags, color, z, stencil)
-#if 0  /* PoA: hp1 00194EC0 has no match in PoA yet (docs/bringup.md) */
-HLE(00194EC0, 6) {
+// xdk_port: XbSymbolDatabase signature match (5849; hp1's body differs, docs/bringup.md); ret 0x18
+HLE(00269050, 6) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     const uint8_t* rects = A(0) && A(1) ? static_cast<const uint8_t*>(HostPtr(A(1))) : nullptr;
     if (g_backend) g_backend->Clear(g_state, A(0), rects, A(2), A(3), ArgF(A(4)), A(5));
     return 0;
 }
-#endif
 
 // D3DDevice_CopyRects(source, rects, count, destination, points) (SCDA)
 HLE(00267A60, 5) {
@@ -869,12 +945,10 @@ COMPLEX_STATE(002655F0, gpu::kRsBackFillMode)
 COMPLEX_STATE(00265650, gpu::kRsTwoSidedLighting)
 COMPLEX_STATE(00265330, gpu::kRsNormalizeNormals)
 COMPLEX_STATE(00266100, gpu::kRsZEnable)
-#if 0  /* PoA: hp1 00191A30 has no match in PoA yet (docs/bringup.md) */
-COMPLEX_STATE(00191A30, gpu::kRsStencilEnable)
-#endif
-#if 0  /* PoA: hp1 00191AC0 has no match in PoA yet (docs/bringup.md) */
-COMPLEX_STATE(00191AC0, gpu::kRsStencilFail)
-#endif
+// by their bodies (docs/bringup.md): store D3D__RenderState[144] / [145] (0x275F90 / 0x275F94) and push NV097 0x32C
+// (stencil test enable) / 0x370 (stencil op fail)
+COMPLEX_STATE(00266190, gpu::kRsStencilEnable)
+COMPLEX_STATE(00266230, gpu::kRsStencilFail)
 COMPLEX_STATE(002652F0, gpu::kRsFrontFace)
 COMPLEX_STATE(00265280, gpu::kRsCullMode)
 COMPLEX_STATE(00265370, gpu::kRsTextureFactor)
@@ -977,6 +1051,12 @@ extern "C" void sub_002682A0(void) {
 HLE(00268400, 2) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     uint32_t stage = A(0) & 3, tex = A(1);
+    static int traced = 0;
+    if (g_trace && tex && traced < 60) {
+        traced++;
+        TRACE("SetTexture(%u, %08X) from %08X common %08X data %08X format %08X size %08X", stage, tex, R32(g_esp),
+              R32(tex), R32(tex + 4), R32(tex + 12), R32(tex + 16));
+    }
     uint32_t old = Dev(kDevTextures + stage * 4);
     AddRef(tex);
     SetDev(kDevTextures + stage * 4, tex);
@@ -1014,6 +1094,35 @@ HLE(00266CB0, 3) {
 }
 
 // shaders
+
+// D3DDevice_CreateVertexShader(declaration, function, handle*, usage) (from hp2); ret 0x10. PoA's renderer init
+// (sub_00030850) assembles its skinning program with XGRPH and creates it here.
+HLE(00266A90, 4) {
+    std::lock_guard<std::recursive_mutex> lock(g_lock);
+    uint32_t decl = A(0), func = A(1), out = A(2);
+    auto vs = std::make_shared<gpu::VertexShader>();
+    if (decl) {
+        for (uint32_t i = 0; i < 1024; i++) {
+            uint32_t t = R32(decl + i * 4);
+            vs->decl.push_back(t);
+            if (t == 0xFFFFFFFF) break;
+        }
+    }
+    if (func) {
+        uint32_t hdr = R32(func);
+        vs->program_type = hdr & 0xFFFF;
+        uint32_t n = hdr >> 16;
+        for (uint32_t i = 0; i < n * 4; i++) vs->program.push_back(R32(func + 4 + i * 4));
+    }
+    gpu::ParseDeclaration(*vs);
+    uint32_t rec = mem::AllocSystem(16, 16);
+    vs->handle = rec | 1;
+    g_vs[vs->handle] = vs;
+    W32(out, vs->handle);
+    LOG_FIRST(64, "d3d: vertex shader %08X, %zu decl tokens, %zu instructions, type %X", vs->handle, vs->decl.size(),
+              vs->program.size() / 4, vs->program_type);
+    return 0;
+}
 
 // D3DDevice_SetVertexShader(handle)
 HLE(00267090, 1) {
@@ -1056,6 +1165,14 @@ void VsConstants(uint32_t reg, uint32_t src, uint32_t count) {
 }
 }  // namespace
 
+// D3DDevice_SetVertexShaderConstantNotInlineFast(register, data, dwords), __fastcall (ecx, edx); ret 4. In 5849 it
+// only pushes NV097 0x1EA4 (constant load: ecx, the hardware register) and the data; no memory mirror as in 5028.
+HLE(00266BD0, 1) {
+    std::lock_guard<std::recursive_mutex> lock(g_lock);
+    VsConstants(g_ecx, g_edx, A(0) / 4);
+    return 0;
+}
+
 // D3DDevice_LoadVertexShader(handle, address)
 HLE(00266D40, 2) {
     LOG_FIRST(4, "d3d: LoadVertexShader %08X at %u is not supported", A(0), A(1));
@@ -1069,7 +1186,7 @@ HLE(00266DA0, 2) {
 HLE(00266E40, 1) { return 0; }  // D3DDevice_SetShaderConstantMode
 
 // D3DDevice_CreatePixelShader(definition, handle*)
-#if 0  /* PoA: hp1 001952B0 has no match in PoA yet (docs/bringup.md) */
+#if 0  /* PoA: hp1 001952B0 not found in PoA by body match or XbSymbolDatabase 5849; no title push through it (check_hle_coverage) */
 HLE(001952B0, 2) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     auto ps = std::make_shared<gpu::PixelShader>();
@@ -1117,7 +1234,7 @@ HLE(00270D00, 1) {
 }
 
 // D3DDevice_SetPixelShaderConstant(register, data, count)
-#if 0  /* PoA: hp1 00195500 has no match in PoA yet (docs/bringup.md) */
+#if 0  /* PoA: hp1 00195500 not found in PoA by body match or XbSymbolDatabase 5849; no title push through it (check_hle_coverage) */
 HLE(00195500, 3) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     uint32_t reg = A(0), src = A(1), n = A(2);
@@ -1170,6 +1287,7 @@ HLE(00269780, 3) {
     HudTrace(A(0), A(2), StreamVertices(A(1)), g_state.streams[0].stride);
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     SyncDeferred();
+    g_state.caller = R32(g_esp);
     if (g_backend) g_backend->Draw(g_state, A(0), A(1), A(2), nullptr);
     return 0;
 }
@@ -1179,6 +1297,7 @@ HLE(00269820, 3) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     SyncDeferred();
     const uint8_t* indices = A(2) ? static_cast<const uint8_t*>(HostPtr(A(2))) : nullptr;
+    g_state.caller = R32(g_esp);
     if (g_backend) g_backend->Draw(g_state, A(0), 0, A(1), indices);
     return 0;
 }
@@ -1220,7 +1339,26 @@ HLE(002694D0, 4) {
     SyncDeferred();
     auto stream = g_state.streams[0];
     g_state.streams[0] = {UpVertices(A(2), A(1) * A(3)), A(3)};
+    g_state.caller = R32(g_esp);
     g_backend->Draw(g_state, A(0), 0, A(1), nullptr);
+    g_state.streams[0] = stream;
+    return 0;
+}
+
+// D3DDevice_DrawIndexedVerticesUP(primitive, count, indices, vertices, stride) (from hp2): the vertices up to the
+// largest index go through the same ring
+HLE(00269640, 5) {
+    std::lock_guard<std::recursive_mutex> lock(g_lock);
+    uint32_t count = A(1), stride = A(4);
+    if (!g_backend || !count || !stride || !A(2)) return 0;
+    SyncDeferred();
+    const uint16_t* idx = static_cast<const uint16_t*>(HostPtr(A(2)));
+    uint32_t top = 0;
+    for (uint32_t i = 0; i < count; i++) top = std::max<uint32_t>(top, idx[i]);
+    auto stream = g_state.streams[0];
+    g_state.streams[0] = {UpVertices(A(3), (top + 1) * stride), stride};
+    g_state.caller = R32(g_esp);
+    g_backend->Draw(g_state, A(0), 0, count, reinterpret_cast<const uint8_t*>(idx));
     g_state.streams[0] = stream;
     return 0;
 }

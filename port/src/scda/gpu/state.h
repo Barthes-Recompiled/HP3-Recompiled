@@ -182,6 +182,7 @@ struct State {
     float ss_offset_x = 0, ss_offset_y = 0;
     float zscale = 16777215.0f;  // depth buffer units per 1.0
     uint32_t pillar = 0;  // xboxrecomp: 16:9, a screen the title lays out 4:3 (inventory): all of it narrowed to the middle
+    uint32_t caller = 0;  // xboxrecomp: the guest return address of the draw call (captures)
 };
 
 }  // namespace gpu

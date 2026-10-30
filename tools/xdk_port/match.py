@@ -77,22 +77,68 @@ def _anchor(d, cands, matched):
     return fit[0] if len(fit) == 1 else None
 
 
+def _branches(img, a, n):
+    """Targets of the rel32 calls and jumps in the n bytes at a, in order."""
+    raw = img.masked_at(a, n, raw=True) or b""
+    md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32)
+    out = []
+    for ins in md.disasm(raw, a):
+        b = ins.bytes
+        if (b[0] in (0xE8, 0xE9) and ins.size == 5) or (b[0] == 0x0F and 0x80 <= b[1] <= 0x8F and ins.size == 6):
+            out.append(ins.address + ins.size + struct.unpack_from("<i", b, ins.size - 4)[0])
+    return out
+
+
+def _compared(dbr, cbr, matched):
+    """(mapped donor target, candidate target) pairs; None when the branch counts differ."""
+    if len(cbr) != len(dbr):
+        return None
+    return [(matched[d], t) for d, t in zip(dbr, cbr) if d in matched]
+
+
+def _consistent(dbr, cbr, matched):
+    """No branch target of the candidate contradicts a donor target already mapped, and none is the match of a
+    different donor function (a target function is the image of one donor function at most)."""
+    pairs = _compared(dbr, cbr, matched)
+    if pairs is None or not all(m == t for m, t in pairs):
+        return False
+    owner = {t: d for d, t in matched.items()}
+    return all(owner.get(t, d) == d for d, t in zip(dbr, cbr))
+
+
+def _by_callees(dbr, cands, cbr, matched):
+    """The one candidate whose branch targets agree with the donor's mapped ones (at least one compared), else None."""
+    taken = set(matched.values())
+    fit = [c for c in cands if c not in taken and _consistent(dbr, cbr[c], matched) and _compared(dbr, cbr[c], matched)]
+    return fit[0] if len(fit) == 1 else None
+
+
 def match_functions(donor, donor_addrs, donor_starts, target, target_starts, limit=0x4000):
     """{"matched": {donor_addr: target_addr}, "unmatched": {donor_addr: reason}, "anchored": {donor_addr, ...}}.
 
     reason: "no-match" (the whole body is nowhere), "ambiguous" (at more than one
-    function start), "not-function-start" (found, but only where no function starts).
+    function start), "not-function-start" (found, but only where no function starts),
+    "callee-conflict" (found, but it calls something other than its donor's mapped callees).
 
     A body found at several function starts is resolved when exactly one of them is
     as far from a matched neighbour (the nearest matched donor function before or
     after it) as it is in the donor: library code keeps its order and spacing within
     an object. Those are listed in "anchored"; they can anchor further ones.
+
+    A body still found at several starts (look-alike wrappers that differ only in
+    what they call) is resolved when exactly one candidate's rel32 call/jump targets
+    agree with the donor's, mapped through the matches so far, with at least one
+    compared. Those are listed in "callee". Neither rule takes a candidate whose
+    calls contradict a mapped callee. Both repeat until nothing changes. Last, any
+    match (unique ones too) whose calls contradict its donor's mapped callees is
+    dropped as "callee-conflict".
     """
     starts = sorted(set(donor_starts) | set(donor_addrs))
     tstarts = set(target_starts)
-    matched, unmatched, ambiguous = {}, {}, {}
+    matched, unmatched, ambiguous, lengths = {}, {}, {}, {}
     for a in sorted(donor_addrs):
         pat = pattern(donor, a, _extent(starts, a, limit))
+        lengths[a] = pat[1] if pat else 0
         hits = _hits(target, pat, tstarts) if pat else []
         at = [h for h in hits if h in tstarts]
         if len(at) == 1:
@@ -101,20 +147,50 @@ def match_functions(donor, donor_addrs, donor_starts, target, target_starts, lim
             ambiguous[a] = at
         else:
             unmatched[a] = "not-function-start" if hits else "no-match"
-    anchored = set()
+    anchored, callee = set(), set()
+    branches = {}  # (image, address) -> rel32 targets, for the callee test
+    for a, cands in ambiguous.items():
+        n = lengths[a]
+        branches[a] = _branches(donor, a, n)
+        for c in cands:
+            branches.setdefault(("t", c), _branches(target, c, n))
     progress = True
     while progress:
         progress = False
-        for a in sorted(set(ambiguous) - anchored):
-            c = _anchor(a, ambiguous[a], matched)
+        # callees first: a matched callee is stronger evidence than a neighbour's distance
+        for a in sorted(set(ambiguous) - anchored - callee):
+            c = _by_callees(branches[a], ambiguous[a], {t: branches[("t", t)] for t in ambiguous[a]}, matched)
+            if c is not None:
+                matched[a] = c
+                callee.add(a)
+                progress = True
+        for a in sorted(set(ambiguous) - anchored - callee):
+            # a candidate whose calls contradict what is already matched cannot be the same function
+            ok = [t for t in ambiguous[a] if _consistent(branches[a], branches[("t", t)], matched)]
+            c = _anchor(a, ok, matched)
             if c is not None:
                 matched[a] = c
                 anchored.add(a)
                 progress = True
     for a in ambiguous:
-        if a not in anchored:
+        if a not in anchored and a not in callee:
             unmatched[a] = "ambiguous"
-    return {"matched": matched, "unmatched": unmatched, "anchored": anchored}
+    # every match, unique ones too: a function whose calls go elsewhere than its donor's mapped callees is a look-alike
+    # (DirectSoundCreateStream vs DirectSoundCreateBuffer are the same bytes calling different methods)
+    dropped = True
+    while dropped:
+        dropped = False
+        for a in sorted(matched):
+            t = matched[a]
+            dbr = branches[a] if a in branches else _branches(donor, a, lengths[a])
+            tbr = branches.get(("t", t)) or _branches(target, t, lengths[a])
+            if not _consistent(dbr, tbr, matched):
+                del matched[a]
+                anchored.discard(a)
+                callee.discard(a)
+                unmatched[a] = "callee-conflict"
+                dropped = True
+    return {"matched": matched, "unmatched": unmatched, "anchored": anchored, "callee": callee}
 
 
 def data_map(donor, matched, donor_starts, target, limit=0x4000):
