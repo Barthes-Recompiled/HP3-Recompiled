@@ -209,3 +209,31 @@ Static evidence (call sites in the title's code), not observed execution.
   planar YUV to YUY2 with MMX (`sub_0005D3C0`) and drawn as a textured quad with D3D's YUV path. Six movies:
   `attract`, `eac_usa`, `filmus`, `gallery`, `intro`, `wb` (`eac_usa`, `wb`, `intro` are the start-up skip candidates).
 - **Debug menu:** see docs/re-notes.md.
+
+## M2 runs
+
+Test folder `Harry Potter Xbox Decomps\test\PoA_USA` (exes, `game` junction, `hppoa.toml` with `debug_logs = true`,
+`debug.env` holding the launcher's `RECOMP_*` defaults from `launcher.cpp` StartGame plus the run's traces).
+
+**Baseline 1 (2026-10-30, m2-boot at 938f9d1, defaults: DirectSound HLE off).** Boots, reads `runtime.cfg`,
+`filesys.dat`, `data/packages/plfs/frontend-startup.pkg`, creates the D3D device (640x480, format 6, interval
+0x80000002) and opens the window, then crashes about 2 s in: `[APU] MMIO decode fail ... offset=0x2000` and an access
+violation reading 0xFE802000. That is the XDK's own DirectSound reading an APU register during DirectSoundCreate:
+guest stack 0x002BE040 <- ... <- 0x002B8761 (DSOUND) <- 0x0014ECA5 (`sub_0014EC90`, EA's audio init). The emulated
+APU cannot carry PoA's DirectSound, so the HLE is required, not optional (Task 7).
+
+**Baseline 2 (same build, `RECOMP_HLE_DSOUND=1`, the partly bound HLE).** Gets past audio init:
+`DirectSoundCreate`, `DownloadEffectsImage(13152 bytes)`, **180 `CreateStream` calls** (PCM, 1 channel, 48 kHz,
+1 packet each, same callback 0x00F7FB7C), one 6-channel buffer (SetBufferData + Play). So PoA plays through
+DirectSound *streams*, and the stream entry points and vtables (hp1's unbound IDirectSoundStream_* set,
+`STREAM_VTABLE` = 0) are on the boot path. Then: `data/gui/inkpot.ttf`, `quorumstd-medium.ttf`, `poa_base.big`,
+`poa_overlay.big`, `poa_startup_xbox.big`, the audio packages and `frontend0.sdt` / `gui_stream.sdt`, `ls_text.txt`,
+and `data/movie/eac_usa.mad` opens. One `[FRAME] 49.3 fps` line, then no more Swaps for the remaining ~70 s while
+the threads keep running (critical sections and waits in the kernel summary): it hangs in the first logo movie. No
+captures (they count from the first Swap and need 20 s of frames). First suspect: the `.mad` player paces itself on
+audio stream packets the unbound stream functions never complete.
+
+Other lines: `d3d: Begin/End immediate mode is not supported (from 00049DD4)` and `(from 00049EF8)`; hp1/hp2's
+renderer has no immediate mode (Begin/End + SetVertexData*). Missing files the console misses too (path joined
+without a separator, so not ours): `fontsfonts.ini`, `texturessymbols.xsh`, `variablesthingvars.txt`.
+Counts: 0 `MakeSpace from`, 0 `ICALL`, 0 `[CRASH]`, 0 unknown shader handles.
