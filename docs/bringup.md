@@ -26,9 +26,9 @@ Live bindings that do not rest on a unique body match (marked `// xdk_port: ... 
 | 0x00267550 | 0x00192170 | D3DDevice_InsertFence | anchored |
 | 0x002662D0, 0x00266340, 0x002663B0, 0x002663D0, 0x002663F0 | 0x00191B60 ... 0x00191C80 | SetRenderState YuvEnable, OcclusionCullEnable, StencilCullEnable, RopZCmpAlwaysRead, RopZRead | anchored |
 | 0x0026AA80 | 0x00194CE0 | D3DResource_BlockUntilNotBusy (a jmp to the uniquely matched D3D_BlockOnResource, as in hp1) | whole-library run |
-| 0x002B8584 | 0x001A87DC | DirectSound SetI3DL2Listener | anchored |
+| 0x002B8584 | 0x001A87DC | DirectSound SetI3DL2Listener | anchored; **body checked M4** (see "M4 binding audit") |
 | 0x002B7FAE | 0x001A7F53 | IDirectSoundBuffer SetBufferData | whole-library run |
-| 0x002B75A3 | 0x001A6E26 | IDirectSoundBuffer Play | anchored |
+| 0x002B75A3 | 0x001A6E26 | IDirectSoundBuffer Play | anchored; **body checked M4** (see "M4 binding audit") |
 | 0x002B7587 | 0x001A6E0A | ~~IDirectSoundBuffer SetVolume~~ **wrong: it is SetMixBinVolumes** (M3, see "M3 audio pops") | anchored |
 | 0x002C09C2 | 0x001F5038 | XInputClose | anchored |
 
@@ -561,7 +561,31 @@ first cutscene roughly doubles (e.g. 400-900 -> 950-1300), 0 full-scale samples.
   stubs, so a full-frame picture over no scene shows 4:3 in the middle), cutscene bars, the inventory/map screens,
   and whether any 3D-in-menu camera needs to stay 4:3 (hp1 needed that for its Remembrall).
 
-## 60 fps (2026-10-30, branch m3-60fps)
+## Widescreen 16:9: menus, loading screens, cutscenes (M4, 2026-10-30, branch m4-widescreen-menus)
+
+Checked with window screenshots (PrintWindow every 2-3 s, runs ws4-ws7) and guest captures (ws2, ws3):
+
+- **Copy swap squeezed twice (the big one).** PoA presents with its own full-frame quad that copies the finished
+  frame (8207C000, a 640x480 render target) into the front buffer (01F50000), which is frame-sized too, so Squeeze2D
+  took it for a 4:3 backdrop and squeezed it again: the title, main menu, Bonus Activities, Dueling Club and the
+  loading screen showed 0.5625 wide, with the clear colour (slate FF2A303E on the loading screen) in a band beside
+  them. A frame-sized render target drawn into another is now never squeezed (d3d12.cpp, `frame_copy`). In gameplay
+  the copy had returned early (scene drawn), so 3D and HUD were not affected.
+- **4:3 screens without the scene** (`WideFrame::flat43`: a squeezed backdrop, fewer than 16 scene draws) are shown
+  as their middle 480 columns at 4:3, black beside them.
+- **In-game menus** (pause, Options, Quit Game): the HUD rule (2D wholly in the left third keeps to the 16:9 left
+  edge) split the menu, some rows to the edge and some about their own middles. The menus draw a parchment band
+  across the top (0-72) and bottom (406-480) over the scene (textured, 512x64); with bands this frame or the last
+  (`menu`, `menu_prev`) all the menu's 2D goes about the middle, and its own picture across the frame (the Quit Game
+  page's map, 64+ texels tall) is squeezed like a 4:3 backdrop. The bands and the pause menu's shading (256x4) stay
+  across the 16:9 width.
+- **Cutscenes** are left as they are: PoA's bars are not HP:PS's (a 4x4 texture at rows 0-57.5 and 371-481, faded
+  in by vertex alpha 00 -> FF, drawn every frame), so hp1's zoom does not trigger. The picture between them is
+  2.72:1 (Hor+, more at the sides than the console), subtitles in the bottom bar, correct shape. Zooming would crop
+  the original's sides (16:9 from 313 rows = 418 of the 480 columns the 4:3 view had). Austin's call (2026-10-30): **no zoom**.
+- PoA has no inventory/map screen: pause is Resume / Save / Options / Quit, Back in gameplay does nothing.
+
+
 
 **Coupling.** The double speed at 60 fps (M3 Task 6) is one value, not frame-stepped logic. The frame timer
 `sub_001A7450` (this = 0x38BA6C, ticked once a frame; callers 0x7C3E0, 0x7C430, 0x115CE0, 0x217DC0) keeps a counter
@@ -629,3 +653,19 @@ Open, each checked against the code and latent for PoA's tested paths:
   so menu 3D (inventory) is treated as scene. Part of the open menus/inventory 16:9 pass.
 - `immediate.h`: unsupported vertex types or streams other than 0 drop or zero an immediate draw (PoA's FVF
   0x42/0x144 is covered).
+
+## M4 binding audit (2026-10-30, static)
+
+The two DirectSound bindings left from the anchored list, read by body after 0x002B7587 turned out to be
+SetMixBinVolumes (lesson: an anchored match says where, not what):
+
+- **0x002B75A3 = IDirectSoundBuffer_Play: confirmed.** `ret 16` (this + 3 args). It enters the DirectSound lock
+  (0x002B6915, EnterCriticalSection through import 0x2C780C), passes its 4th stack argument to 0x002BC203 and leaves
+  the lock. 0x002BC203 tests that argument's bit 2 (DSBPLAY_SYNCHPLAYBACK) and bit 1 (DSBPLAY_FROMSTART): the
+  dwFlags of `Play(this, dwReserved1, dwReserved2, dwFlags)`.
+- **0x002B8584 = IDirectSound_SetI3DL2Listener: confirmed.** `ret 12` (this + 2 args) into 0x002B843D, which takes
+  the lock, skips everything when the I3DL2 effect index (`[ecx+8]`) is -1 (no reverb in the effects image) and,
+  unless `dwApply & 1` (DS3D_DEFERRED), commits through 0x002B8079: `(this, pds3dl, dwApply)`. Our stub returning S_OK
+  with no reverb stays right (the effects image is zeroed, so the title has no I3DL2 effect anyway).
+- Also read: **0x002B7FAE = SetBufferData** (a whole-library run match): `ret 12`; 0x002B7CC0 compares the new
+  pointer and size with the buffer's current ones (+0xBC, +0xC0) before rebuilding it, as SetBufferData does.
