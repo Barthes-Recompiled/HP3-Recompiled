@@ -43,8 +43,9 @@ Harry in the Hogwarts Express corridor with the HUD, at a steady 30.0 fps, 0 cra
 3. **"Press START" title is silent; the console may have audio there.** Our mix: RMS 0 on the "Press START" screen
    only. From the "I solemnly swear" screen on there is quiet, rising sound (menu music fading in). The user said
    the console "plays the 'I solemnly swear I am up to no good' intro and goes to the New Game... screen that has
-   music". Open question for the user: is there a **voice line** on the swear screen, and is there **music on the
-   Press START screen itself**? Task 8 depends on the answer. A DeepCode read of the music/speech path failed to
+   music". **User answers (2026-10-30): the console's Press START screen has no music (ours matches: not a bug),
+   and the swear screen plays a spoken voice line.** Ours has only quiet sound there (RMS 50-800, the menu music
+   fading in), so the voice line is missing: Task 8 = find why (`frontendspeech.pkg` loads right then). A DeepCode read of the music/speech path failed to
    start (two DeepCode sessions at once); rerun it alone (prompt idea in the ledger / this file's task list).
 4. **Pops on the main menu (user, run m3t3 at 60 fps).** Not visible in the 30 fps recordings of the front end (no
    full-scale samples there); recheck by ear at 30 fps. May be issue 1's sound.

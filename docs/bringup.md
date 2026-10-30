@@ -186,7 +186,9 @@ Activities / Options), A on New Game loads the Hogwarts Express. Audio (`RECOMP_
 "Press START" title only; quiet, rising sound from the swear screen on. **In the level, popping (user) = one
 repeating burst**: every 3-5 s a one-second window with RMS ~2420, 164 or 284 full-scale samples and 15-16
 sample-to-sample jumps over 8000, identical each time: one sound decoded or mixed wrongly (next to check: which
-voice/format plays then, `RECOMP_DSOUND_TRACE`).
+voice/format plays then, `RECOMP_DSOUND_TRACE`). **User (2026-10-30):** on the console the Press START screen has no
+music (ours matches), and the swear screen plays a spoken voice line; ours has only the quiet music fade there
+(RMS 50-800), so the line is missing (Task 8).
 
 ## Title facts so far
 
