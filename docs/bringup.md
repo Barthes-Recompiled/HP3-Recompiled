@@ -160,6 +160,34 @@ samples all three textures. Run m3t4b: `immediate mode prim 6, 6 vertices, strid
 DSOUND 0 gaps. The start-up pass draws before the first Swap, so a timed capture can't show its target; the
 level-side pass is checked in Task 5.
 
+**Frame rate (M3 Task 6).** PoA's frame timer `sub_001A7450` *clamps* a short frame's delta up to the minimum at
+0x38BA84 (1000/30 or 1000/25 ms, set by `sub_00096520` from renderer init) and does not wait; its delta 0x38BA74 has
+no consumer found (DeepCode read; `sub_00026A50` measures QPC itself). The real 30 Hz limiter is the presentation
+interval: `sub_00034750` creates the device with `0x80000002` (D3DPRESENT_INTERVAL_TWO_OR_IMMEDIATE, the log's
+`CreateDevice ... interval 80000002`). The HLE decoded only 2/3/4 and ran it at one vblank, so the game ran at 60 and
+its per-frame logic at double speed (the user saw the opening cutscene run fast). Fix: `xdk/present_interval.h`
+(XDK ONE 1, TWO 2, THREE 4, FOUR 8, IMMEDIATE 0x80000000 ored in; test `port/tests/present_interval`, the old mapping
+fails on 0x80000002). Runs m3t6 / m3t6c / m3t6d: 29.9-30.0 fps. Speed: by eye at the user check (Task 10). A real
+60 fps for PoA needs its frame-stepped logic decoupled: its own plan after M3; caps above 30 (`fps_limit` 120+,
+unlocked) still bypass the interval and run the game fast.
+
+**Missed functions (M3 Task 5).** `[ICALL] Failed to resolve VA 0x000CBEE0` in the level (m3t3): a method stored
+by a static initializer (0x0026023D `mov eax, 0xcbee0`, into the table at 0x2FE200, beside 0xCBE20 / 0xCA090) and
+never found by the disassembler. A sweep of code immediates for unknown 16-aligned function-like targets found it
+and 0x243390 (after int3 padding, merged into 0x243370's span; a callback a getter returns at 0x244561);
+`scan_code_ptrs.py` (data tables) adds 0x777F0 (`push ebp` after a table). All three are in `port/icall_seeds.json`;
+0x5E040 / 0x5E050 (start with an int3 byte, never called) are left out. m3t6d: 0 ICALL failures in the level.
+`MakeSpace from 00268E2D` (16 per level load) is D3DVertexBuffer_Lock2's vertex-cache invalidate, allowlisted in M2.
+
+**m3t6c / m3t6d (30 fps; Start 65 s, Start 80 s, A 88 / 96 / 104 s).** At 30 fps the first Start skips the intro
+movie; the second leaves the title for the "I solemnly swear that I am up to no good" screen (`poa_trc.big`,
+`frontendspeech.pkg`, `frontendaudio.pkg`), A gives the main menu (`poa_fe.big`: New Game / Load Game / Bonus
+Activities / Options), A on New Game loads the Hogwarts Express. Audio (`RECOMP_DSOUND_WAV`): RMS 0 on the
+"Press START" title only; quiet, rising sound from the swear screen on. **In the level, popping (user) = one
+repeating burst**: every 3-5 s a one-second window with RMS ~2420, 164 or 284 full-scale samples and 15-16
+sample-to-sample jumps over 8000, identical each time: one sound decoded or mixed wrongly (next to check: which
+voice/format plays then, `RECOMP_DSOUND_TRACE`).
+
 ## Title facts so far
 
 - Frame timing follows the video standard: hp2's toolkit fix for `XC_FACTORY_AV_REGION` notes PoA runs 25 fps on PAL

@@ -34,6 +34,7 @@
 #include "gpu/immediate.h"
 #include "gpu/texture.h"
 #include "gpu/vertex.h"
+#include "xdk/present_interval.h"
 #include "kernel/kernel.h"
 #include "kernel/memory.h"
 
@@ -408,8 +409,8 @@ HLE(00264DD0, 6) {
     g_copy_swap = (multisample >> 8 & 0x30) || swap_effect == 3;
     LOGI("d3d: CreateDevice multisample %X swap effect %u: %s", multisample, swap_effect,
          g_copy_swap ? "copy swaps (one front buffer)" : "flipping swaps");
-    g_interval = interval == 2 ? 2 : interval == 3 ? 3 : interval == 4 ? 4 : 1;
-    if (interval == 0x80000000u) g_interval = 1;
+    // PoA asks for 0x80000002, TWO_OR_IMMEDIATE: 30 fps on the console, and its logic steps per frame
+    g_interval = xdk::PresentIntervalVblanks(interval);
     std::memset(HostPtr(kDevice), 0, kDeviceBytes);
     W32(kDevicePtr, kDevice);
     // anything still pushing hardware commands writes into a scratch buffer that MakeSpace rewinds
