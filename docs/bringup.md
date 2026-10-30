@@ -420,3 +420,10 @@ Application Error for hppoa). 5/5 clean vs 3/7 stalled before the fix (chance of
 **Task 11 user check (2026-10-30, exe CF685B849B99, test\PoA_USA).** The user ran it and confirmed that logos,
 title, front-end menu, menu sounds and music work. Not answered: whether the console's title screen is also silent,
 and whether the `debug_menu` setting lets a title-screen button open the debug menu (both carried to M3).
+
+**M2 review follow-ups (DeepCode whole-branch review, 2026-10-30; all pre-existing on main, none hit in PoA runs).**
+- `tools/xdk_port/match.py` unique-body pass (`matched[a] = at[0]`): no check that another donor already took the
+  target, so two byte-identical donor wrappers can map to one PoA address. Demote such pairs to ambiguous.
+- `src/kernel/kernel_bridge.c` `kernel_set_timer`: the lazy `g_timer_lock` init and timer-thread start are unguarded
+  (two first callers at once would double-init). Move them to kernel init or use InitOnce.
+- `port/src/hle_dsound.c` `Play` does not clear `paused`: check what XDK Play does on a paused buffer before changing.
