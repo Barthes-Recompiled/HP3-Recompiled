@@ -613,3 +613,19 @@ Austin (2026-10-30, own play): "everything seems good with task 7" (save and loa
 
 **M3 user check (Task 10, Austin, 2026-10-30, 60 fps build).** Saves/load good (Task 7), swear-screen line plays
 (Task 8), "Play felt good." Merge approved after the code review.
+
+## M3 review follow-ups (DeepCode whole-branch review, 2026-10-30, `.superpowers/dc-m3-review.txt`)
+
+Fixed: **PAL at 30 fps** (finding 5): the game's 40 ms floor on PAL ran the clock 1.2x on the HLE's 59.94 Hz
+two-vblank frames; the floor at 0/30 is now capped at 33 ms (`hle_video.c`). NTSC unchanged (33 ms either way).
+Open, each checked against the code and latent for PoA's tested paths:
+- DirectSound 5.1 fold (`hle_dsound.c`): centre/back take the front pair's gains, not their own mix-bin volumes
+  (`levels()` builds 2x2); every >2-channel format is read as 5.1 (`dwChannelMask` unread); streams don't fold;
+  `SetMixBinVolumes` on a voice with no bin list stores volumes nobody reads.
+- Clock floor 1 ms above 30 fps: still gains time if ticked more than 1000 times a second (unlocked, menus).
+- `present_interval.h`: bare IMMEDIATE means one vblank; `PaceAbove` makes up stalls of 2-4 periods back to back;
+  `fps_limit = 60` ignores any title's interval (fine for PoA's TWO_OR_IMMEDIATE).
+- 16:9: `d3d12.cpp` `Squeeze2D`'s menu-camera tag (`kMenuX`) comes from hp1's hook; PoA's `hle_video.c` never tags,
+  so menu 3D (inventory) is treated as scene. Part of the open menus/inventory 16:9 pass.
+- `immediate.h`: unsupported vertex types or streams other than 0 drop or zero an immediate draw (PoA's FVF
+  0x42/0x144 is covered).

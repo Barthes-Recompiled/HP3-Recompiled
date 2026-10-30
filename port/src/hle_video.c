@@ -171,7 +171,8 @@ void sub_000518D0(void)
  * a frame shorter than it puts the clock ahead of real time, and when the next frame comes sooner than that lead, the
  * timer's elapsed time is negative, which its unsigned compares read as a hitch and step 100 ms. With a 10 ms floor at
  * 60 fps (a slow frame, a quick one, then the vblank wait) that ran the clock 1.1-1.3x in play (Austin's run play60:
- * movement felt odd, Flippendo's sounds held back). At the game's own rate and 30 fps the game's value stays. The
+ * movement felt odd, Flippendo's sounds held back). At the game's own rate and 30 fps the game's value stays, capped at
+ * 33 ms (DeepCode review: PAL's 40 ms floor ran the clock 1.2x on the 59.94 Hz grid). The
  * floor is put back each tick, so the F10 panel's choice applies at once. [CLOCK] counts the 100 ms steps. Evidence:
  * docs/bringup.md, "60 fps". */
 extern uint32_t app_FpsLimit(void); /* scda/app/app.cpp: 0 the game's rate, 30, 60, 1000 unlocked */
@@ -184,7 +185,8 @@ void sub_001A7450(void)
     if (t == 0x0038BA6Cu) {
         uint32_t fps = app_FpsLimit();
         if (MEM32(t + 0x18) != ours) game_floor = MEM32(t + 0x18);  /* the game set it (renderer init) */
-        ours = fps > 30 ? 1 : game_floor;
+        /* at 30 the floor is at most a 30 fps frame: PAL's 40 ms (25 fps) would outrun two of the HLE's 59.94 Hz vblanks */
+        ours = fps > 30 ? 1 : (game_floor > 1000 / 30 ? 1000 / 30 : game_floor);
         MEM32(t + 0x18) = ours;
     }
     uint32_t before = MEM32(t + 4);
