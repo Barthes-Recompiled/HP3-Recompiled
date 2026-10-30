@@ -371,3 +371,19 @@ quad into the front buffer (01F50000) with `t0 8207C000 fmt 12 640x480 target`; 
 intro movie (train on the viaduct, a Dementor's hand, the snow scene); 59-60 fps. One earlier run of this build
 (run 7, with `RECOMP_DSOUND_WAV`) stopped logging ~2 s in and would not exit for minutes; not reproduced in runs 8-9
 (gdb stacks of run 8 showed nothing blocked). Watch for it in the done run.
+
+**Done run (Task 9, 2026-10-30, m2-boot at 73ddeb7, 180 s, launcher defaults + `RECOMP_D3D_TRACE`,
+`RECOMP_CAPTURE_AFTER=10:10:17`, `RECOMP_DSOUND_WAV`; nothing pressed, though a pad was connected).** The log
+grew steadily the whole run (no repeat of run 7's stall). Sequence: `eac_usa.mad`, `wb.mad`, `poa_legal_eng.big`,
+`intro.mad`, then `poa_transitional.big` / `poa_fe_eng.big` (about 60 s in): the title screen ("Harry Potter and
+the Prisoner of Azkaban", "Press START") in the 60 s and 70 s captures; after its idle timeout `attract.mad` plays
+(captures 80-130 s: Harry in bed, a spell flash, the Knight Bus / Patronus scenes, Ron with the Monster Book, a
+library troll, Harry) and returns to the title (140 s, 150 s), then attract again (160-170 s). The 10 s capture is
+black (between logos). 59-60 fps outside movie starts. Counts: 0 `MakeSpace from`, 0 `ICALL`, 0 `[CRASH]`, 0
+unknown handle, 0 DSOUND FALLBACK. Audio RMS per 10 s: 950-5500 through the logos, intro and attract, **0 on the
+title screen** (60 s and 140 s windows): whether the console's title screen has music is for the user check (Task
+11). `check_hle_coverage.py --strict --section D3D --section DSOUND`: DSOUND 0, D3D 1 gap, SetVertexData4f
+0x00269AC0. Its only Begin/End use ran exactly twice in the run, both at start-up before the first movie
+(`sub_00049A70` and its neighbour from `sub_0004A3C0`: SetRenderTarget, then two immediate-mode quads), so nothing on
+the boot path to the title is drawn through it; what that start-up pass renders (and whether a level samples it) is
+an M3 item, with immediate mode in the renderer.
