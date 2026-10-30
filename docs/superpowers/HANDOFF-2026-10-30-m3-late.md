@@ -28,4 +28,4 @@ Pad scripts (outside the repo, `Harry Potter Xbox Decomps\tools\`): `poa_exit.pa
    SetI3DL2Listener 0x002B8584) deserve the same body check that caught 0x002B7587.
 4. Tasks 9-10 (debug-menu key, user check + merge), the immediate-mode effect in a level (`sub_00049F70`).
 5. A separate plan for real 60 fps (decoupling), from the reference recomps.
-6. `m3-ingame` is 5 commits ahead of `github/m3-ingame`; not pushed (ask Austin).
+6. `m3-ingame` is 10 commits ahead of `github/m3-ingame` (`git log github/m3-ingame..`); not pushed (ask Austin).
