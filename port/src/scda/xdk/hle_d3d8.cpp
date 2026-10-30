@@ -56,25 +56,25 @@ namespace {
 
 // ── This XBE's D3D globals ──────────────────────────────────────────────────
 
-constexpr uint32_t kDevice = 0x001A13E0;       // the static CDevice: Direct3D_CreateDevice stores it to g_pDevice
+constexpr uint32_t kDevice = 0x002763F0;       // the static CDevice: Direct3D_CreateDevice stores it to g_pDevice
 constexpr uint32_t kDeviceBytes = 0x928 * 4;   // Direct3D_CreateDevice clears this many dwords when Init fails
-constexpr uint32_t kDevicePtr = 0x001A13D8;    // D3D__pDevice
-constexpr uint32_t kDirtyFlags = 0x001A0F38;   // D3D__DirtyFlags
-constexpr uint32_t kTextureState = 0x001A0F40; // D3D__TextureState [4][32]
-constexpr uint32_t kRenderState = 0x001A1140;  // D3D__RenderState [166]
-constexpr uint32_t kStreams = 0x001A3898;      // g_Stream [16] stride, offset, buffer
-constexpr uint32_t kSimpleEncode = 0x001FB2B0; // D3DSIMPLERENDERSTATEENCODE, SetRenderStateNotInline
+constexpr uint32_t kDevicePtr = 0x002763E8;    // D3D__pDevice
+constexpr uint32_t kDirtyFlags = 0x00275F48;   // D3D__DirtyFlags
+constexpr uint32_t kTextureState = 0x00275F50; // D3D__TextureState [4][32]
+constexpr uint32_t kRenderState = 0x00276150;  // D3D__RenderState [166]
+constexpr uint32_t kStreams = 0x00278490;      // g_Stream [16] stride, offset, buffer
+constexpr uint32_t kSimpleEncode = 0x002C7AD8; // D3DSIMPLERENDERSTATEENCODE, SetRenderStateNotInline
 
 // recompiled D3D helpers kept as guest code
-constexpr uint32_t kDestroyResource = 0x00194A70;  // D3D_DestroyResource
-constexpr uint32_t kInitDefaultState = 0x00196D50; // called by CDevice::Init after SetRenderTarget
+constexpr uint32_t kDestroyResource = 0x0026A810;  // D3D_DestroyResource
+constexpr uint32_t kInitDefaultState = 0x0026B180; // called by CDevice::Init after SetRenderTarget
 
 // CDevice fields mirrored so the recompiled getters and resource code see what the XDK would (5659 layout)
 constexpr uint32_t kDevPush = 0x00, kDevThreshold = 0x04;
 constexpr uint32_t kDevFence = 0x2C;             // stored into a resource as it is released (SetTexture)
 constexpr uint32_t kDevPsTextureModes = 0x790;   // SetRenderState_PSTextureModes
 constexpr uint32_t kDevVertexShader = 0x794;     // m_VertexShader, by XbSymbolDatabase
-constexpr uint32_t kDevZScale = 0x948;           // the viewport helper 0x190910
+constexpr uint32_t kDevZScale = 0x948;           // the viewport helper 0x00265070
 constexpr uint32_t kDevSuperX = 0x95C, kDevSuperY = 0x960;
 constexpr uint32_t kDevTransforms = 0xC60;       // SetTransform: 10 matrices
 constexpr uint32_t kDevViewport = 0xEE0;         // SetViewport's copy, GetViewport reads it
@@ -262,96 +262,88 @@ bool On() {
 
 // the generated XDK bodies this file wraps (tools/recomp/manual_scan.py reads this list)
 extern "C" {
-extern void sub_0019D860_gen(void);
-extern void sub_00196140_gen(void);
-extern void sub_00191CA0_gen(void);
-extern void sub_00191E40_gen(void);
-extern void sub_00192060_gen(void);
-extern void sub_00192070_gen(void);
-extern void sub_00192170_gen(void);
-extern void sub_00192890_gen(void);
-extern void sub_00192E30_gen(void);
-extern void sub_001930F0_gen(void);
-extern void sub_00193400_gen(void);
-extern void sub_00195B90_gen(void);
-extern void sub_00190720_gen(void);
-extern void sub_00190750_gen(void);
-extern void sub_00190780_gen(void);
-extern void sub_00190A50_gen(void);
-extern void sub_00190A90_gen(void);
-extern void sub_00190AD0_gen(void);
-extern void sub_00190B20_gen(void);
-extern void sub_00190B90_gen(void);
-extern void sub_00190BD0_gen(void);
-extern void sub_00190C10_gen(void);
-extern void sub_00190C70_gen(void);
-extern void sub_00190CE0_gen(void);
-extern void sub_00190D60_gen(void);
-extern void sub_00190DE0_gen(void);
-extern void sub_00190E40_gen(void);
-extern void sub_00190E90_gen(void);
-extern void sub_00190EF0_gen(void);
-extern void sub_00190F70_gen(void);
-extern void sub_00190FC0_gen(void);
-extern void sub_001910D0_gen(void);
-extern void sub_00191140_gen(void);
-extern void sub_00191180_gen(void);
-extern void sub_001911C0_gen(void);
-extern void sub_001919A0_gen(void);
-extern void sub_00191A30_gen(void);
-extern void sub_00191AC0_gen(void);
-extern void sub_00191B30_gen(void);
-extern void sub_00191B60_gen(void);
-extern void sub_00191BD0_gen(void);
-extern void sub_00191C40_gen(void);
-extern void sub_00191C60_gen(void);
-extern void sub_00191C80_gen(void);
-extern void sub_00191CD0_gen(void);
-extern void sub_00191D00_gen(void);
-extern void sub_00191D80_gen(void);
-extern void sub_00191DD0_gen(void);
-extern void sub_001944D0_gen(void);
-extern void sub_00194560_gen(void);
-extern void sub_001945C0_gen(void);
-extern void sub_00194660_gen(void);
-extern void sub_001948B0_gen(void);
-extern void sub_00192340_gen(void);
-extern void sub_00191ED0_gen(void);
-extern void sub_00192020_gen(void);
-extern void sub_00192090_gen(void);
-extern void sub_001920C0_gen(void);
-extern void sub_00192110_gen(void);
-extern void sub_00192270_gen(void);
-extern void sub_001925C0_gen(void);
-extern void sub_00192BC0_gen(void);
-extern void sub_00192BE0_gen(void);
-extern void sub_00192C00_gen(void);
-extern void sub_00193250_gen(void);
-extern void sub_00193490_gen(void);
-extern void sub_00193500_gen(void);
-extern void sub_001935E0_gen(void);
-extern void sub_001938E0_gen(void);
-extern void sub_001952B0_gen(void);
-extern void sub_00195300_gen(void);
-extern void sub_00195500_gen(void);
-extern void sub_00194CE0_gen(void);
-extern void sub_0019E390_gen(void);
-extern void sub_00194EC0_gen(void);
-extern void sub_00195BB0_gen(void);
-extern void sub_00195CD0_gen(void);
-extern void sub_00195D90_gen(void);
-extern void sub_00195F00_gen(void);
-extern void sub_00196040_gen(void);
-extern void sub_00196050_gen(void);
-extern void sub_001960A0_gen(void);
-extern void sub_001960C0_gen(void);
-extern void sub_00193D30_gen(void);
-extern void sub_00193EA0_gen(void);
-extern void sub_00193F40_gen(void);
-extern void sub_001941A0_gen(void);
-extern void sub_001941E0_gen(void);
-extern void sub_00194220_gen(void);
-extern void sub_00198370_gen(void);
+extern void sub_00264DD0_gen(void);
+extern void sub_0026C8F0_gen(void);
+extern void sub_00266410_gen(void);
+extern void sub_00267230_gen(void);
+extern void sub_00267460_gen(void);
+extern void sub_00267550_gen(void);
+extern void sub_00267A60_gen(void);
+extern void sub_00267FE0_gen(void);
+extern void sub_002682A0_gen(void);
+extern void sub_002685B0_gen(void);
+extern void sub_00264E80_gen(void);
+extern void sub_00264EB0_gen(void);
+extern void sub_00264EE0_gen(void);
+extern void sub_002651B0_gen(void);
+extern void sub_002651F0_gen(void);
+extern void sub_00265230_gen(void);
+extern void sub_00265280_gen(void);
+extern void sub_002652F0_gen(void);
+extern void sub_00265330_gen(void);
+extern void sub_00265370_gen(void);
+extern void sub_002653D0_gen(void);
+extern void sub_00265440_gen(void);
+extern void sub_002654C0_gen(void);
+extern void sub_00265540_gen(void);
+extern void sub_002655A0_gen(void);
+extern void sub_002655F0_gen(void);
+extern void sub_00265650_gen(void);
+extern void sub_002656D0_gen(void);
+extern void sub_00265720_gen(void);
+extern void sub_00265830_gen(void);
+extern void sub_002658A0_gen(void);
+extern void sub_002658E0_gen(void);
+extern void sub_00265920_gen(void);
+extern void sub_00266100_gen(void);
+extern void sub_002662A0_gen(void);
+extern void sub_002662D0_gen(void);
+extern void sub_00266340_gen(void);
+extern void sub_002663B0_gen(void);
+extern void sub_002663D0_gen(void);
+extern void sub_002663F0_gen(void);
+extern void sub_00266440_gen(void);
+extern void sub_00266470_gen(void);
+extern void sub_002664F0_gen(void);
+extern void sub_00266540_gen(void);
+extern void sub_00266CB0_gen(void);
+extern void sub_00266D40_gen(void);
+extern void sub_00266DA0_gen(void);
+extern void sub_00266E40_gen(void);
+extern void sub_00267090_gen(void);
+extern void sub_00267720_gen(void);
+extern void sub_002672C0_gen(void);
+extern void sub_002673E0_gen(void);
+extern void sub_00267470_gen(void);
+extern void sub_002674A0_gen(void);
+extern void sub_002674F0_gen(void);
+extern void sub_00267650_gen(void);
+extern void sub_002679A0_gen(void);
+extern void sub_00267D90_gen(void);
+extern void sub_00267DB0_gen(void);
+extern void sub_00268400_gen(void);
+extern void sub_002686D0_gen(void);
+extern void sub_00268700_gen(void);
+extern void sub_002687E0_gen(void);
+extern void sub_00268AE0_gen(void);
+extern void sub_00270D00_gen(void);
+extern void sub_0026AA80_gen(void);
+extern void sub_0026A610_gen(void);
+extern void sub_0026C360_gen(void);
+extern void sub_0026C480_gen(void);
+extern void sub_0026C540_gen(void);
+extern void sub_0026C6B0_gen(void);
+extern void sub_0026C7F0_gen(void);
+extern void sub_0026C800_gen(void);
+extern void sub_0026C850_gen(void);
+extern void sub_0026C870_gen(void);
+extern void sub_002694D0_gen(void);
+extern void sub_00269780_gen(void);
+extern void sub_00269820_gen(void);
+extern void sub_00269A80_gen(void);
+extern void sub_00269B20_gen(void);
+extern void sub_00269B60_gen(void);
+extern void sub_0026DA30_gen(void);
 }
 
 using namespace d3d;
@@ -387,7 +379,7 @@ using namespace d3d;
 // device
 
 // Direct3D_CreateDevice(adapter, type, window, flags, params, device**)
-HLE(0019D860, 6) {
+HLE(00264DD0, 6) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     uint32_t pp = A(4);
     uint32_t w = R32(pp), h = R32(pp + 4), fmt = R32(pp + 8), count = std::max<uint32_t>(R32(pp + 12), 1);
@@ -456,7 +448,7 @@ HLE(0019D860, 6) {
 // synchronisation, the renderer never runs behind
 
 // D3D_BlockOnResource(resource)
-HLE(001960C0, 1) {
+HLE(0026C870, 1) {
     uint32_t res = A(0);
     if (res && g_backend) {
         std::lock_guard<std::recursive_mutex> lock(g_lock);
@@ -474,8 +466,8 @@ HLE(001960C0, 1) {
 
 // Lock2DSurface(resource, face, level, locked, rect, flags): D3DLOCK_NOOVERWRITE skips the block above, yet a
 // title may read what the GPU drew
-extern "C" void sub_00198370_gen(void);
-extern "C" void sub_00198370(void) {
+extern "C" void sub_0026DA30_gen(void);
+extern "C" void sub_0026DA30(void) {
     if (On()) {
         uint32_t res = A(0);
         if ((A(5) & 0x20) && res && g_backend) {
@@ -483,14 +475,14 @@ extern "C" void sub_00198370(void) {
             g_backend->SyncLate(mem::VirtualFromPhysical(R32(res + 4)));
         }
     }
-    sub_00198370_gen();
+    sub_0026DA30_gen();
 }
 
 // D3D_BlockOnNonSurfaceResource(resource), 5659: what D3DVertexBuffer_Lock2 (and the other non-surface locks) wait
 // in unless D3DLOCK_NOOVERWRITE. The XDK waits through D3D_BlockOnTime, which the HLE answers at once, so the title
 // rewrote its ring vertex buffer of CPU-skinned characters while the render thread still read it: bodies drawn with
 // another character's vertices (missing, flickering, eyes floating alone). Wait for the render thread instead.
-HLE(00196140, 1) {
+HLE(0026C8F0, 1) {
     uint32_t res = A(0);
     if (res && g_backend) {
         std::lock_guard<std::recursive_mutex> lock(g_lock);
@@ -500,7 +492,7 @@ HLE(00196140, 1) {
 }
 
 // D3DResource_BlockUntilNotBusy(resource)
-HLE(00194CE0, 1) {
+HLE(0026AA80, 1) {
     if (A(0) && g_backend) {
         std::lock_guard<std::recursive_mutex> lock(g_lock);
         g_backend->WaitResource(A(0));
@@ -508,42 +500,42 @@ HLE(00194CE0, 1) {
     gpu::MarkDirty(A(0));
     return 0;
 }
-HLE(00193490, 0) { return 0; }  // D3DDevice_IsBusy
-HLE(00195D90, 2) { return 0; }  // D3D_BlockOnTime(time, ...)
+HLE(002686D0, 0) { return 0; }  // D3DDevice_IsBusy
+HLE(0026C540, 2) { return 0; }  // D3D_BlockOnTime(time, ...)
 // D3D_SetFence(flags)
-HLE(00195CD0, 1) {
+HLE(0026C480, 1) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     return g_backend ? g_backend->Fence() : 0;
 }
 // D3D_KickOffAndWaitForIdle
-HLE(001960A0, 0) {
+HLE(0026C850, 0) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     if (g_backend) g_backend->Flush();
     return 0;
 }
-HLE(00195BB0, 0) { return 0; }  // CDevice_KickOff (__thiscall, no stack arguments)
+HLE(0026C360, 0) { return 0; }  // CDevice_KickOff (__thiscall, no stack arguments)
 
 // D3DDevice_MakeSpace
-HLE(00196040, 0) {
+HLE(0026C7F0, 0) {
     LOG_FIRST(16, "d3d: MakeSpace from %08X, some caller still pushes hardware commands", R32(g_esp));
     SetDev(kDevPush, g_scratch_push);
     return g_scratch_push;
 }
 // D3D_MakeRequestedSpace(minimum, requested)
-HLE(00195F00, 2) {
+HLE(0026C6B0, 2) {
     LOG_FIRST(16, "d3d: MakeRequestedSpace from %08X", R32(g_esp));
     SetDev(kDevPush, g_scratch_push);
     return g_scratch_push;
 }
 // D3DDevice_BeginStateBig(count): room for a long run of pushes
-HLE(00196050, 1) {
+HLE(0026C800, 1) {
     LOG_FIRST(16, "d3d: BeginStateBig from %08X", R32(g_esp));
     SetDev(kDevPush, g_scratch_push);
     return g_scratch_push;
 }
 
 // D3DDevice_BlockUntilVerticalBlank
-HLE(00192090, 0) {
+HLE(00267470, 0) {
     // xboxrecomp: unlocked and caps above 60 (Pace) do not wait for the 59.94 Hz grid, nor a cutscene fast-forwarding
     if (app::Get().fps_limit > 60 || hppoa_FastForward() > 1) return 0;
     WaitVblank(xbox_Nv2aVblankCount(), 1);  // the next vblank
@@ -552,24 +544,26 @@ HLE(00192090, 0) {
 
 // fences (SCDA): the renderer's own
 // D3DDevice_InsertFence()
-HLE(00192170, 0) {
+HLE(00267550, 0) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     return g_backend ? g_backend->Fence() : 0;
 }
 // D3DDevice_IsFencePending(fence)
+#if 0  /* PoA: hp1 00195B90 has no match in PoA yet (docs/bringup.md) */
 HLE(00195B90, 1) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     return g_backend && g_backend->FencePending(A(0)) ? 1 : 0;
 }
+#endif
 // D3DDevice_BlockOnFence(fence)
-HLE(00192060, 1) {
+HLE(00267460, 1) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     if (g_backend) g_backend->WaitFence(A(0));
     return 0;
 }
 
 // D3DDevice_SetGammaRamp(flags, ramp): 3 x 256 bytes, red, green, blue (SCDA)
-HLE(00191E40, 2) {
+HLE(00267230, 2) {
     uint8_t ramp[768];
     std::memcpy(ramp, HostPtr(A(1)), 768);
     std::lock_guard<std::recursive_mutex> lock(g_lock);
@@ -596,6 +590,7 @@ void VblankHook() {
     CallGuest(cb, {g_vblank_data});
 }
 }  // namespace
+#if 0  /* PoA: hp1 00192070 has no match in PoA yet (docs/bringup.md) */
 HLE(00192070, 1) {
     if (!g_vblank_data) {
         g_vblank_data = mem::AllocSystem(16, 16);
@@ -606,12 +601,13 @@ HLE(00192070, 1) {
     TRACE("SetVerticalBlankCallback %08X", A(0));
     return 0;
 }
-HLE(001920C0, 1) { return 0; }  // D3DDevice_SetFlickerFilter
-HLE(00192110, 1) { return 0; }  // D3DDevice_SetSoftDisplayFilter
-HLE(00193500, 2) { return 0; }  // D3D_SetTileNoWait: the console's memory controller's business
+#endif
+HLE(002674A0, 1) { return 0; }  // D3DDevice_SetFlickerFilter
+HLE(002674F0, 1) { return 0; }  // D3DDevice_SetSoftDisplayFilter
+HLE(00268700, 2) { return 0; }  // D3D_SetTileNoWait: the console's memory controller's business
 
 // D3DDevice_GetDisplayMode(mode): Width, Height, RefreshRate, Flags, Format of the device's buffers
-HLE(00192270, 1) {
+HLE(00267650, 1) {
     uint32_t m = A(0);
     uint32_t w = 640, h = 480;
     if (g_buffers[1]) gpu::SurfaceSize(SurfaceOf(g_buffers[1]), w, h);
@@ -626,7 +622,7 @@ HLE(00192270, 1) {
 // targets and presentation
 
 // D3DDevice_SetRenderTarget(target, depth)
-HLE(00192340, 2) {
+HLE(00267720, 2) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     uint32_t rt = A(0) ? A(0) : Dev(kDevRenderTarget), zs = A(1);
     AddRef(rt);
@@ -649,20 +645,22 @@ HLE(00192340, 2) {
 }
 
 // D3DDevice_GetBackBuffer2(index): -1 the front buffer
-HLE(001925C0, 1) {
+HLE(002679A0, 1) {
     int32_t i = int32_t(A(0));
     uint32_t s = i < 0 ? g_buffers[0] : g_buffers[std::min<uint32_t>(uint32_t(i) + 1, g_buffer_count - 1)];
     W32(s, R32(s) + 1);
     return s;
 }
 // D3DDevice_GetRenderTarget2
+#if 0  /* PoA: hp1 00192BC0 has no match in PoA yet (docs/bringup.md) */
 HLE(00192BC0, 0) {
     uint32_t s = Dev(kDevRenderTarget);
     if (s) W32(s, R32(s) + 1);
     return s;
 }
+#endif
 // D3DDevice_GetDepthStencilSurface2
-HLE(00192BE0, 0) {
+HLE(00267D90, 0) {
     uint32_t s = Dev(kDevDepth);
     if (s) W32(s, R32(s) + 1);
     return s;
@@ -687,7 +685,7 @@ extern "C" void hle_d3d8_overlay_present(void) {
     if (g_backend && g_buffers[1]) g_backend->Present(SurfaceOf(g_buffers[1]), false);
 }
 
-HLE(0019E390, 1) {
+HLE(0026A610, 1) {
     g_last_swap_ms.store(GetTickCount64());
     {   // xboxrecomp debug: F12 down starts a [HUD] trace of the next frame, this Swap ends one
         static bool was_down;
@@ -764,22 +762,24 @@ HLE(0019E390, 1) {
 }
 
 // D3DDevice_Clear(count, rects, flags, color, z, stencil)
+#if 0  /* PoA: hp1 00194EC0 has no match in PoA yet (docs/bringup.md) */
 HLE(00194EC0, 6) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     const uint8_t* rects = A(0) && A(1) ? static_cast<const uint8_t*>(HostPtr(A(1))) : nullptr;
     if (g_backend) g_backend->Clear(g_state, A(0), rects, A(2), A(3), ArgF(A(4)), A(5));
     return 0;
 }
+#endif
 
 // D3DDevice_CopyRects(source, rects, count, destination, points) (SCDA)
-HLE(00192890, 5) {
+HLE(00267A60, 5) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     if (g_backend) g_backend->Copy(SurfaceOf(A(0)), SurfaceOf(A(3)), A(2), A(1), A(4));
     return 0;
 }
 
 // D3DDevice_SetViewport(viewport)
-HLE(00192C00, 1) {
+HLE(00267DB0, 1) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     uint32_t v = A(0);
     g_state.viewport = {R32(v), R32(v + 4), R32(v + 8), R32(v + 12), GF(v + 16), GF(v + 20)};
@@ -791,7 +791,7 @@ HLE(00192C00, 1) {
 }
 
 // D3DDevice_SetScissors(count, exclusive, rects)
-HLE(001935E0, 3) {
+HLE(002687E0, 3) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     g_state.scissor_count = std::min<uint32_t>(A(0), 8);
     for (uint32_t i = 0; i < g_state.scissor_count * 4; i++) g_state.scissors[i] = R32(A(2) + i * 4);
@@ -799,7 +799,7 @@ HLE(001935E0, 3) {
 }
 
 // D3DDevice_SetScreenSpaceOffset(x, y)
-HLE(001938E0, 2) {
+HLE(00268AE0, 2) {
     g_state.ss_offset_x = ArgF(A(0));
     g_state.ss_offset_y = ArgF(A(1));
     W32(kDevice + kDevScreenOffset, A(0));
@@ -811,14 +811,14 @@ HLE(001938E0, 2) {
 // render states
 
 // D3DDevice_SetRenderState_Simple(method, value), __fastcall
-HLE(00190750, 0) {
+HLE(00264EB0, 0) {
     uint32_t method = g_ecx & 0x1FFC, value = g_edx;
     g_state.simple[method >> 2] = value;
     return 0;
 }
 
 // D3DDevice_SetRenderStateNotInline(state, value)
-HLE(00190780, 2) {
+HLE(00264EE0, 2) {
     uint32_t rs = A(0), v = A(1);
     if (rs < gpu::kRsDeferredFirst) {
         uint32_t method = R32(kSimpleEncode + rs * 4) & 0x1FFC;
@@ -836,7 +836,7 @@ HLE(00190780, 2) {
 // states, which are what the renderer keys depth bias on (decals such as windows z-fight without it). As 5028 does:
 // f = -(float)(DWORD)value; PolygonOffsetZSlopeScale (0x4D) = f / 4, PolygonOffsetZOffset (0x4E) = f, and the
 // point/wireframe/solid offset enables (0x4F-0x51) = value != 0.
-HLE(00190D60, 1) {
+HLE(002654C0, 1) {
     uint32_t v = A(0);
     float f = -float(v);  // the XDK reads the DWORD unsigned
     float slope = f * 0.25f;
@@ -890,28 +890,28 @@ COMPLEX_STATE(00191C60, gpu::kRsRopZRead)
 COMPLEX_STATE(00191C80, gpu::kRsDoNotCullUncompressed)
 
 // D3DDevice_SetTextureState_TexCoordIndex(stage, value)
-HLE(00190FC0, 2) {
+HLE(00265720, 2) {
     g_state.tss[A(0) & 3][gpu::kTssTexCoordIndex] = A(1);
     W32(kTextureState + ((A(0) & 3) * 32 + gpu::kTssTexCoordIndex) * 4, A(1));
     return 0;
 }
 // D3DDevice_SetTextureState_BumpEnv(stage, type, value)
-HLE(001910D0, 3) {
+HLE(00265830, 3) {
     if (A(1) >= gpu::kTssBumpEnvMat00 && A(1) <= gpu::kTssBumpEnvLOffset) g_state.tss[A(0) & 3][A(1)] = A(2);
     return 0;
 }
 // D3DDevice_SetTextureState_BorderColor(stage, value)
-HLE(00191140, 2) {
+HLE(002658A0, 2) {
     g_state.tss[A(0) & 3][gpu::kTssBorderColor] = A(1);
     return 0;
 }
 // D3DDevice_SetTextureState_ColorKeyColor(stage, value)
-HLE(00191180, 2) {
+HLE(002658E0, 2) {
     g_state.tss[A(0) & 3][gpu::kTssColorKeyColor] = A(1);
     return 0;
 }
 // D3DDevice_SetTextureStageStateNotInline(stage, type, value)
-HLE(001911C0, 3) {
+HLE(00265920, 3) {
     uint32_t stage = A(0) & 3, type = A(1), v = A(2);
     if (type < gpu::kTssCount) {
         g_state.tss[stage][type] = v;
@@ -923,7 +923,7 @@ HLE(001911C0, 3) {
 // D3DDevice_SetTransform(type, matrix): the XDK's types are view 0, projection 1, texture 2-5, world 6-9; the
 // renderer keeps Direct3D 8's numbers (view 2, projection 3, texture 16, world 256). The device copy is what
 // GetTransform reads.
-HLE(00191ED0, 2) {
+HLE(002672C0, 2) {
     uint32_t t = A(0);
     if (t >= 10) return 0;
     std::memcpy(HostPtr(kDevice + kDevTransforms + t * 64), HostPtr(A(1)), 64);
@@ -933,37 +933,37 @@ HLE(00191ED0, 2) {
 }
 
 // D3DDevice_SetMaterial(material)
-HLE(00192020, 1) {
+HLE(002673E0, 1) {
     std::memcpy(g_state.material.data(), HostPtr(A(0)), 17 * 4);
     return 0;
 }
 
 // the XDK keeps its own light lists, the renderer gets a copy (SCDA)
 // D3DDevice_SetLight(index, light)
-extern "C" void sub_00192E30_gen(void);
-extern "C" void sub_00192E30(void) {
+extern "C" void sub_00267FE0_gen(void);
+extern "C" void sub_00267FE0(void) {
     uint32_t i = A(0), l = A(1);
     if (On() && i < 8 && l) {
         std::lock_guard<std::recursive_mutex> lock(g_lock);
         std::memcpy(g_state.lights[i].data(), HostPtr(l), 26 * 4);
     }
-    sub_00192E30_gen();
+    sub_00267FE0_gen();
 }
 // D3DDevice_LightEnable(index, enable)
-extern "C" void sub_001930F0_gen(void);
-extern "C" void sub_001930F0(void) {
+extern "C" void sub_002682A0_gen(void);
+extern "C" void sub_002682A0(void) {
     uint32_t i = A(0), on = A(1);
     if (On() && i < 8) {
         std::lock_guard<std::recursive_mutex> lock(g_lock);
         g_state.light_enable = on ? g_state.light_enable | 1u << i : g_state.light_enable & ~(1u << i);
     }
-    sub_001930F0_gen();
+    sub_002682A0_gen();
 }
 
 // resources in use
 
 // D3DDevice_SetTexture(stage, texture)
-HLE(00193250, 2) {
+HLE(00268400, 2) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     uint32_t stage = A(0) & 3, tex = A(1);
     uint32_t old = Dev(kDevTextures + stage * 4);
@@ -977,7 +977,7 @@ HLE(00193250, 2) {
 }
 
 // D3DDevice_SetPalette(stage, palette): the device's slot at +0xF98, references as the XDK keeps them
-HLE(00193400, 2) {
+HLE(002685B0, 2) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     uint32_t stage = A(0) & 3, pal = A(1);
     uint32_t old = Dev(kDevPalettes + stage * 4);
@@ -990,7 +990,7 @@ HLE(00193400, 2) {
 }
 
 // D3DDevice_SetStreamSource(stream, buffer, stride)
-HLE(001944D0, 3) {
+HLE(00266CB0, 3) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     uint32_t n = A(0) & 15, vb = A(1), stride = A(2);
     uint32_t old = R32(kStreams + n * 12 + 8);
@@ -1005,7 +1005,7 @@ HLE(001944D0, 3) {
 // shaders
 
 // D3DDevice_SetVertexShader(handle)
-HLE(001948B0, 1) {
+HLE(00267090, 1) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     uint32_t h = A(0);
     g_state.vs_handle = h;
@@ -1046,18 +1046,19 @@ void VsConstants(uint32_t reg, uint32_t src, uint32_t count) {
 }  // namespace
 
 // D3DDevice_LoadVertexShader(handle, address)
-HLE(00194560, 2) {
+HLE(00266D40, 2) {
     LOG_FIRST(4, "d3d: LoadVertexShader %08X at %u is not supported", A(0), A(1));
     return 0;
 }
 // D3DDevice_SelectVertexShader(handle, address)
-HLE(001945C0, 2) {
+HLE(00266DA0, 2) {
     LOG_FIRST(4, "d3d: SelectVertexShader %08X at %u is not supported", A(0), A(1));
     return 0;
 }
-HLE(00194660, 1) { return 0; }  // D3DDevice_SetShaderConstantMode
+HLE(00266E40, 1) { return 0; }  // D3DDevice_SetShaderConstantMode
 
 // D3DDevice_CreatePixelShader(definition, handle*)
+#if 0  /* PoA: hp1 001952B0 has no match in PoA yet (docs/bringup.md) */
 HLE(001952B0, 2) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     auto ps = std::make_shared<gpu::PixelShader>();
@@ -1068,9 +1069,10 @@ HLE(001952B0, 2) {
     W32(A(1), rec);
     return 0;
 }
+#endif
 
 // D3DDevice_SetPixelShader(handle)
-HLE(00195300, 1) {
+HLE(00270D00, 1) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     g_state.ps = nullptr;
     if (!A(0)) return 0;
@@ -1104,6 +1106,7 @@ HLE(00195300, 1) {
 }
 
 // D3DDevice_SetPixelShaderConstant(register, data, count)
+#if 0  /* PoA: hp1 00195500 has no match in PoA yet (docs/bringup.md) */
 HLE(00195500, 3) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     uint32_t reg = A(0), src = A(1), n = A(2);
@@ -1111,6 +1114,7 @@ HLE(00195500, 3) {
     gpu::ApplyPixelConstants(g_state, reg, n);
     return 0;
 }
+#endif
 
 // drawing
 
@@ -1133,7 +1137,7 @@ void HudTrace(uint32_t prim, uint32_t count, uint32_t verts, uint32_t stride) {
     int found = 0;
     for (uint32_t i = 0; i < 256 && found < 10; i++) {
         uint32_t v = R32(g_esp + 4 * i);
-        if (v < 0x11005 || v >= 0x190714) continue;  // the title's own code (.text)
+        if (v < 0x11005 || v >= 0x264C64) continue;  // the title's own code (.text)
         if (R8(v - 5) == 0xE8 || R8(v - 2) == 0xFF || R8(v - 3) == 0xFF || R8(v - 6) == 0xFF) {
             fprintf(stderr, " %08X", v);
             found++;
@@ -1151,7 +1155,7 @@ uint32_t StreamVertices(uint32_t start) {
 }  // namespace
 
 // D3DDevice_DrawVertices(primitive, start, count)
-HLE(00193EA0, 3) {
+HLE(00269780, 3) {
     HudTrace(A(0), A(2), StreamVertices(A(1)), g_state.streams[0].stride);
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     SyncDeferred();
@@ -1160,7 +1164,7 @@ HLE(00193EA0, 3) {
 }
 
 // D3DDevice_DrawIndexedVertices(primitive, count, indices)
-HLE(00193F40, 3) {
+HLE(00269820, 3) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     SyncDeferred();
     const uint8_t* indices = A(2) ? static_cast<const uint8_t*>(HostPtr(A(2))) : nullptr;
@@ -1198,7 +1202,7 @@ uint32_t UpVertices(uint32_t src, uint32_t bytes) {
 }  // namespace
 
 // D3DDevice_DrawVerticesUP(primitive, count, vertices, stride)
-HLE(00193D30, 4) {
+HLE(002694D0, 4) {
     HudTrace(A(0), A(1), A(2), A(3));
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     if (!g_backend || !A(1) || !A(3)) return 0;
@@ -1211,9 +1215,9 @@ HLE(00193D30, 4) {
 }
 
 // immediate mode: not drawn, said once
-HLE(001941E0, 1) {  // D3DDevice_Begin(primitive)
+HLE(00269B20, 1) {  // D3DDevice_Begin(primitive)
     LOG_FIRST(4, "d3d: Begin/End immediate mode is not supported (from %08X)", R32(g_esp));
     return 0;
 }
-HLE(00194220, 0) { return 0; }  // D3DDevice_End
-HLE(001941A0, 3) { return 0; }  // D3DDevice_SetVertexData2f(register, a, b)
+HLE(00269B60, 0) { return 0; }  // D3DDevice_End
+HLE(00269A80, 3) { return 0; }  // D3DDevice_SetVertexData2f(register, a, b)

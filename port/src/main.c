@@ -82,7 +82,7 @@ extern ptrdiff_t g_xbox_mem_offset;
  * TODO: Set these from your xbe_parser output.
  * Run: py -3 -m tools.xbe_parser game/default.xbe
  */
-#define YOUR_GAME_ENTRY_POINT   0x00154331  /* XBE entry point VA (mainCRTStartup) */
+#define YOUR_GAME_ENTRY_POINT   0x000111DB  /* XBE entry point VA (mainCRTStartup), PoA USA */
 #define YOUR_GAME_XBE_PATH      "game\\default.xbe"
 #define YOUR_GAME_DIR            "game"
 
@@ -552,12 +552,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         hppoa_TrainerInit();
     }
 
-    /* GPU fence. D3D's push-buffer wait (guest 0x00195D90, D3D_BlockOnTime) spins until the
+    /* GPU fence. D3D's push-buffer wait (guest 0x0026C540, D3D_BlockOnTime) spins until the
      * time stamp the GPU has completed -- *(dev+0x30) points at it -- catches
      * up with the one it last inserted at dev+0x2C. Nothing here runs a GPU to
      * write it, so mirror the inserted stamp into it. The device pointer is
-     * the global D3D CreateDevice stores at 0x001A13D8. */
-    xbox_Nv2aMirrorFence(0x001A13D8u, 0x2Cu, 0x30u);
+     * the global D3D CreateDevice stores at 0x002763E8. */
+    xbox_Nv2aMirrorFence(0x002763E8u, 0x2Cu, 0x30u);
 
     /* Step 6: Initialize stack */
     g_esp = XBOX_STACK_TOP;

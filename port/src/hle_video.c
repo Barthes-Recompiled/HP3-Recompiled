@@ -64,7 +64,7 @@ static int trace_on(void)
 /* D3DDevice_GetDisplayFieldStatus(pFieldStatus): { Field, VBlankCount }. The
  * runtime's 60 Hz count, progressive (field 3, as the XDK reports when the mode
  * is not interlaced). */
-extern void sub_001934C0_gen(void);
+#if 0  /* PoA: hp1 001934C0 has no match in PoA yet (docs/bringup.md) */
 void sub_001934C0(void)
 {
     static DWORD t0;
@@ -84,10 +84,11 @@ void sub_001934C0(void)
         }
     }
 }
+#endif
 
 /* D3DDevice_GetOverlayUpdateStatus(): TRUE once a vblank has passed since the
  * last UpdateOverlay. The title never shows an overlay, so always. */
-extern void sub_0019D910_gen(void);
+#if 0  /* PoA: hp1 0019D910 has no match in PoA yet (docs/bringup.md) */
 void sub_0019D910(void)
 {
     if (!d3d_hle()) {
@@ -97,6 +98,7 @@ void sub_0019D910(void)
     g_eax = 1;
     g_esp += 4;
 }
+#endif
 
 /* Hooks the renderer asks about the title's screens (scda/gpu/d3d12.cpp's Squeeze2D and captures). Philosopher's
  * Stone answered them from its movie player, loading thread and icon table; PoA's equivalents are not found yet

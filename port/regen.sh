@@ -10,8 +10,13 @@ python3 tools/region/retarget.py --port port --xbe game/default.xbe --out port/s
 src() { if [ -f "port/src/recomp/region/$1" ]; then echo "port/src/recomp/region/$1"; else echo "port/$1"; fi; }
 # the XBE's layout (sections, imports, entry), which disasm reads as game/default_analysis.json
 python3 -m tools.xbe_parser game/default.xbe --json game/default_analysis.json
-python3 -m tools.disasm game/default.xbe --text-only --extra-sections D3D,D3DX,XGRPH,DSOUND,XMV,XPP \
+python3 -m tools.disasm game/default.xbe --text-only --extra-sections D3D,D3DX,XGRPH,DSOUND,XPP \
     --seed-functions "$(src icall_seeds.json)"
+# hand-written code may name only functions this XBE has: an address carried over from another title would replace
+# part of an unrelated function (comments and #if 0 blocks are not looked at)
+python3 port/tools/check_no_foreign_addrs.py --functions tools/disasm/output/functions.json \
+    $(cd port && find src -path src/recomp -prune -o \( -name '*.c' -o -name '*.cpp' -o -name '*.h' \) -print \
+      | while read -r f; do src "$f"; done)
 python3 -m tools.func_id game/default.xbe
 python3 -m tools.abi_analysis game/default.xbe
 python3 -m tools.recomp game/default.xbe --all --split 1000 --gen-dir port/src/recomp/gen --game-name hppoa \

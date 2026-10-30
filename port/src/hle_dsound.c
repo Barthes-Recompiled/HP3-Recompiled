@@ -49,8 +49,8 @@ void xbox_HeapFree(uint32_t xbox_va);
 
 /* ── Guest addresses (XDK 5659 DSOUND in this XBE) ───────────────────────── */
 
-#define STREAM_VTABLE   0x0020F098u  /* CDirectSoundStream, XMediaObject part (AddRef 0x1A6696 first) */
-#define STREAM_VTABLE2  0x0020F08Cu  /* its second base, at object + 4 */
+#define STREAM_VTABLE   0x00000000u  /* CDirectSoundStream, XMediaObject part: PoA's not found yet (hp1 0x0020F098) */
+#define STREAM_VTABLE2  0x00000000u  /* its second base, at object + 4 (hp1 0x0020F08C) */
 
 #define S_OK_           0x00000000u
 #define E_FAIL_         0x80004005u
@@ -75,7 +75,9 @@ static int hle_on(void)
     if (g_hle < 0) {
         const char *e = getenv("RECOMP_HLE_DSOUND");
         const char *t = getenv("RECOMP_DSOUND_TRACE");
-        g_hle = !(e && *e == '0');
+        /* PoA: off unless RECOMP_HLE_DSOUND=1 until every entry point is bound (docs/bringup.md): part host
+         * mixer, part XDK DirectSound would share voices between the two */
+        g_hle = e && *e == '1';
         g_trace = t && *t && *t != '0';
         fprintf(stderr, "[DSOUND] %s\n", g_hle ? "host mixer (HLE)" : "XDK DirectSound on the emulated APU");
     }
@@ -795,8 +797,8 @@ static void run_callbacks(uint32_t only_voice, int all)
 /* ── Device ─────────────────────────────────────────────────────────────── */
 
 /* DirectSoundCreate(pguid, ppDirectSound, pUnkOuter) */
-extern void sub_001A89A2_gen(void);
-void sub_001A89A2(void)
+extern void sub_002B874A_gen(void);
+void sub_002B874A(void)
 {
     FALLBACK(001A89A2);
     EnterCriticalSection(&g_lock);
@@ -812,21 +814,24 @@ void sub_001A89A2(void)
 }
 
 /* IDirectSound_Release(this) */
-extern void sub_001A5FAA_gen(void);
-void sub_001A5FAA(void) { FALLBACK(001A5FAA); ret_stdcall(0, 1); }
+extern void sub_002B6962_gen(void);
+void sub_002B6962(void) { FALLBACK(001A5FAA); ret_stdcall(0, 1); }
 
 /* DirectSoundUseFullHRTF(), DirectSoundOverrideSpeakerConfig(dwSpeakerConfig): HRTF is not reproduced */
-extern void sub_001A5FD6_gen(void);
+#if 0  /* PoA: hp1 001A5FD6 has no match in PoA yet (docs/bringup.md) */
 void sub_001A5FD6(void) { FALLBACK(001A5FD6); ret_stdcall(0, 0); }
-extern void sub_001A5FF5_gen(void);
+#endif
+#if 0  /* PoA: hp1 001A5FF5 has no match in PoA yet (docs/bringup.md) */
 void sub_001A5FF5(void) { FALLBACK(001A5FF5); ret_stdcall(0, 1); }
+#endif
 
 /* IDirectSound_CommitDeferredSettings(this): every setting applies at once here */
-extern void sub_001A844A_gen(void);
+#if 0  /* PoA: hp1 001A844A has no match in PoA yet (docs/bringup.md) */
 void sub_001A844A(void) { FALLBACK(001A844A); ret_stdcall(S_OK_, 1); }
+#endif
 
 /* IDirectSound_SetDistanceFactor / SetRolloffFactor(this, fl, dwApply) */
-extern void sub_001A8794_gen(void);
+#if 0  /* PoA: hp1 001A8794 has no match in PoA yet (docs/bringup.md) */
 void sub_001A8794(void)
 {
     uint32_t u;
@@ -836,8 +841,9 @@ void sub_001A8794(void)
     if (!(g_distance_factor > 0)) g_distance_factor = 1.0f;
     ret_stdcall(S_OK_, 3);
 }
+#endif
 
-extern void sub_001A87B8_gen(void);
+#if 0  /* PoA: hp1 001A87B8 has no match in PoA yet (docs/bringup.md) */
 void sub_001A87B8(void)
 {
     uint32_t u;
@@ -847,20 +853,22 @@ void sub_001A87B8(void)
     if (!(g_rolloff_factor >= 0)) g_rolloff_factor = 1.0f;
     ret_stdcall(S_OK_, 3);
 }
+#endif
 
 /* IDirectSound_SynchPlayback(this) */
-extern void sub_001A6DF2_gen(void);
+#if 0  /* PoA: hp1 001A6DF2 has no match in PoA yet (docs/bringup.md) */
 void sub_001A6DF2(void) { FALLBACK(001A6DF2); ret_stdcall(S_OK_, 1); }
+#endif
 
 /* IDirectSound_SetI3DL2Listener(this, pds3dl, dwApply): no room reverb here */
-extern void sub_001A87DC_gen(void);
-void sub_001A87DC(void) { FALLBACK(001A87DC); ret_stdcall(S_OK_, 3); }
+extern void sub_002B8584_gen(void);
+void sub_002B8584(void) { FALLBACK(001A87DC); ret_stdcall(S_OK_, 3); }
 
 /* IDirectSound_DownloadEffectsImage(this, pvImageBuffer, dwImageSize,
  * pImageLoc, ppImageDesc). Effects run on the console's DSP and are not
  * reproduced; the title gets a zeroed descriptor with no effects. */
-extern void sub_001A6DCB_gen(void);
-void sub_001A6DCB(void)
+extern void sub_002B7508_gen(void);
+void sub_002B7508(void)
 {
     FALLBACK(001A6DCB);
     if (ARG(4)) {
@@ -873,7 +881,7 @@ void sub_001A6DCB(void)
 }
 
 /* DirectSoundDoWork() */
-extern void sub_001A6EE1_gen(void);
+#if 0  /* PoA: hp1 001A6EE1 has no match in PoA yet (docs/bringup.md) */
 void sub_001A6EE1(void)
 {
     FALLBACK(001A6EE1);
@@ -881,6 +889,7 @@ void sub_001A6EE1(void)
     g_esp += 4;
     g_eax = 0;
 }
+#endif
 
 /* ── Buffers ────────────────────────────────────────────────────────────── */
 
@@ -914,8 +923,8 @@ static uint32_t new_buffer(uint32_t desc, uint32_t out)
 }
 
 /* IDirectSound_CreateSoundBuffer(this, pdsbd, ppBuffer, pUnkOuter) */
-extern void sub_001A8770_gen(void);
-void sub_001A8770(void) { FALLBACK(001A8770); ret_stdcall(new_buffer(ARG(1), ARG(2)), 4); }
+extern void sub_002B8560_gen(void);
+void sub_002B8560(void) { FALLBACK(001A8770); ret_stdcall(new_buffer(ARG(1), ARG(2)), 4); }
 
 /* One buffer method: look the voice up under the lock, run the body. */
 typedef uint32_t (*buf_fn)(Voice *v);
@@ -1099,8 +1108,8 @@ BUFFER(SetFormat)
 /* DirectSoundCreateStream(pdssd, ppStream)
  * DSSTREAMDESC { dwFlags, dwMaxAttachedPackets, lpwfxFormat, lpfnCallback,
  *                lpvContext, lpMixBins } */
-extern void sub_001A89E9_gen(void);
-void sub_001A89E9(void)
+extern void sub_002B8791_gen(void);
+void sub_002B8791(void)
 {
     uint32_t desc, flags;
     Voice *v;
@@ -1285,107 +1294,138 @@ STREAM(Pause)
 /* ── Entry points: literal definitions, so --exclude-manual finds them ──── */
 
 /* IDirectSoundBuffer_* */
-extern void sub_001A5FC0_gen(void);
-void sub_001A5FC0(void) { buffer_call(sub_001A5FC0_gen, buf_Release, "Release", 1); }
-extern void sub_001A7F53_gen(void);
-void sub_001A7F53(void) { buffer_call(sub_001A7F53_gen, buf_SetBufferData, "SetBufferData", 3); }
-extern void sub_001A6E26_gen(void);
-void sub_001A6E26(void) { buffer_call(sub_001A6E26_gen, buf_Play, "Play", 4); }
-extern void sub_001A6E4A_gen(void);
-void sub_001A6E4A(void) { buffer_call(sub_001A6E4A_gen, buf_Stop, "Stop", 1); }
-extern void sub_001A6E62_gen(void);
+extern void sub_002B6978_gen(void);
+void sub_002B6978(void) { buffer_call(sub_002B6978_gen, buf_Release, "Release", 1); }
+extern void sub_002B7FAE_gen(void);
+void sub_002B7FAE(void) { buffer_call(sub_002B7FAE_gen, buf_SetBufferData, "SetBufferData", 3); }
+extern void sub_002B75A3_gen(void);
+void sub_002B75A3(void) { buffer_call(sub_002B75A3_gen, buf_Play, "Play", 4); }
+extern void sub_002B75C7_gen(void);
+void sub_002B75C7(void) { buffer_call(sub_002B75C7_gen, buf_Stop, "Stop", 1); }
+#if 0  /* PoA: hp1 001A6E62 has no match in PoA yet (docs/bringup.md) */
 void sub_001A6E62(void) { buffer_call(sub_001A6E62_gen, buf_SetLoopRegion, "SetLoopRegion", 3); }
-extern void sub_001A6E82_gen(void);
+#endif
+#if 0  /* PoA: hp1 001A6E82 has no match in PoA yet (docs/bringup.md) */
 void sub_001A6E82(void) { buffer_call(sub_001A6E82_gen, buf_GetStatus, "GetStatus", 2); }
-extern void sub_001A6E9E_gen(void);
+#endif
+#if 0  /* PoA: hp1 001A6E9E has no match in PoA yet (docs/bringup.md) */
 void sub_001A6E9E(void) { buffer_call(sub_001A6E9E_gen, buf_SetCurrentPosition, "SetCurrentPosition", 2); }
-extern void sub_001A6E0A_gen(void);
-void sub_001A6E0A(void) { buffer_call(sub_001A6E0A_gen, buf_SetVolume, "SetVolume", 2); }
-extern void sub_001A77EF_gen(void);
+#endif
+extern void sub_002B7587_gen(void);
+void sub_002B7587(void) { buffer_call(sub_002B7587_gen, buf_SetVolume, "SetVolume", 2); }
+#if 0  /* PoA: hp1 001A77EF has no match in PoA yet (docs/bringup.md) */
 void sub_001A77EF(void) { buffer_call(sub_001A77EF_gen, buf_SetFrequency, "SetFrequency", 2); }
-extern void sub_001A780B_gen(void);
+#endif
+#if 0  /* PoA: hp1 001A780B has no match in PoA yet (docs/bringup.md) */
 void sub_001A780B(void) { buffer_call(sub_001A780B_gen, buf_SetMixBins, "SetMixBins", 2); }
+#endif
 
-extern void sub_001A7827_gen(void);
+#if 0  /* PoA: hp1 001A7827 has no match in PoA yet (docs/bringup.md) */
 void sub_001A7827(void) { buffer_call(sub_001A7827_gen, buf_SetMaxDistance, "SetMaxDistance", 3); }
-extern void sub_001A784B_gen(void);
+#endif
+#if 0  /* PoA: hp1 001A784B has no match in PoA yet (docs/bringup.md) */
 void sub_001A784B(void) { buffer_call(sub_001A784B_gen, buf_SetMinDistance, "SetMinDistance", 3); }
-extern void sub_001A786F_gen(void);
+#endif
+#if 0  /* PoA: hp1 001A786F has no match in PoA yet (docs/bringup.md) */
 void sub_001A786F(void) { buffer_call(sub_001A786F_gen, buf_SetPosition, "SetPosition", 5); }
-extern void sub_001A78A4_gen(void);
+#endif
+#if 0  /* PoA: hp1 001A78A4 has no match in PoA yet (docs/bringup.md) */
 void sub_001A78A4(void) { buffer_call(sub_001A78A4_gen, buf_Ignore3D, "SetVelocity", 5); }
-extern void sub_001A78D9_gen(void);
+#endif
+#if 0  /* PoA: hp1 001A78D9 has no match in PoA yet (docs/bringup.md) */
 void sub_001A78D9(void) { buffer_call(sub_001A78D9_gen, buf_Ignore3D, "SetDistanceFactor", 3); }
-extern void sub_001A78FD_gen(void);
+#endif
+#if 0  /* PoA: hp1 001A78FD has no match in PoA yet (docs/bringup.md) */
 void sub_001A78FD(void) { buffer_call(sub_001A78FD_gen, buf_Ignore3D, "SetDopplerFactor", 3); }
-extern void sub_001A7921_gen(void);
+#endif
+#if 0  /* PoA: hp1 001A7921 has no match in PoA yet (docs/bringup.md) */
 void sub_001A7921(void) { buffer_call(sub_001A7921_gen, buf_Ignore3D, "SetRolloffCurve", 4); }
-extern void sub_001A7945_gen(void);
+#endif
+#if 0  /* PoA: hp1 001A7945 has no match in PoA yet (docs/bringup.md) */
 void sub_001A7945(void) { buffer_call(sub_001A7945_gen, buf_SetPlayRegion, "SetPlayRegion", 3); }
-extern void sub_001A7F37_gen(void);
+#endif
+#if 0  /* PoA: hp1 001A7F37 has no match in PoA yet (docs/bringup.md) */
 void sub_001A7F37(void) { buffer_call(sub_001A7F37_gen, buf_SetFormat, "SetFormat", 2); }
+#endif
 
 /* CDirectSoundStream_*, reached through the stream vtable */
-extern void sub_001A6696_gen(void);
+#if 0  /* PoA: hp1 001A6696 has no match in PoA yet (docs/bringup.md) */
 void sub_001A6696(void) { stream_call(sub_001A6696_gen, str_AddRef, "AddRef", 1); }
-extern void sub_001A66DD_gen(void);
+#endif
+#if 0  /* PoA: hp1 001A66DD has no match in PoA yet (docs/bringup.md) */
 void sub_001A66DD(void) { stream_call(sub_001A66DD_gen, str_Release, "Release", 1); }
-extern void sub_001A672B_gen(void);
+#endif
+#if 0  /* PoA: hp1 001A672B has no match in PoA yet (docs/bringup.md) */
 void sub_001A672B(void) { stream_call(sub_001A672B_gen, str_GetInfo, "GetInfo", 2); }
-extern void sub_001A682A_gen(void);
+#endif
+#if 0  /* PoA: hp1 001A682A has no match in PoA yet (docs/bringup.md) */
 void sub_001A682A(void) { stream_call(sub_001A682A_gen, str_GetStatus, "GetStatus", 2); }
-extern void sub_001A687B_gen(void);
+#endif
+#if 0  /* PoA: hp1 001A687B has no match in PoA yet (docs/bringup.md) */
 void sub_001A687B(void) { stream_call(sub_001A687B_gen, str_Process, "Process", 3); }
-extern void sub_001A6792_gen(void);
+#endif
+#if 0  /* PoA: hp1 001A6792 has no match in PoA yet (docs/bringup.md) */
 void sub_001A6792(void) { stream_call(sub_001A6792_gen, str_Discontinuity, "Discontinuity", 1); }
-extern void sub_001A67DF_gen(void);
+#endif
+#if 0  /* PoA: hp1 001A67DF has no match in PoA yet (docs/bringup.md) */
 void sub_001A67DF(void) { stream_call(sub_001A67DF_gen, str_Flush, "Flush", 1); }
-extern void sub_001A6943_gen(void);
+#endif
+#if 0  /* PoA: hp1 001A6943 has no match in PoA yet (docs/bringup.md) */
 void sub_001A6943(void) { stream_call(sub_001A6943_gen, str_FlushEx, "FlushEx", 4); }
-extern void sub_001A68F2_gen(void);
+#endif
+#if 0  /* PoA: hp1 001A68F2 has no match in PoA yet (docs/bringup.md) */
 void sub_001A68F2(void) { stream_call(sub_001A68F2_gen, str_Pause, "Pause", 2); }
+#endif
 
-extern void sub_001A6D27_gen(void);
+#if 0  /* PoA: hp1 001A6D27 has no match in PoA yet (docs/bringup.md) */
 void sub_001A6D27(void) { stream_call(sub_001A6D27_gen, str_SetVolume, "SetVolume", 2); }
-extern void sub_001A6D79_gen(void);
+#endif
+#if 0  /* PoA: hp1 001A6D79 has no match in PoA yet (docs/bringup.md) */
 void sub_001A6D79(void) { stream_call(sub_001A6D79_gen, str_SetHeadroom, "SetHeadroom", 2); }
-extern void sub_001A779D_gen(void);
+#endif
+#if 0  /* PoA: hp1 001A779D has no match in PoA yet (docs/bringup.md) */
 void sub_001A779D(void) { stream_call(sub_001A779D_gen, str_SetMixBins, "SetMixBins", 2); }
+#endif
 
 /* IDirectSoundStream_SetVolume / SetHeadroom / SetMixBins: jmps to the CDirectSoundStream methods */
-extern void sub_001A6EBA_gen(void);
+#if 0  /* PoA: hp1 001A6EBA has no match in PoA yet (docs/bringup.md) */
 void sub_001A6EBA(void)
 {
     FALLBACK(001A6EBA);
     sub_001A6D27();
 }
+#endif
 
-extern void sub_001A6EBF_gen(void);
+#if 0  /* PoA: hp1 001A6EBF has no match in PoA yet (docs/bringup.md) */
 void sub_001A6EBF(void)
 {
     FALLBACK(001A6EBF);
     sub_001A6D79();
 }
+#endif
 
-extern void sub_001A7965_gen(void);
+#if 0  /* PoA: hp1 001A7965 has no match in PoA yet (docs/bringup.md) */
 void sub_001A7965(void)
 {
     FALLBACK(001A7965);
     sub_001A779D();
 }
+#endif
 
 /* IDirectSoundStream_Pause: a jmp to CDirectSoundStream_Pause */
-extern void sub_001A6EC4_gen(void);
+#if 0  /* PoA: hp1 001A6EC4 has no match in PoA yet (docs/bringup.md) */
 void sub_001A6EC4(void)
 {
     FALLBACK(001A6EC4);
     sub_001A68F2();
 }
+#endif
 
 /* IDirectSoundStream_FlushEx: forwards its four arguments */
-extern void sub_001A6EC9_gen(void);
+#if 0  /* PoA: hp1 001A6EC9 has no match in PoA yet (docs/bringup.md) */
 void sub_001A6EC9(void)
 {
     FALLBACK(001A6EC9);
     sub_001A6943();
 }
+#endif

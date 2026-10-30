@@ -138,6 +138,15 @@ def test_not_function_start():
     assert r["unmatched"] == {A: "not-function-start"}, r
 
 
+def test_data_map_from_matched_pairs():
+    from tools.xdk_port.match import data_map
+    # the same function in both; its global moved from TEXT+0x100 to TEXT+0x150
+    donor = image(place({0x00: fn(TEXT + 0x100, TEXT + 0x00, TEXT + 0x80), 0x80: b"\xC3"}))
+    target = image(place({0x20: fn(TEXT + 0x150, TEXT + 0x20, TEXT + 0xA0), 0xA0: b"\xC3"}))
+    m = data_map(donor, {TEXT: TEXT + 0x20}, {TEXT, TEXT + 0x80}, target)
+    assert m[TEXT + 0x100] == {TEXT + 0x150: 1}, m
+
+
 def test_names_from_source():
     from tools.xdk_port.__main__ import names_from_source
     src = """

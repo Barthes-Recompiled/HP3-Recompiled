@@ -7,7 +7,7 @@
  * What counts as a cutscene is title state: Philosopher's Stone used its letterbox bars. PoA's equivalent is not found
  * yet (docs/bringup.md), so cutscene() is always false and the fast-forward never starts.
  *
- * The clock: sub_0018DD83 is XAPI's QueryPerformanceCounter (an rdtsc). It runs SKIP_SCALE times as fast while
+ * The clock: sub_00195129 is XAPI's QueryPerformanceCounter (an rdtsc). It runs SKIP_SCALE times as fast while
  * fast-forwarding, so each frame steps the logic that many times further; the DirectSound mixer (hle_dsound.c) mixes
  * that many blocks a block and outputs silence, so speech and streams end in step, and the frame pacing (hle_d3d8.cpp)
  * and the renderer's presents (d3d12.cpp) stand aside. Start and Back still reach the game as always.
@@ -94,8 +94,8 @@ static uint64_t game_clock(void)
     return c;
 }
 
-/* sub_0018DD83(LARGE_INTEGER *count): XAPI's QueryPerformanceCounter (rdtsc), ret 4, returns TRUE */
-void sub_0018DD83(void)
+/* sub_00195129(LARGE_INTEGER *count): XAPI's QueryPerformanceCounter (rdtsc), ret 4, returns TRUE */
+void sub_00195129(void)
 {
     uint32_t out = MEM32(g_esp + 4);
     uint64_t c = game_clock();

@@ -84,7 +84,7 @@ static int is_hle(uint32_t va)
     size_t lo = 0, hi = sizeof(k_hle_vas) / sizeof(k_hle_vas[0]);
     while (lo < hi) {
         size_t m = (lo + hi) / 2;
-        if (k_hle_vas[m] == va) return va != 0x00159620u && va != 0x001597E0u;  /* hle_debug.c's wrappers only forward */
+        if (k_hle_vas[m] == va) return 1;
         if (k_hle_vas[m] < va) lo = m + 1; else hi = m;
     }
     return 0;

@@ -67,9 +67,9 @@ static DWORD pad_read(DWORD port, XBOX_INPUT_STATE *s)
     return rc;
 }
 
-#define XPP_GAMEPAD_TYPE 0x001F422Cu  /* g_DeviceType_Gamepad: Current, Change, Previous connected */
-#define XPP_TYPES_BEGIN  0x001F4204u  /* g_DeviceTypeInfoTableBegin .. End: the linked device types */
-#define XPP_TYPES_END    0x001F420Cu
+#define XPP_GAMEPAD_TYPE 0x002BF9F4u  /* g_DeviceType_Gamepad: Current, Change, Previous connected */
+#define XPP_TYPES_BEGIN  0x002BF924u  /* g_DeviceTypeInfoTableBegin .. End: the linked device types */
+#define XPP_TYPES_END    0x002BF92Cu
 #define HANDLE_BASE      0x5ADE0010u  /* opaque handles, never dereferenced by the title */
 #define MAX_HANDLES      32
 
@@ -132,12 +132,12 @@ static int handle_port(uint32_t h)
 }
 
 /* XInitDevices(dwPreallocTypeCount, PreallocTypes) */
-extern void sub_001F4543_gen(void);
-void sub_001F4543(void)
+extern void sub_002BFC0C_gen(void);
+void sub_002BFC0C(void)
 {
     static int poller;
     if (!hle_on()) {
-        sub_001F4543_gen();
+        sub_002BFC0C_gen();
         return;
     }
     InitializeCriticalSection(&g_pad_lock);
@@ -163,8 +163,8 @@ void sub_001F4543(void)
 }
 
 /* XInputOpen(DeviceType, dwPort, dwSlot, pPollingParameters) -> HANDLE */
-extern void sub_001F4FE2_gen(void);
-void sub_001F4FE2(void)
+extern void sub_002C096C_gen(void);
+void sub_002C096C(void)
 {
     uint32_t type = ARG(0), port = ARG(1), slot = ARG(2);
     if (hle_on()) {
@@ -181,7 +181,7 @@ void sub_001F4FE2(void)
         }
         g_esp += 4 + 16;
     } else {
-        sub_001F4FE2_gen();
+        sub_002C096C_gen();
     }
     if (trace_on())
         fprintf(stderr, "[PADTRACE] XInputOpen(type %08X, port %u, slot %u) = %08X\n",
@@ -189,12 +189,12 @@ void sub_001F4FE2(void)
 }
 
 /* XInputClose(hDevice) */
-extern void sub_001F5038_gen(void);
-void sub_001F5038(void)
+extern void sub_002C09C2_gen(void);
+void sub_002C09C2(void)
 {
     int p;
     if (!hle_on()) {
-        sub_001F5038_gen();
+        sub_002C09C2_gen();
         return;
     }
     p = handle_index(ARG(0));
@@ -206,13 +206,13 @@ void sub_001F5038(void)
 
 /* XInputGetCapabilities(hDevice, pCapabilities) -> DWORD. XINPUT_CAPABILITIES:
  * BYTE SubType, WORD Reserved (at 2), XINPUT_GAMEPAD In (at 4), XINPUT_RUMBLE Out (at 22). */
-extern void sub_001F5044_gen(void);
-void sub_001F5044(void)
+extern void sub_002C09CE_gen(void);
+void sub_002C09CE(void)
 {
     uint32_t caps = ARG(1);
     int p;
     if (!hle_on()) {
-        sub_001F5044_gen();
+        sub_002C09CE_gen();
         return;
     }
     p = handle_port(ARG(0));
@@ -314,8 +314,8 @@ static void get_state_direct(void)
 /* XInputGetState(hDevice, pState) -> DWORD. XINPUT_STATE: dwPacketNumber,
  * then XINPUT_GAMEPAD { wButtons, bAnalogButtons[8], sThumb* }. Logs every
  * change of result, buttons or the A/B/X/Y pressure, and a heartbeat. */
-extern void sub_001F521C_gen(void);
-void sub_001F521C(void)
+extern void sub_002C0BA6_gen(void);
+void sub_002C0BA6(void)
 {
     static uint32_t last_rc = 0xFFFFFFFF, last_btn = 0xFFFFFFFF, last_abxy = 0xFFFFFFFF, calls;
     static DWORD t0;
@@ -323,7 +323,7 @@ void sub_001F521C(void)
     if (hle_on())
         get_state_direct();
     else
-        sub_001F521C_gen();
+        sub_002C0BA6_gen();
     if (!trace_on())
         return;
     calls++;
@@ -358,22 +358,22 @@ void sub_001F521C(void)
 }
 
 /* XGetDeviceChanges(DeviceType, pdwInsertions, pdwRemovals) -> BOOL */
-extern void sub_001F530B_gen(void);
-void sub_001F530B(void)
+extern void sub_002C08FF_gen(void);
+void sub_002C08FF(void)
 {
     uint32_t type = ARG(0), ins = ARG(1), rem = ARG(2);
-    sub_001F530B_gen();
+    sub_002C08FF_gen();
     if (trace_on() && g_eax)
         fprintf(stderr, "[PADTRACE] XGetDeviceChanges(type %08X): insertions %08X removals %08X\n",
                 type, ins ? MEM32(ins) : 0, rem ? MEM32(rem) : 0);
 }
 
 /* XGetDevices(DeviceType) -> bitmask of connected ports */
-extern void sub_001F52E9_gen(void);
-void sub_001F52E9(void)
+extern void sub_002C08DD_gen(void);
+void sub_002C08DD(void)
 {
     uint32_t type = ARG(0);
-    sub_001F52E9_gen();
+    sub_002C08DD_gen();
     if (trace_on())
         fprintf(stderr, "[PADTRACE] XGetDevices(type %08X) = %08X\n", type, g_eax);
 }
@@ -420,7 +420,7 @@ static DWORD host_rumble(DWORD port, XBOX_VIBRATION v)
     return xbox_InputSetState(port, &v);
 }
 
-void sub_001F528F(void)
+void sub_002C0C19(void)
 {
     uint32_t fb = ARG(1);
     uint32_t caller = MEM32(g_esp);

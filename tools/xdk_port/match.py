@@ -115,3 +115,34 @@ def match_functions(donor, donor_addrs, donor_starts, target, target_starts, lim
         if a not in anchored:
             unmatched[a] = "ambiguous"
     return {"matched": matched, "unmatched": unmatched, "anchored": anchored}
+
+
+def data_map(donor, matched, donor_starts, target, limit=0x4000):
+    """{donor value: {target value: votes}} for the image addresses matched functions use.
+
+    A matched pair is the same instructions, so an absolute address at an offset in the
+    donor function (a global, a table, another function) is at the same offset in the
+    target's copy: each occurrence is one vote for that pairing.
+    """
+    starts = sorted(set(donor_starts) | set(matched))
+    votes = {}
+    md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_32)
+    for d, t in matched.items():
+        end = _extent(starts, d, limit)
+        raw = donor.masked_at(d, end - d, raw=True)
+        traw = target.masked_at(t, end - d, raw=True)
+        if not raw or not traw:
+            continue
+        for ins in md.disasm(raw.rstrip(PAD), d):
+            o, b = ins.address - d, ins.bytes
+            rel = (b[0] in (0xE8, 0xE9) and ins.size == 5) or (b[0] == 0x0F and 0x80 <= b[1] <= 0x8F and ins.size == 6)
+            if rel:
+                continue
+            for i in range(ins.size - 3):
+                v = struct.unpack_from("<I", b, i)[0]
+                if donor.lo <= v < donor.hi and o + i + 4 <= len(traw):
+                    tv = struct.unpack_from("<I", traw, o + i)[0]
+                    if target.lo <= tv < target.hi:
+                        votes.setdefault(v, {})
+                        votes[v][tv] = votes[v].get(tv, 0) + 1
+    return votes

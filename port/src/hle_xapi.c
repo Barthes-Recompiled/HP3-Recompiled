@@ -35,7 +35,7 @@ static int hle_on(void)
 }
 
 /* NTSTATUS XapiAuthenticateDisc(void) (no stack arguments) */
-extern void sub_00155251_gen(void);
+#if 0  /* PoA: hp1 00155251 has no match in PoA yet (docs/bringup.md) */
 void sub_00155251(void)
 {
     if (!hle_on()) {
@@ -46,3 +46,4 @@ void sub_00155251(void)
     g_eax = 0;
     g_esp += 4;
 }
+#endif
