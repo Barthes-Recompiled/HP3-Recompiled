@@ -511,3 +511,22 @@ points. m3fix (same New Game script, 145 s): **0 clipped samples** (was 74,290 t
 pass anywhere in the WAV, no silent stretches in the level (zero fraction 0.00 from 95 s on; m3t6d had 0.35-1.00).
 The few single samples with jumps over 8000 left are in the intro movie (20-56 s), as in m3t6d. Same run: the pause
 menu opens on Start (Resume Game / Save Game / Options / Quit Game).
+
+**m3quit, m3quit2 (Task 5 exit run; `poa_quit2.pad`: New Game, left stick forward 6 s at 119 s, Start, Quit Game,
+Yes, then Start/A/A/A on the menu).** Captures: Harry runs down the corridor on the injected stick (moved between
+the 120 s and 132 s frames); Start opens Game Paused; Quit Game asks No/Yes (No highlighted); Yes goes back to the
+main menu (New Game / Load Game / Bonus Activities / Options); New Game loads the level a second time (Loading
+viaduct, the Ron and Lupin cutscenes, Harry in the corridor with the HUD). 30.0 fps after the reload, 0 `[CRASH]` /
+`ICALL` / unknown handle. Not checked: the immediate-mode effect in the level (`sub_00049F70`).
+
+**m3fps (fps clamp; 70 s, `RECOMP_FPS_LIMIT=unlocked`).** The fps choices are now the game's rate and 30 only
+(caps above 60 and unlocked map to the game's rate). Result: 30.0 fps through the intro movie and title (unlocked
+used to skip the presentation interval).
+
+**m3save (Task 7 first look; `poa_save.pad`: pause, Save Game, A on the first Empty slot).** The game shows "Saving
+Harry Potter POA. Please don't turn off your Xbox console." and writes `saves\UDATA\4541004c\71370821DB7F\`
+(`SaveGame-0` 16384 bytes, `SaveMeta.xbx` 48 bytes, `Name=Harry Potter POA`) plus `TitleMeta.xbx` 598,
+`TitleImage.xbx` 10240, `SaveImage.xbx` 4096 next to it: the exe-beside `saves` tree, as the DeepCode read
+predicted (`.superpowers/dc-m3-saves.txt`: title ID 0x4541004C, `XapiSetupPerTitleDriveLetters` maps U:/T:). A
+third A on the slot asked "Are you sure you want to overwrite Harry Potter POA?" (Yes/No): the game sees its save.
+Not checked yet: Load Game from the main menu restores it.
