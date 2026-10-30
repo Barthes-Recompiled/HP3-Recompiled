@@ -4,8 +4,6 @@
  "skip": ["src/recomp/gen/*", "src/recomp/region/*"],
  "include_dirs": ["src", "src/recomp", "src/scda"],
  "numbers": [
-  {"values": ["0x00011000"], "files": ["src/hle_debug.c"],
-   "why": "lower bound of the guest memory a pointer may be in (0x11000..0x4000000), not a code address"},
   {"values": ["0x20000", "0x30000", "0x40000", "0x50000", "0x70000"],
    "files": ["src/scda/gpu/render_thread.cpp", "src/scda/gpu/texture.cpp", "src/scda/xdk/hle_d3d8.cpp"],
    "why": "D3D resource Common type bits (0x70000 mask; 0x40000 texture, 0x50000 surface)"},

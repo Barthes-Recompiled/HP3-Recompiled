@@ -12,11 +12,7 @@ import sys
 
 # (function, label the hook goes after, declaration, hook line)
 PATCHES = [
-    # hle_debug.c's RECOMP_SCRIPT_TRACE: every level-script command, just before sub_0014DD30 calls its handler
-    # (ecx = the command's table entry, edi = the script context, esp + 0x1C = the arguments)
-    ("sub_0014DD30", "loc_0014DE01: ;",
-     "extern void hppoa_ScriptCommand(uint32_t entry, uint32_t ctx, uint32_t argv);",
-     "    hppoa_ScriptCommand(ecx, edi, esp + 0x1C); /* patch_gen.py: hle_debug.c's RECOMP_SCRIPT_TRACE */"),
+    # none yet for PoA
 ]
 
 

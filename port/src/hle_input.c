@@ -54,17 +54,6 @@ extern void app_InputPad0Present(int present);
 void hppoa_TrainerInject(XBOX_GAMEPAD *g);  /* hle_trainer.c: input a tool asks for, added to port 0 */
 void hppoa_SkipPad(const XBOX_GAMEPAD *g);  /* hle_skip.c: holding Start/Back fast-forwards a cutscene */
 
-/* scda/app/input.cpp's sneak toggle: Harry's pace as the game last picked it, [[0x3565B0] + 0xDC] + 0x2574 (0 stand,
- * 1 sneak, 2 walk, 3 run, set by the movement code at 0x8567A from the stick's push); -1 when there is no Harry */
-int hppoa_HarryPace(void)
-{
-    uint32_t player = MEM32(0x3565B0), ctrl;
-    if (player < 0x80000000u || player >= 0x84000000u) return -1;
-    ctrl = MEM32(player + 0xDC);
-    if (ctrl < 0x80000000u || ctrl >= 0x84000000u) return -1;
-    return (int)MEM32(ctrl + 0x2574);
-}
-
 /* a pad read, port 0 standing in at rest for keyboard and mouse when no controller is there (always: with no
  * controller on port 0 keyboard and mouse play, so unplugging it hands over instead of pausing the game) */
 static DWORD pad_read(DWORD port, XBOX_INPUT_STATE *s)

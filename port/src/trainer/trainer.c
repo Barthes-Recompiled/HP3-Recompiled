@@ -51,7 +51,7 @@ static const struct { const char *name; uint8_t id; } kSpells[] = {
 };
 #define NSPELLS (int)(sizeof(kSpells) / sizeof(kSpells[0]))
 
-/* the story levels, ids 6..30 (the title's names at 0x21BB70) */
+/* the story levels, ids 6..30 (Philosopher's Stone's; PoA's level list is not found yet) */
 static const char *const kLevelFiles[] = {
     "day0", "night0", "day1", "day1lumos", "night1", "day2", "day2spongify", "night2", "night2troll", "day3",
     "day3diffindo", "night3", "night3library", "day4", "day4incendio", "night4", "night4ingredients", "day5",
@@ -388,14 +388,11 @@ static DWORD WINAPI report_worker(LPVOID arg)
         HANDLE h = OpenProcess(PROCESS_VM_READ | PROCESS_QUERY_INFORMATION, FALSE, g_t->pid);
         if (h) {
             uint64_t off = g_t->mem_offset;
-            snprintf(path, sizeof path, "%s\\progress_3253B0.bin", dir);
-            size_t a = dump_guest(h, off, HPPOA_PROGRESS_VA, HPPOA_PROGRESS_SIZE, path);
             snprintf(path, sizeof path, "%s\\guest_00000000.bin", dir);
             size_t b = dump_guest(h, off, 0x00000000u, 0x04000000u, path);
             snprintf(path, sizeof path, "%s\\guest_80000000.bin", dir);
             size_t c = dump_guest(h, off, 0x80000000u, 0x04000000u, path);
-            report_line(f, "memory: progress block %zu bytes, guest 0x00000000 %zu MB, guest 0x80000000 %zu MB read",
-                        a, b >> 20, c >> 20);
+            report_line(f, "memory: guest 0x00000000 %zu MB, guest 0x80000000 %zu MB read", b >> 20, c >> 20);
             CloseHandle(h);
         } else {
             report_line(f, "memory: could not open the game (error %lu)", GetLastError());

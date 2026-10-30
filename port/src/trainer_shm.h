@@ -14,16 +14,17 @@
 #define HPPOA_TRAINER_MAGIC   0x52545048u  /* "HPTR" */
 #define HPPOA_TRAINER_VERSION 5u
 
-/* the title's spell numbers (button slots at 0x329DD5..7; 0 = none) */
+/* The values below are still Philosopher's Stone's: the trainer exe's pages use them, the PoA game side
+ * (hle_trainer.c) ignores everything but input injection and the report until PoA's state is found. */
+
+/* spell numbers (0 = none) */
 enum { kSpellNone = 0, kSpellFlipendo = 1, kSpellLumos = 2, kSpellDiffindo = 5, kSpellSpongify = 8,
        kSpellIncendio = 10, kSpellAlohomora = 12 };
 
-/* guest memory the report copies: the progress block (= the save file after its 24 byte header) */
-#define HPPOA_PROGRESS_VA   0x3253B0u
+/* the progress block (= the save file after its 24 byte header): its size; where PoA keeps it is not found yet */
 #define HPPOA_PROGRESS_SIZE 0x4AE4u
 
-/* levels: [0x356CC4] is the one in play, an id = 6 + its index in the title's name table at 0x21BB70
- * (6 day0.lvl .. 30 day6.lvl are the story) */
+/* levels: an id = 6 + its index in the title's name table (6 day0.lvl .. 30 day6.lvl were the story) */
 #define HPPOA_LEVEL_FIRST 6u
 #define HPPOA_LEVEL_LAST  30u
 
@@ -78,7 +79,7 @@ typedef struct HppoaTrainerShm {
     /* version 4 */
     volatile uint32_t instakill;   /* 1: an enemy whose CurrentHealth drops goes to 0 (dies on the first hit) */
     volatile uint32_t level;       /* game -> trainer: the level in play */
-    volatile uint32_t warp_seq;    /* bumped: load warp_level (the title's StartLevel way, sub_00146110) */
+    volatile uint32_t warp_seq;    /* bumped: load warp_level (the title's StartLevel way) */
     volatile uint32_t warp_level;
     /* checkpoints: the progress block (everything a save keeps) as a level starts, or when asked (snap_now_seq);
      * the trainer files them in run\checkpoints. Restore puts restore_block back and loads restore_level. */

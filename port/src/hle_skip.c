@@ -4,17 +4,13 @@
  * held (a frame every quarter of a second shows how far it got). Nothing in the cutscene is left out: its scripts,
  * speech and camera all run as they would, only faster, so whatever the cutscene sets up is set up.
  *
- * A cutscene here is the time the letterbox bars are down: the script command setletterbox (handler 0x4CAF0, through
- * sub_0002A590 / sub_0002A5E0) keeps their state at [0x32E1FC] (2 sliding in, 1 down, 3 sliding out, 0 none) and
- * their height at [0x32E1F8]; the cutscene levels (32..75, hpm01..hpm38) and the cutscenes inside levels both use them.
- * The fast-forward stops when the bars start to go (state 3 or 0).
+ * What counts as a cutscene is title state: Philosopher's Stone used its letterbox bars. PoA's equivalent is not found
+ * yet (docs/bringup.md), so cutscene() is always false and the fast-forward never starts.
  *
- * The game's logic runs in fixed 0.04 s steps (25 a second, [0x21B7B8]) on its own clock: sub_0018DD83, its
- * QueryPerformanceCounter (an rdtsc), read by the main loop's timer (sub_00162B60 / sub_00162C30). That clock runs
- * SKIP_SCALE times as fast while fast-forwarding, so each frame steps the logic that many times further; the DirectSound
- * mixer (hle_dsound.c) mixes that many blocks a block and outputs silence, so speech and streams end in step, and the
- * frame pacing (hle_d3d8.cpp) and the renderer's presents (d3d12.cpp) stand aside. Start and Back still reach the game
- * as always (Start skips the title's attract cutscene there).
+ * The clock: sub_0018DD83 is XAPI's QueryPerformanceCounter (an rdtsc). It runs SKIP_SCALE times as fast while
+ * fast-forwarding, so each frame steps the logic that many times further; the DirectSound mixer (hle_dsound.c) mixes
+ * that many blocks a block and outputs silence, so speech and streams end in step, and the frame pacing (hle_d3d8.cpp)
+ * and the renderer's presents (d3d12.cpp) stand aside. Start and Back still reach the game as always.
  *
  * Built into the recompile with --exclude-manual naming this file.
  */
@@ -29,9 +25,6 @@
 
 extern int app_CutsceneSkip(void);           /* hppoa.toml cutscene_skip (scda/app/app.cpp) */
 
-#define LETTERBOX_STATE 0x0032E1FCu
-#define LETTERBOX_DOWN  1u
-#define LETTERBOX_IN    2u
 #define BTN_START       0x0010u
 #define BTN_BACK        0x0020u
 #define HOLD_MS         500u
@@ -45,8 +38,7 @@ int hppoa_FastForward(void) { return (int)g_scale; }
 
 static int cutscene(void)
 {
-    uint32_t s = MEM32(LETTERBOX_STATE);
-    return s == LETTERBOX_DOWN || s == LETTERBOX_IN;
+    return 0;  /* PoA's cutscene state: not found yet */
 }
 
 /* hle_input.c, port 0's pad as the game reads it: the hold that starts the fast-forward, and its end */
@@ -67,8 +59,7 @@ void hppoa_SkipPad(const XBOX_GAMEPAD *g)
         if (!cutscene() || now - ff_since > SKIP_MAX_MS) {
             InterlockedExchange(&g_scale, 1);
             ended = cutscene() ? 0 : now;
-            fprintf(stderr, "[SKIP] cutscene fast-forward ended after %lu ms (bars state %u)\n",
-                    (unsigned long)(now - ff_since), MEM32(LETTERBOX_STATE));
+            fprintf(stderr, "[SKIP] cutscene fast-forward ended after %lu ms\n", (unsigned long)(now - ff_since));
         }
         return;
     }
@@ -103,7 +94,7 @@ static uint64_t game_clock(void)
     return c;
 }
 
-/* sub_0018DD83(LARGE_INTEGER *count): QueryPerformanceCounter as the title has it (rdtsc), ret 4, returns TRUE */
+/* sub_0018DD83(LARGE_INTEGER *count): XAPI's QueryPerformanceCounter (rdtsc), ret 4, returns TRUE */
 void sub_0018DD83(void)
 {
     uint32_t out = MEM32(g_esp + 4);

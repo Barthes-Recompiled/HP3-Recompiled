@@ -1,15 +1,11 @@
 /**
- * Display timing the D3D8 HLE no longer gets from the XDK's vblank interrupt.
+ * Display timing the D3D8 HLE no longer gets from the XDK's vblank interrupt:
+ * the device's vblank counter, which the XDK's interrupt advances and which the
+ * HLE CreateDevice (scda/xdk/hle_d3d8.cpp) never connects:
  *
- * HP: Philosopher's Stone (XDK 5659) plays its XMV movies through a texture
- * the title draws itself, not the NV2A overlay, so unlike the Chamber of
- * Secrets port nothing here converts overlay frames. What remains is the
- * device's vblank counter (+0x1DE8), which the XDK's interrupt advances and
- * which the HLE CreateDevice (scda/xdk/hle_d3d8.cpp) never connects:
- *
- *   D3DDevice_GetDisplayFieldStatus   the XMV player waits on its field count
- *   D3DDevice_GetOverlayUpdateStatus  the loading loop: "a vblank passed since
- *                                     the last overlay update" (always, here)
+ *   D3DDevice_GetDisplayFieldStatus   a movie player waits on its field count
+ *   D3DDevice_GetOverlayUpdateStatus  "a vblank passed since the last overlay
+ *                                     update" (always, here)
  *
  * Every entry point keeps the generated body as sub_X_gen, used when
  * RECOMP_HLE_D3D=0 (the XDK's own Direct3D on the emulated NV2A).
@@ -36,7 +32,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 
 /* the register names (eax, esp, ...) the runtime macros expand to */
 #define RECOMP_GENERATED_CODE
@@ -103,135 +98,11 @@ void sub_0019D910(void)
     g_esp += 4;
 }
 
-/* xboxrecomp: true 16:9. The engine's camera setter, Camera_SetScale(cam, xs, ys):
- * the projection's x and y scales at cam+0xE4 / cam+0xE8 (read back by
- * 0x16A480 / 0x16A492). Every camera passes ys = xs * 4/3 (the world camera
- * from its horizontal field of view at 0x210FC4, the menu cameras 2.4 / 3.2),
- * so in 16:9 a 4:3 pair gets xs * 3/4: the same vertical view, wider at the
- * sides (Hor+). The 640x480 frame is shown 16:9 wide and d3d12.cpp's Squeeze2D
- * keeps the 2D at its 4:3 shape. */
-extern int hppoa_Widescreen(void);
-extern void sub_0016A4A0_gen(void);
-void sub_0016A4A0(void)
-{
-    uint32_t cam = ARG(0);
-    float xs = MEMF(g_esp + 8), ys = MEMF(g_esp + 12);
-    {   /* [CAM] once per camera and caller: which camera a screen uses (the inventory's, a cutscene's) */
-        static uint32_t seen[64][2];
-        static int n;
-        uint32_t caller = MEM32(g_esp);
-        int i = 0;
-        while (i < n && !(seen[i][0] == cam && seen[i][1] == caller)) i++;
-        if (i == n && n < 64) {
-            seen[n][0] = cam, seen[n][1] = caller, n++;
-            fprintf(stderr, "[CAM] cam %08X from %08X xs %g ys %g\n", cam, caller, xs, ys);
-        }
-    }
-    if (!d3d_hle() || !hppoa_Widescreen() || !(xs > 0.0f) || fabsf(ys / xs - 4.0f / 3.0f) > 0.01f) {
-        sub_0016A4A0_gen();
-        return;
-    }
-    /* the menus' own cameras (the Remembrall inventory's, made after remember.hog loads, pointer at 0x34F998, and
-     * its sibling at 0x34F944) stay 4:3: their 3D (the hourglass, the books) is laid out with the menu's 2D. Tagged
-     * for d3d12.cpp's Squeeze2D by an x scale two float steps up (hppoa_MenuScale), which nothing else draws with. */
-    if (cam && (cam == MEM32(0x34F998) || cam == MEM32(0x34F944))) {
-        MEMF(cam + 0xE4) = nextafterf(nextafterf(xs, INFINITY), INFINITY);
-        MEMF(cam + 0xE8) = ys;
-        g_esp += 4;
-        return;
-    }
-    MEMF(cam + 0xE4) = xs * 0.75f;
-    MEMF(cam + 0xE8) = ys;
-    g_esp += 4;
-}
-
-/* the main menu's background movie is playing */
-static volatile int g_menu_movie;
-
-int hppoa_MenuMovie(void)
-{
-    static int on = -1;
-    if (on < 0) {
-        const char *e = getenv("RECOMP_MENU_MOVIE_CROP");
-        on = !(e && *e == '0');
-    }
-    return on && g_menu_movie;
-}
-
-extern int app_IntroSkip(void);  /* hppoa.toml intro_skip (scda/app/app.cpp) */
-
-/* the start-up logos (the EA logo ea_<language>, then Warner Bros.' splashwb), left out
- * with intro_skip; the menu's background, the trailer and the Quidditch movies play as always */
-static int intro_movie(const char *n)
-{
-    return !_strnicmp(n, "movies/ea_", 10) || !_stricmp(n, "movies/splashwb.thp");
-}
-
-extern void sub_00164450_gen(void);
-void sub_00164450(void)
-{
-    uint32_t name = ARG(0);
-    if (name && app_IntroSkip() && intro_movie((const char *)XBOX_PTR(name))) {
-        fprintf(stderr, "[XMV] %s left out (intro_skip)\n", (const char *)XBOX_PTR(name));
-        g_eax = 0;
-        g_esp += 4;  /* its ret: the caller (cdecl) pops the arguments */
-        return;
-    }
-    int menu = name && _stricmp((const char *)XBOX_PTR(name), "movies/frontend.thp") == 0;
-    if (menu) g_menu_movie = 1;
-    sub_00164450_gen();
-    if (menu) g_menu_movie = 0;
-}
-
-/* the loading screen's thread is drawing it */
-static volatile int g_loading;
-
-int hppoa_LoadingScreen(void)
-{
-    static int on = -1;
-    if (on < 0) {
-        const char *e = getenv("RECOMP_LOADING_CROP");
-        on = !(e && *e == '0');
-    }
-    return on && g_loading;
-}
-
-/* loading screens so far (d3d12.cpp's RECOMP_CAP_LOADING captures the first frame of each that shows its
- * picture) */
-static volatile int g_loads;
-int hppoa_LoadingCount(void) { return g_loads; }
-
-/* the icons text puts in its lines ("[[CROSS ICON]]" ... "[[R2 ICON]]", table 0x211F28): the controller's sprites
- * (sub_00050060: "<sprite>_icon.tga"), their records at 0x331638 + 4 * i, each with its D3D texture at +0x20.
- * Some lines ("Press [B], [Y] or [X] button to test the wand.") draw them through a header of their own over the
- * same pixels (8045BC80 for the record's 8045B820, both Data 8045B880): matched by Data (D3D resource +4) too */
-int hppoa_TextIcon(uint32_t tex)
-{
-    if (!tex) return 0;
-    const uint32_t data = MEM32(tex + 4);
-    for (uint32_t i = 0; i < 12; i++) {
-        uint32_t rec = MEM32(0x331638 + 4 * i);
-        if (rec && (rec + 0x20 == tex || (data && MEM32(rec + 0x20 + 4) == data))) return 1;
-    }
-    return 0;
-}
-
-/* debug: the icons' textures now, for a [WIDE] line */
-void hppoa_TextIconDump(void)
-{
-    fprintf(stderr, "[WIDE]   text icons:");
-    for (uint32_t i = 0; i < 12; i++) {
-        uint32_t rec = MEM32(0x331638 + 4 * i);
-        fprintf(stderr, " %08X", rec ? rec + 0x20 : 0);
-    }
-    fprintf(stderr, "\n");
-}
-
-extern void sub_00148100_gen(void);
-void sub_00148100(void)
-{
-    g_loads++;
-    g_loading = 1;
-    sub_00148100_gen();
-    g_loading = 0;
-}
+/* Hooks the renderer asks about the title's screens (scda/gpu/d3d12.cpp's Squeeze2D and captures). Philosopher's
+ * Stone answered them from its movie player, loading thread and icon table; PoA's equivalents are not found yet
+ * (docs/bringup.md), so none of these screens is recognised. */
+int hppoa_MenuMovie(void) { return 0; }
+int hppoa_LoadingScreen(void) { return 0; }
+int hppoa_LoadingCount(void) { return 0; }
+int hppoa_TextIcon(uint32_t tex) { (void)tex; return 0; }
+void hppoa_TextIconDump(void) {}

@@ -1041,9 +1041,7 @@ BUFFER(SetMinDistance)
 }
 
 /* RECOMP_DS3D_TRACE=1 logs [DS3D] for each 3D buffer at most twice a second as the title places it: the caller, the
- * position given, its distance, the min / max distance, the level atten3d makes of it, and Harry's world position
- * (his object's matrix, [0x3565B0]+0x28): whether the positions are the listener's (Harry's or the camera's) frame or
- * the world's */
+ * position given, its distance, the min / max distance and the level atten3d makes of it */
 static void ds3d_trace(const Voice *v)
 {
     static int on = -1, lines;
@@ -1061,15 +1059,9 @@ static void ds3d_trace(const Voice *v)
     seen[i][0] = buf, seen[i][1] = now;
     lines++;
     float d = sqrtf(v->pos3d[0] * v->pos3d[0] + v->pos3d[1] * v->pos3d[1] + v->pos3d[2] * v->pos3d[2]);
-    float hx = 0, hy = 0, hz = 0;
-    uint32_t harry = MEM32(0x3565B0), obj = harry >= 0x80000000u && harry < 0x84000000u ? MEM32(harry + 0x28) : 0;
-    if (obj >= 0x80000000u && obj < 0x84000000u) {
-        uint32_t m = obj + 0x40 * (MEM32(obj + 0x2C) + 1);
-        hx = MEMF(m + 0x30), hy = MEMF(m + 0x34), hz = MEMF(m + 0x38);
-    }
     fprintf(stderr, "[DS3D] %8.2f s buf %08X from %08X pos %.0f %.0f %.0f dist %.0f min %.0f max %.0f level %.3f "
-            "playing %d | harry %.0f %.0f %.0f\n", now / 1000.0, buf, MEM32(g_esp), v->pos3d[0], v->pos3d[1],
-            v->pos3d[2], d, v->min_dist, v->max_dist, atten3d(v, 2), v->playing, hx, hy, hz);
+            "playing %d\n", now / 1000.0, buf, MEM32(g_esp), v->pos3d[0], v->pos3d[1],
+            v->pos3d[2], d, v->min_dist, v->max_dist, atten3d(v, 2), v->playing);
 }
 
 /* SetPosition(this, x, y, z, dwApply) */

@@ -48,3 +48,6 @@ port/dist/
 saves/
 shadercache/
 hppoa.toml
+
+# cross-title XDK matcher maps and reports (addresses of the game)
+tools/xdk_port/output/
