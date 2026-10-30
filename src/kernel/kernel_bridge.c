@@ -2644,21 +2644,23 @@ static DWORD WINAPI kernel_timer_thread(LPVOID unused)
                 g_timers[i].due_ms = now + g_timers[i].period_ms;
             else
                 g_timers[i].timer_va = 0;      /* one-shot, done */
+
+            /* Signal it, then queue its DPC, as KiTimerExpiration does. The
+             * signal is given under the lock, so a KeSetTimer of the same
+             * timer comes wholly before it (and this expiry is the new one's)
+             * or wholly after (and resets it, as it should). */
+            {
+                HANDLE ev = ke_shadow_lookup(fired_va);
+                if (ev) {
+                    BRIDGE_MEM32(fired_va + 4) = 1;   /* SignalState */
+                    SetEvent(ev);
+                }
+            }
             LeaveCriticalSection(&g_timer_lock);
 
             /* Outside the lock: the routine can set or cancel timers. */
             if (dpc)
                 kernel_run_dpc(dpc, 0, 0);
-
-            /* Wake anyone parked on the timer's shadow event; a timer with no
-             * DPC is just a kernel sleep. */
-            {
-                HANDLE ev = ke_shadow_lookup(fired_va);
-                if (ev) {
-                    SetEvent(ev);
-                    BRIDGE_MEM32(fired_va + 4) = 1;   /* SignalState */
-                }
-            }
         }
     }
 }
@@ -2670,6 +2672,7 @@ static void kernel_set_timer(uint32_t timer_va, long long due_100ns,
     long long delay_ms = (due_100ns < 0) ? (-due_100ns) / 10000 : 0;
     int i, free_slot = -1;
     uint32_t was_set = 0;
+    HANDLE ev = ke_shadow_lookup(timer_va);
 
     if (!g_timer_started) {
         InitializeCriticalSection(&g_timer_lock);
@@ -2678,6 +2681,18 @@ static void kernel_set_timer(uint32_t timer_va, long long due_100ns,
     }
 
     EnterCriticalSection(&g_timer_lock);
+    /* A set timer starts unsignaled, like the real KeSetTimer, and is reset
+     * in the same step that arms it. The reset used to come after the lock
+     * was dropped: the timer thread, pinned to the guest core and woken by
+     * that very LeaveCriticalSection, could fire a 0 ms timer in between, and
+     * the late ResetEvent erased the expiry for good (the slot of a one-shot
+     * is already free). XAPI's timeSetEvent service re-arms 0 ms timers from
+     * its callbacks when the title runs late; PoA's game clock (sub_00222B10,
+     * fed by such a timer) then stopped at its first movie, whose loop spins
+     * until the clock moves. */
+    if (ev)
+        ResetEvent(ev);
+    BRIDGE_MEM32(timer_va + 4) = 0;   /* SignalState */
     for (i = 0; i < XBOX_MAX_TIMERS; i++) {
         if (g_timers[i].timer_va == timer_va) { free_slot = i; was_set = 1; break; }
         if (!g_timers[i].timer_va && free_slot < 0) free_slot = i;
@@ -2689,13 +2704,6 @@ static void kernel_set_timer(uint32_t timer_va, long long due_100ns,
         g_timers[free_slot].period_ms = period_ms;
     }
     LeaveCriticalSection(&g_timer_lock);
-
-    /* A freshly set timer starts unsignaled, like the real KeSetTimer. */
-    {
-        HANDLE ev = ke_shadow_lookup(timer_va);
-        if (ev)
-            ResetEvent(ev);
-    }
     g_eax = was_set;
 }
 
