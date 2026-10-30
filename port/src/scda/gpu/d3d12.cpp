@@ -3758,11 +3758,14 @@ bool Squeeze2D(const State& s, const Assembled& a, const DrawShaders& sh, uint32
         // xboxrecomp: an in-game menu's band across the top or the bottom over the scene (a parchment strip, 512x64:
         // not the cutscene bars, a 4x4 texture faded in by its vertex alpha)
         TextureDesc bd;
-        if (wf.scene >= 16 && r[3] - r[1] < fh * 0.25f && (r[1] <= 1.0f || r[3] >= fh - 1.0f) &&
-            Describe(s.textures[0], bd) && bd.width >= 64)
-            wf.menu = true;
+        const bool band = r[3] - r[1] < fh * 0.25f && (r[1] <= 1.0f || r[3] >= fh - 1.0f);
+        const bool described = Describe(s.textures[0], bd);
+        if (wf.scene >= 16 && band && described && bd.width >= 64) wf.menu = true;
+        // a menu's own picture across the frame over the scene (the Quit Game page's map backdrop, 64+ texels tall:
+        // not the pause menu's shading, a 256x4 strip) is a 4:3 picture like the menu's 2D, not a screen effect
+        const bool menu_picture = (wf.menu || wf.menu_prev) && !band && described && bd.height >= 64;
         // over the scene (gameplay, a cutscene) a picture across the frame is a screen effect: left as drawn
-        if (wf.scene >= 16) return false;
+        if (wf.scene >= 16 && !menu_picture) return false;
         wf.backdrop = true;
         // the main menu's moving background (frontend.xmv, a 640x480 YUY2 frame) and the loading screen: the full
         // 16:9 width, their middle 360 lines (4/3 as tall about the middle) instead of the 4:3 picture between bars
@@ -4028,7 +4031,17 @@ void D3D12Backend::Draw(const State& s, uint32_t prim, uint32_t start, uint32_t 
     SurfaceSize(bound_rt_ ? s.rt : s.zs, size.w, size.h);
     DrawConstants c{};
     QuadTextureRects(s, a, sh, c);
-    if (bound_rt_ && bound_rt_->gw == guest_w_ && bound_rt_->gh == guest_h_ && Squeeze2D(s, a, sh, guest_w_, guest_h_, wf_, c))
+    // xboxrecomp: 16:9, a frame-sized render target drawn into another (PoA's copy swap: its own quad copies the
+    // finished frame into the front buffer) is the frame itself, already laid out: squeezed again, the menus and the
+    // loading screen came out 0.5625 wide, and it counted as a 4:3 backdrop
+    bool frame_copy = false;
+    if (s.textures[0]) {
+        TextureDesc fd;
+        frame_copy = Describe(s.textures[0], fd) && fd.width == guest_w_ && fd.height == guest_h_ &&
+                     targets_.count(TargetKey(fd.data, Format(fd.format).depth));
+    }
+    if (bound_rt_ && bound_rt_->gw == guest_w_ && bound_rt_->gh == guest_h_ && !frame_copy &&
+        Squeeze2D(s, a, sh, guest_w_, guest_h_, wf_, c))
         return;  // xboxrecomp: 16:9, a cutscene's HUD
     UploadConstants(s, sh, k, stages, size, c);
 
