@@ -35,8 +35,25 @@ DM_Activate `sub_0001F770`, DM_DeActivate `sub_0001F780`, DM_DPadUp `sub_0001F79
 DM_Selection `sub_0001F7B0`, DM_ChapterSelection `sub_0001F7D0`, DM_BackSelection `sub_0001F7C0`. The string
 "ROOM SELECTION: X - Select debug start point" is used at 0x000233A3 (`sub_000232D4`); "DebugMenu" at 0x00020315
 (`sub_00020310`). Menu resource strings: `debug_menu_depth`, `DebugMenuCustomControlValue`, `StartLoadingGame`,
-`FSCommand:StartGame`. How it is opened is not known yet. A chapter/room select is the obvious test tool for M2-M4
-and a candidate entry point for the randomizer's warps.
+`FSCommand:StartGame`. A chapter/room select is the obvious test tool for M2-M4 and a candidate entry point for the
+randomizer's warps.
+
+How it opens (Explore trace, 2026-10-30, Task 10): `sub_00256C50` is a static constructor (CRT initializer table at
+.data 0x2F8F18) that fills the APT FSCommand table with `{name, handler}` pairs through `sub_001AE6C0`; the DM_*
+entries sit at 0x30F118-0x30F148 and "DebugMenu" at 0x30F180 (name 0x2C9360, handler `sub_00020310`). The front
+end's APT scripts (`poa_startup_xbox.big`, `poa_fe.big`) call `FSCommand:DebugMenu` (RequestDebugMenu) and, in a
+key handler (`onKeyDown` / `Key.getCode`), open `POA_DEBUGMENU.swf` through `extern.TransitionTooMovie` when the APT
+variable `DebugMenu == "true"`. `sub_00020310` sets that variable through the APT set-variable call at [0x38A2F8]
+(`sub_001AD3B0`) to the constant "false" (0x2C8718); "true" is at 0x2C8730. That is the only gate: no flag, config
+file or command line. The handlers' worker is the singleton at 0x30E2D4 (+0x1C chapter, +0x20 room, +0x24 cursor,
++0x28 active): Activate `sub_0001B560` (inits "ChapterRoom" and "DebugStartPoint"), DeActivate `sub_0001C720`,
+DPadUp/Down `sub_0001B6F0`/`sub_0001B750`, Selection `sub_0001B800` (chapter -> room -> start point, writing
+**0x376B44** chapter, **0x376B48** room, **0x376B4C** start-point name, which the level loader reads around
+recomp_0000.c 73036-73998), ChapterSelection `sub_0001B7D0`, BackSelection `sub_0001B900`. The text renderer
+`sub_000231D0` ("Build: %s, %s" May 8 2004, CHAPTER/ROOM SELECTION) is the custom control
+"DebugMenuCustomControlValue" (`sub_0001DE30`, registered at .data 0x2FA178). `hle_debug.c` answers "true" when
+`debug_menu` is on (F10 > Debug). Not known yet: which key or button the APT key handler waits for (decode the
+ActionScript in poa_startup_xbox.big near file offset 0x12394 or poa_fe.big near 0x64EB4).
 
 ## File I/O
 

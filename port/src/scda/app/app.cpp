@@ -69,6 +69,8 @@ const Entry kEntries[] = {
      "holding Start or Back for half a second fast-forwards a cutscene to its own end (muted, the picture held); false as the Xbox"},
     {"cutscene_bars", nullptr, Kind::Bool, FIELD(cutscene_bars), 0, 0,
      "16:9: cutscenes fill the screen and keep the console's black bars over the picture (subtitles in the bottom one)"},
+    {"debug_menu", "RECOMP_DEBUG_MENU", Kind::Bool, FIELD(debug_menu), 0, 0,
+     "the front end may open the developers' debug menu (chapter and room select), which the shipped game never allows"},
     {"debug_logs", "RECOMP_DEBUG_LOGS", Kind::Bool, FIELD(debug_logs), 0, 0,
      "hppoa_run.log and xbox_kernel.log beside the exe, for reporting a problem; from the next start (F10 > Debug)"},
     {"controller", nullptr, Kind::Bool, FIELD(controller), 0, 0,
@@ -474,6 +476,7 @@ std::recursive_mutex& UiLock() {
 // hle_dsound.c, when the mixer starts: output channels
 extern "C" int app_Speakers(void) { return app::Get().speakers == 6 ? 6 : 2; }
 extern "C" int app_CutsceneSkip(void) { return app::Get().cutscene_skip; }
+extern "C" int app_DebugMenu(void) { return app::Get().debug_menu; }
 extern "C" int app_IntroSkip(void) { return app::Get().intro_skip; }
 
 // main.c, first thing: the settings read, and handed to the C side (the window, the title's widescreen camera, the

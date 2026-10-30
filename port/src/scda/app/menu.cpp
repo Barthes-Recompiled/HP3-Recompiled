@@ -270,6 +270,7 @@ static void ResetPage(Settings& s, const char* page) {
     }
     if (!std::strcmp(page, "Debug")) {
         std::memcpy(&s.debug_logs, &d.debug_logs, sizeof(s.debug_logs));
+        std::memcpy(&s.debug_menu, &d.debug_menu, sizeof(s.debug_menu));
     }
 }
 
@@ -438,6 +439,9 @@ void DrawPanel(bool start) {
         if (ImGui::Checkbox("Write debug logs", &s.debug_logs)) Changed();
         ImGui::TextDisabled("hppoa_run.log and xbox_kernel.log beside the game, for reporting a problem.");
         ImGui::TextDisabled("Takes effect the next time the game starts.");
+        Row("Developer menu");
+        if (ImGui::Checkbox("Allow the debug menu", &s.debug_menu)) Changed();
+        ImGui::TextDisabled("The developers' chapter and room select, which the front end asks for on its title screen.");
         ImGui::EndTabItem();
     }
     if (tabs) ImGui::EndTabBar();

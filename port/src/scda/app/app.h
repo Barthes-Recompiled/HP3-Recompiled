@@ -61,6 +61,7 @@ struct Settings {
     bool intro_skip = true;            // xboxrecomp: the start-up logo movies are left out (hle_video.c)
     bool cutscene_skip = true;         // xboxrecomp: holding Start/Back fast-forwards a cutscene to its end (hle_skip.c)
     bool cutscene_bars = true;         // xboxrecomp: 16:9's zoomed cutscenes keep the console's black bars over the picture
+    bool debug_menu = false;           // xboxrecomp: the front end may open the developer debug menu (hle_debug.c)
     bool debug_logs = false;           // RECOMP_DEBUG_LOGS: hppoa_run.log (launcher) and xbox_kernel.log, from the next start
     uint32_t aniso = 0;                // RECOMP_ANISO, 0 as the game asks
     uint32_t msaa = 0;                 // RECOMP_MSAA samples, 0 off
