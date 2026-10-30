@@ -572,8 +572,8 @@ through the getter `sub_001A8C30` (returns +4); 30 read the real clock through `
 1/30 s or 33.3 ms step exists in the XBE (no 1/30 float or double; two 1/60 floats, file offsets 0x2C6E78 and 0x2D32C0, not traced).
 At 60 fps each frame is shorter than 33 ms, so the clock gained 33 ms a frame: 2x speed.
 
-**Fix.** `hle_video.c` overrides `sub_001A7450`: for this timer, with `fps_limit` above 30 the floor is 600/fps ms
-(10 at 60, 5 at 120, 1 unlocked), put back each tick (the F10 panel applies at once); at 0 / 30 the game's own value
+**Fix.** `hle_video.c` overrides `sub_001A7450`: for this timer, with `fps_limit` above 30 the floor is 1 ms
+(first 600/fps, see play60 below), put back each tick (the F10 panel applies at once); at 0 / 30 the game's own value
 stays. `Pace` shows a frame for one vblank at `fps_limit = 60` whatever interval the title asked for (PoA asks for
 TWO_OR_IMMEDIATE). The choices 60, 120-240 and unlocked are offered again (app.h, launcher). A `[CLOCK]` line every
 10 s prints game ms against real ms (GetTickCount64, so ±2% per window).
@@ -593,3 +593,10 @@ f60a.wav and f60b.wav (RMS envelope at 50 ms, from each level's first sound afte
 a time scale of 1.00 (r 0.50; 0.98 and 1.02 lower, 2.0 none): the scripted opening and its dialogue run at the
 console's speed at 60 fps. **Not checked yet:** Harry's walk/run speed, animation and particle speed by eye, and the
 movies at 60 (Austin's play-test).
+
+**play60 / play60b (Austin's play-test, 60 fps).** With the 600/fps floor (10 ms) Austin found movement odd and
+Flippendo's sounds held back until a pause. play60's [CLOCK] showed x1.13-1.32 in play: a frame shorter than the floor
+puts the clock ahead of real time, and when the next frame is sooner than that lead the timer's elapsed time is
+negative, which its unsigned compares (0x001A749D jae, 0x001A74A9 jbe) take for a hitch: +100 ms. Floor 1 ms
+(play60b): x0.95-1.00 in play with 0-3 100 ms steps per 10 s (real hitches), one x1.23 window (unexplained, 2 steps);
+the level load's x55 window is the load loop (x30 at 30 fps too). Austin: "Good."
