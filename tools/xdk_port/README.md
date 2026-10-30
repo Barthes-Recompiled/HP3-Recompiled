@@ -48,3 +48,21 @@ checked by running the game.
 The map holds addresses, names and counts only. Keep it out of the repository (`tools/xdk_port/output/` is ignored).
 
 Tests: `py -3 tools/xdk_port/test_match.py`.
+
+## Second source: XbSymbolDatabase signatures (`oovpa.py`)
+
+```
+py -3 -m tools.xdk_port.oovpa --db <XbSymbolDatabase>/src/OOVPADatabase --xbe game/default.xbe \
+    --functions tools/disasm/output/functions.json --libs D3D8:5849,DSOUND:5849,XAPILIB:5849 \
+    --known tools/xdk_port/output/lib2_hp1_to_poa.json -o tools/xdk_port/output/oovpa_poa.json
+```
+
+Reads a local clone of [XbSymbolDatabase](https://github.com/Cxbx-Reloaded/XbSymbolDatabase) (MIT; checked with
+commit `20eced544726f5558c5a408458f38a086cc4e543`, 2025-08-23), kept outside this repository (e.g.
+`DecompProject\out\XbSymbolDatabase`); nothing of it is copied here. Rules in the module docstring: highest version
+not above the library's, unique hit at a function start of the library's section, XREF entries checked once their
+target is known (else 8 byte pairs needed), repeated until nothing new is found.
+
+Checked against a known answer: hp1's PS EUR XBE (XDK 5659) finds D3D8 102, DSOUND 118, XAPILIB 32 symbols; the 46
+that hp1's overrides also name are all at hp1's addresses. PoA (5849): D3D8 104, DSOUND 72, XAPILIB 37; of the
+symbols both this and the whole-library body match name, 73 agree and none differ (2026-10-30).

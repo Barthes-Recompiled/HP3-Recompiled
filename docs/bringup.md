@@ -257,3 +257,36 @@ explain: 0x002B9760 = hp1 0x001AA384 (both donors), 0x002B765B = hp2 0x00145337.
 = hp2's **D3DDevice_SetVertexData4f** (unique), so PoA draws a lot in Begin/End immediate mode, which the renderer
 lacks; 0x00268E10 = hp1 0x00197BC0 / hp2 0x00132E50 (unique in both, unnamed). The IDirectSoundStream methods and
 the other unnamed DirectSound entries are still unmatched.
+
+**XbSymbolDatabase signatures (Task 4, `tools/xdk_port/oovpa.py`, map `tools/xdk_port/output/oovpa_poa.json`).**
+104 D3D8, 72 DSOUND, 37 XAPILIB symbols in PoA. Against the body-match maps: 73 names agree, none differ (nine
+apparent differences were names misread from source comments: SetTransform, Lock2DSurface, ZBias, ...). Names for
+the coverage gaps:
+
+| PoA | Signature name | Body match |
+|---|---|---|
+| 0x002B752F | IDirectSound_SetMixBinHeadroom | - |
+| 0x002B754F | IDirectSoundBuffer_SetEG | - |
+| 0x002B756B | IDirectSoundBuffer_SetFilter | - |
+| 0x002B75DF | IDirectSoundBuffer_PauseEx | - |
+| 0x002B7603 | IDirectSoundBuffer_Pause | - |
+| 0x002B761F | IDirectSoundBuffer_SetLoopRegion | callee (hp1 and hp2) |
+| 0x002B763F | IDirectSoundBuffer_GetStatus | callee (hp1 and hp2) |
+| 0x002B765B | IDirectSoundBuffer_GetCurrentPosition | callee (hp2) |
+| 0x002B767B | IDirectSoundBuffer_SetCurrentPosition | callee (hp1 and hp2) |
+| 0x002B7A60 | IDirectSoundBuffer_SetFrequency | callee (hp1 and hp2) |
+| 0x002B7A7C | IDirectSoundBuffer_SetMixBins | callee (hp1 and hp2) |
+| 0x002B9760 | - | hp1 0x001AA384, hp2 (callee / anchored) |
+| 0x002B8791 | DirectSoundCreateBuffer | - |
+| 0x00269050 | D3DDevice_Clear | - |
+| 0x00268E10 | D3DVertexBuffer_Lock2 | unique (hp1 0x00197BC0, hp2 0x00132E50) |
+| 0x00266BD0 | D3DDevice_SetVertexShaderConstantNotInlineFast | unique (hp2) |
+| 0x00269640 | D3DDevice_DrawIndexedVerticesUP | - |
+| 0x00269AC0 | D3DDevice_SetVertexData4f | unique (hp2) |
+| 0x00266190, 0x00266230 | - | - |
+
+Also found: D3DDevice_CreateVertexShader 0x00266A90, SetVertexData2f 0x00269A80, Begin 0x00269B20, End 0x00269B60,
+XapiInitProcess 0x000117AB, DirectSoundCreate 0x002B874A, IDirectSound_CreateSoundBuffer 0x002B8560. Not found by
+either source: CreatePixelShader, SetPixelShaderConstant, GetRenderTarget2, IsFencePending,
+GetDisplayFieldStatus, GetOverlayUpdateStatus, SetVertexShaderConstant1/4 (none of them title-called), and the
+IDirectSoundStream / CDirectSoundStream methods.
