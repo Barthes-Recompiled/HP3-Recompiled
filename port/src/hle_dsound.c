@@ -1049,6 +1049,18 @@ BUFFER(SetVolume)
     return S_OK_;
 }
 
+/* SetMixBinVolumes(this, pMixBins): DSMIXBINS { count, pairs[] of { bin, volume } }, the volumes only: the XDK
+ * (0x002B6B45) stores each pair's volume in the voice's per-bin table and keeps the voice's bins */
+BUFFER(SetMixBinVolumes)
+{
+    uint32_t mixbins = ARG(1), n, pairs;
+    if (!mixbins) return S_OK_;
+    n = MEM32(mixbins);
+    pairs = MEM32(mixbins + 4);
+    for (uint32_t i = 0; i < n && i < 32; i++) v->bin_mb[MEM32(pairs + i * 8) & 31] = (int32_t)MEM32(pairs + i * 8 + 4);
+    return S_OK_;
+}
+
 BUFFER(SetFrequency)
 {
     v->freq = ARG(1);
@@ -1317,8 +1329,10 @@ extern void sub_002B767B_gen(void);
 // xdk_port: callee match (hp1 and hp2) and XbSymbolDatabase signature agree (docs/bringup.md)
 void sub_002B767B(void) { buffer_call(sub_002B767B_gen, buf_SetCurrentPosition, "SetCurrentPosition", 2); }
 extern void sub_002B7587_gen(void);
-// xdk_port: anchored match (not a unique body): suspect this binding first (docs/bringup.md)
-void sub_002B7587(void) { buffer_call(sub_002B7587_gen, buf_SetVolume, "SetVolume", 2); }
+/* xboxrecomp: SetMixBinVolumes, not SetVolume as the anchored xdk_port match had it: its body (0x002B74BA ->
+ * 0x002B6C64) loops over a DSMIXBINS. Read as SetVolume, the pointer became +inf dB: the gameplay pops and NaN
+ * silences (docs/bringup.md, "M3 audio pops") */
+void sub_002B7587(void) { buffer_call(sub_002B7587_gen, buf_SetMixBinVolumes, "SetMixBinVolumes", 2); }
 extern void sub_002B7A60_gen(void);
 // xdk_port: callee match (hp1 and hp2) and XbSymbolDatabase signature agree (docs/bringup.md)
 void sub_002B7A60(void) { buffer_call(sub_002B7A60_gen, buf_SetFrequency, "SetFrequency", 2); }

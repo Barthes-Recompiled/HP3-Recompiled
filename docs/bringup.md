@@ -29,7 +29,7 @@ Live bindings that do not rest on a unique body match (marked `// xdk_port: ... 
 | 0x002B8584 | 0x001A87DC | DirectSound SetI3DL2Listener | anchored |
 | 0x002B7FAE | 0x001A7F53 | IDirectSoundBuffer SetBufferData | whole-library run |
 | 0x002B75A3 | 0x001A6E26 | IDirectSoundBuffer Play | anchored |
-| 0x002B7587 | 0x001A6E0A | IDirectSoundBuffer SetVolume | anchored |
+| 0x002B7587 | 0x001A6E0A | ~~IDirectSoundBuffer SetVolume~~ **wrong: it is SetMixBinVolumes** (M3, see "M3 audio pops") | anchored |
 | 0x002C09C2 | 0x001F5038 | XInputClose | anchored |
 
 The final review checked the DirectSound ones byte for byte against hp1's (same shape, same `ret n`, same spacing).
@@ -496,3 +496,18 @@ viaduct), `packages\level\hogwartsexpressizcell_pasengercar.pkg`, `ar3_ws_he_*.
 `hogwarts_express.sdt`, sfx `hogex_amb_str.sdt`; the 150 s capture shows Harry in the train corridor with the HUD.
 New in the level: **massive audio clipping** (heard by the user), `[ICALL] Failed to resolve VA 0x000CBEE0`
 (repeating), 16 x `MakeSpace from 00268E2D`. 0 `[CRASH]`. These are Task 5's first blockers.
+
+**M3 audio pops (2026-10-30, runs m3nan and m3fix).** The m3t6d recording, read sample by sample: every burst is
+exactly one 256-frame mixer pass of +-32767 with the zero samples left at 0 (a gain of +inf: x * inf = +-inf, clamped;
+0 * inf = NaN, written as 0), and from the New Game press on whole passes are 0 (the log's "960000 clipped samples"
+in 10 s = every sample NaN: the inf gain ramp turns into inf - inf). m3nan logged the voice: `vol inf`, ADPCM 22050
+Hz, 7 mix bins, not 3D. The cause is the anchored binding at **0x002B7587**: its body (0x002B74BA -> 0x002B6C64 ->
+0x002B6B45) loops over `DSMIXBINS { count, pairs[] }` storing each volume at `settings + 0x30 + bin * 4`, then commits
+the voice (0x002BB2D6): it is **IDirectSoundBuffer_SetMixBinVolumes**. Our override read its DSMIXBINS pointer as
+`lVolume`, and `db(pointer)` = inf. Fix: `buf_SetMixBinVolumes` (sets the per-bin volumes, keeps the bins). The
+neighbours 0x002B754F / 0x002B756B go through 0x002B6C3E / 0x002B6C51 to 0x002BACFF (an envelope struct: SetEG) and
+0x002BAE91 (a 24-byte struct or 0xFFFF defaults: SetFilter); PoA's real SetVolume is not among the called entry
+points. m3fix (same New Game script, 145 s): **0 clipped samples** (was 74,290 to 960,000 per 10 s), no full-scale
+pass anywhere in the WAV, no silent stretches in the level (zero fraction 0.00 from 95 s on; m3t6d had 0.35-1.00).
+The few single samples with jumps over 8000 left are in the intro movie (20-56 s), as in m3t6d. Same run: the pause
+menu opens on Start (Resume Game / Save Game / Options / Quit Game).
