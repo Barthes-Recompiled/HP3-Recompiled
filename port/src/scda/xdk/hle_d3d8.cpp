@@ -263,6 +263,10 @@ bool On() {
 // the generated XDK bodies this file wraps (tools/recomp/manual_scan.py reads this list)
 extern "C" {
 extern void sub_00264DD0_gen(void);
+extern void sub_00269050_gen(void);
+extern void sub_00266190_gen(void);
+extern void sub_00266230_gen(void);
+extern void sub_00269640_gen(void);
 extern void sub_0026C8F0_gen(void);
 extern void sub_00266410_gen(void);
 extern void sub_00267230_gen(void);
@@ -551,7 +555,7 @@ HLE(00267550, 0) {
     return g_backend ? g_backend->Fence() : 0;
 }
 // D3DDevice_IsFencePending(fence)
-#if 0  /* PoA: hp1 00195B90 has no match in PoA yet (docs/bringup.md) */
+#if 0  /* PoA: hp1 00195B90 not found in PoA by body match or XbSymbolDatabase 5849; no title push through it (check_hle_coverage) */
 HLE(00195B90, 1) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     return g_backend && g_backend->FencePending(A(0)) ? 1 : 0;
@@ -654,7 +658,7 @@ HLE(002679A0, 1) {
     return s;
 }
 // D3DDevice_GetRenderTarget2
-#if 0  /* PoA: hp1 00192BC0 has no match in PoA yet (docs/bringup.md) */
+#if 0  /* PoA: hp1 00192BC0 not found in PoA by body match or XbSymbolDatabase 5849; no title push through it (check_hle_coverage) */
 HLE(00192BC0, 0) {
     uint32_t s = Dev(kDevRenderTarget);
     if (s) W32(s, R32(s) + 1);
@@ -764,14 +768,13 @@ HLE(0026A610, 1) {
 }
 
 // D3DDevice_Clear(count, rects, flags, color, z, stencil)
-#if 0  /* PoA: hp1 00194EC0 has no match in PoA yet (docs/bringup.md) */
-HLE(00194EC0, 6) {
+// xdk_port: XbSymbolDatabase signature match (5849; hp1's body differs, docs/bringup.md); ret 0x18
+HLE(00269050, 6) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     const uint8_t* rects = A(0) && A(1) ? static_cast<const uint8_t*>(HostPtr(A(1))) : nullptr;
     if (g_backend) g_backend->Clear(g_state, A(0), rects, A(2), A(3), ArgF(A(4)), A(5));
     return 0;
 }
-#endif
 
 // D3DDevice_CopyRects(source, rects, count, destination, points) (SCDA)
 HLE(00267A60, 5) {
@@ -869,12 +872,10 @@ COMPLEX_STATE(002655F0, gpu::kRsBackFillMode)
 COMPLEX_STATE(00265650, gpu::kRsTwoSidedLighting)
 COMPLEX_STATE(00265330, gpu::kRsNormalizeNormals)
 COMPLEX_STATE(00266100, gpu::kRsZEnable)
-#if 0  /* PoA: hp1 00191A30 has no match in PoA yet (docs/bringup.md) */
-COMPLEX_STATE(00191A30, gpu::kRsStencilEnable)
-#endif
-#if 0  /* PoA: hp1 00191AC0 has no match in PoA yet (docs/bringup.md) */
-COMPLEX_STATE(00191AC0, gpu::kRsStencilFail)
-#endif
+// by their bodies (docs/bringup.md): store D3D__RenderState[144] / [145] (0x275F90 / 0x275F94) and push NV097 0x32C
+// (stencil test enable) / 0x370 (stencil op fail)
+COMPLEX_STATE(00266190, gpu::kRsStencilEnable)
+COMPLEX_STATE(00266230, gpu::kRsStencilFail)
 COMPLEX_STATE(002652F0, gpu::kRsFrontFace)
 COMPLEX_STATE(00265280, gpu::kRsCullMode)
 COMPLEX_STATE(00265370, gpu::kRsTextureFactor)
@@ -1069,7 +1070,7 @@ HLE(00266DA0, 2) {
 HLE(00266E40, 1) { return 0; }  // D3DDevice_SetShaderConstantMode
 
 // D3DDevice_CreatePixelShader(definition, handle*)
-#if 0  /* PoA: hp1 001952B0 has no match in PoA yet (docs/bringup.md) */
+#if 0  /* PoA: hp1 001952B0 not found in PoA by body match or XbSymbolDatabase 5849; no title push through it (check_hle_coverage) */
 HLE(001952B0, 2) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     auto ps = std::make_shared<gpu::PixelShader>();
@@ -1117,7 +1118,7 @@ HLE(00270D00, 1) {
 }
 
 // D3DDevice_SetPixelShaderConstant(register, data, count)
-#if 0  /* PoA: hp1 00195500 has no match in PoA yet (docs/bringup.md) */
+#if 0  /* PoA: hp1 00195500 not found in PoA by body match or XbSymbolDatabase 5849; no title push through it (check_hle_coverage) */
 HLE(00195500, 3) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     uint32_t reg = A(0), src = A(1), n = A(2);
@@ -1221,6 +1222,23 @@ HLE(002694D0, 4) {
     auto stream = g_state.streams[0];
     g_state.streams[0] = {UpVertices(A(2), A(1) * A(3)), A(3)};
     g_backend->Draw(g_state, A(0), 0, A(1), nullptr);
+    g_state.streams[0] = stream;
+    return 0;
+}
+
+// D3DDevice_DrawIndexedVerticesUP(primitive, count, indices, vertices, stride) (from hp2): the vertices up to the
+// largest index go through the same ring
+HLE(00269640, 5) {
+    std::lock_guard<std::recursive_mutex> lock(g_lock);
+    uint32_t count = A(1), stride = A(4);
+    if (!g_backend || !count || !stride || !A(2)) return 0;
+    SyncDeferred();
+    const uint16_t* idx = static_cast<const uint16_t*>(HostPtr(A(2)));
+    uint32_t top = 0;
+    for (uint32_t i = 0; i < count; i++) top = std::max<uint32_t>(top, idx[i]);
+    auto stream = g_state.streams[0];
+    g_state.streams[0] = {UpVertices(A(3), (top + 1) * stride), stride};
+    g_backend->Draw(g_state, A(0), 0, count, reinterpret_cast<const uint8_t*>(idx));
     g_state.streams[0] = stream;
     return 0;
 }

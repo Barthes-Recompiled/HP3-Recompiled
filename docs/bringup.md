@@ -290,3 +290,12 @@ XapiInitProcess 0x000117AB, DirectSoundCreate 0x002B874A, IDirectSound_CreateSou
 either source: CreatePixelShader, SetPixelShaderConstant, GetRenderTarget2, IsFencePending,
 GetDisplayFieldStatus, GetOverlayUpdateStatus, SetVertexShaderConstant1/4 (none of them title-called), and the
 IDirectSoundStream / CDirectSoundStream methods.
+
+**D3D bound (Task 5).** D3DDevice_Clear -> 0x00269050 (XbSymbolDatabase; `ret 0x18`); hp1's two "unnamed"
+COMPLEX_STATE entries are SetRenderState_StencilEnable 0x00266190 and SetRenderState_StencilFail 0x00266230, by
+their bodies: they store D3D__RenderState[144] / [145] (0x275F90 / 0x275F94, the renderer's kRsStencilEnable /
+kRsStencilFail) and push NV097 0x32C (stencil test enable) / 0x370 (stencil op fail). DrawIndexedVerticesUP
+0x00269640 (`ret 0x14`) gets hp2's HLE. D3DVertexBuffer_Lock2 0x00268E10 is allowlisted: its one push is NV097
+0x1710 (vertex cache invalidate). CreatePixelShader, SetPixelShaderConstant, GetRenderTarget2 and IsFencePending
+stay disabled (found by neither source, and no title push goes through them). Coverage now: D3D 2 gaps (Task 6),
+DSOUND 12.

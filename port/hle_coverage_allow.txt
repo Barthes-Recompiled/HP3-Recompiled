@@ -1,2 +1,3 @@
 # check_hle_coverage.py allowlist: title-called D3D/DSOUND functions that may run the XDK's own body.
 # 0x<addr> <name>: <reason why running the original is right>
+0x00268E10 D3DVertexBuffer_Lock2: its only push is NV097 0x1710 (vertex cache invalidate), meaningless to the host renderer; the wait it does goes through D3D_BlockOnNonSurfaceResource (HLE). hp1 runs the same body.
