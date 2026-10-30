@@ -318,6 +318,8 @@ static void KeysPace(const Settings& s, int16_t* x, int16_t* y) {
 extern "C" void app_InputPad(int port, XBOX_GAMEPAD* g) {
     const app::Settings& s = app::Get();
     if (!s.controller) std::memset(g, 0, sizeof(*g));  // xboxrecomp: "Use controller" off: the pad at rest
+    // xboxrecomp: "Controller in background" off: the pad at rest while another window has the focus
+    if (!s.background_pad && GetForegroundWindow() != static_cast<HWND>(app::Window())) std::memset(g, 0, sizeof(*g));
     uint8_t in[app::kPadInputs], out[app::kPadInputs];
     app::Read(*g, in);
     for (uint32_t i = 0; i < app::kPadInputs; i++) out[i] = in[std::min(s.pad_map[i], app::kPadInputs - 1)];

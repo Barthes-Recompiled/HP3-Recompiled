@@ -168,6 +168,7 @@ void DrawControls(Settings& s) {
     Row("Controller");
     if (ImGui::Checkbox("Use controller", &s.controller)) Changed();
     if (!s.controller) ImGui::TextDisabled("The game ignores the controller; keyboard and mouse still play.");
+    if (ImGui::Checkbox("Controller works while the window is in the background", &s.background_pad)) Changed();
     int dl = int(s.deadzone_left), dr = int(s.deadzone_right), sl = int(s.sensitivity_left), sr = int(s.sensitivity_right);
     if (ImGui::SliderInt("Left stick deadzone %", &dl, 0, 50)) s.deadzone_left = uint32_t(dl);
     if (ImGui::IsItemDeactivatedAfterEdit()) Changed();
@@ -242,6 +243,7 @@ static void ResetPage(Settings& s, const char* page) {
     }
     if (!std::strcmp(page, "Controls")) {
         std::memcpy(&s.controller, &d.controller, sizeof(s.controller));
+        std::memcpy(&s.background_pad, &d.background_pad, sizeof(s.background_pad));
         std::memcpy(&s.deadzone_left, &d.deadzone_left, sizeof(s.deadzone_left));
         std::memcpy(&s.deadzone_right, &d.deadzone_right, sizeof(s.deadzone_right));
         std::memcpy(&s.invert_x, &d.invert_x, sizeof(s.invert_x));
