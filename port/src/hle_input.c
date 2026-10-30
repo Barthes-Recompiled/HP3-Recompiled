@@ -190,6 +190,7 @@ void sub_002C096C(void)
 
 /* XInputClose(hDevice) */
 extern void sub_002C09C2_gen(void);
+// xdk_port: anchored match (not a unique body): suspect this binding first (docs/bringup.md)
 void sub_002C09C2(void)
 {
     int p;

@@ -12,9 +12,11 @@ src() { if [ -f "port/src/recomp/region/$1" ]; then echo "port/src/recomp/region
 python3 -m tools.xbe_parser game/default.xbe --json game/default_analysis.json
 python3 -m tools.disasm game/default.xbe --text-only --extra-sections D3D,D3DX,XGRPH,DSOUND,XPP \
     --seed-functions "$(src icall_seeds.json)"
-# hand-written code may name only functions this XBE has: an address carried over from another title would replace
-# part of an unrelated function (comments and #if 0 blocks are not looked at)
+# hand-written code may name only functions this XBE has (an address carried over from another title would replace
+# part of an unrelated function), and every address literal must be one this XBE's code uses (comments and #if 0
+# blocks are not looked at)
 python3 port/tools/check_no_foreign_addrs.py --functions tools/disasm/output/functions.json \
+    --asm-dir tools/disasm/output/asm --xbe game/default.xbe --numbers port/region/retarget.json \
     $(cd port && find src -path src/recomp -prune -o \( -name '*.c' -o -name '*.cpp' -o -name '*.h' \) -print \
       | while read -r f; do src "$f"; done)
 python3 -m tools.func_id game/default.xbe

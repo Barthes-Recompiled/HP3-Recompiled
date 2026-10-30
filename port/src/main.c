@@ -556,8 +556,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
      * time stamp the GPU has completed -- *(dev+0x30) points at it -- catches
      * up with the one it last inserted at dev+0x2C. Nothing here runs a GPU to
      * write it, so mirror the inserted stamp into it. The device pointer is
-     * the global D3D CreateDevice stores at 0x002763E8. */
-    xbox_Nv2aMirrorFence(0x002763E8u, 0x2Cu, 0x30u);
+     * the global D3D CreateDevice stores at 0x00275FE8. */
+    xbox_Nv2aMirrorFence(0x00275FE8u, 0x2Cu, 0x30u);
 
     /* Step 6: Initialize stack */
     g_esp = XBOX_STACK_TOP;

@@ -56,12 +56,12 @@ namespace {
 
 // ── This XBE's D3D globals ──────────────────────────────────────────────────
 
-constexpr uint32_t kDevice = 0x002763F0;       // the static CDevice: Direct3D_CreateDevice stores it to g_pDevice
+constexpr uint32_t kDevice = 0x00275FF0;       // the static CDevice: Direct3D_CreateDevice stores it to g_pDevice
 constexpr uint32_t kDeviceBytes = 0x928 * 4;   // Direct3D_CreateDevice clears this many dwords when Init fails
-constexpr uint32_t kDevicePtr = 0x002763E8;    // D3D__pDevice
-constexpr uint32_t kDirtyFlags = 0x00275F48;   // D3D__DirtyFlags
-constexpr uint32_t kTextureState = 0x00275F50; // D3D__TextureState [4][32]
-constexpr uint32_t kRenderState = 0x00276150;  // D3D__RenderState [166]
+constexpr uint32_t kDevicePtr = 0x00275FE8;    // D3D__pDevice
+constexpr uint32_t kDirtyFlags = 0x00275B48;   // D3D__DirtyFlags
+constexpr uint32_t kTextureState = 0x00275B50; // D3D__TextureState [4][32]
+constexpr uint32_t kRenderState = 0x00275D50;  // D3D__RenderState [166]
 constexpr uint32_t kStreams = 0x00278490;      // g_Stream [16] stride, offset, buffer
 constexpr uint32_t kSimpleEncode = 0x002C7AD8; // D3DSIMPLERENDERSTATEENCODE, SetRenderStateNotInline
 
@@ -492,6 +492,7 @@ HLE(0026C8F0, 1) {
 }
 
 // D3DResource_BlockUntilNotBusy(resource)
+// xdk_port: whole-library run match (not a unique body): suspect this binding first (docs/bringup.md)
 HLE(0026AA80, 1) {
     if (A(0) && g_backend) {
         std::lock_guard<std::recursive_mutex> lock(g_lock);
@@ -544,6 +545,7 @@ HLE(00267470, 0) {
 
 // fences (SCDA): the renderer's own
 // D3DDevice_InsertFence()
+// xdk_port: anchored match (not a unique body): suspect this binding first (docs/bringup.md)
 HLE(00267550, 0) {
     std::lock_guard<std::recursive_mutex> lock(g_lock);
     return g_backend ? g_backend->Fence() : 0;
@@ -887,10 +889,15 @@ COMPLEX_STATE(002653D0, gpu::kRsLineWidth)
 COMPLEX_STATE(00266540, gpu::kRsSampleAlpha)
 COMPLEX_STATE(00265440, gpu::kRsDxt1NoiseEnable)
 COMPLEX_STATE(002662A0, gpu::kRsYuvEnable)
+// xdk_port: anchored match (not a unique body): suspect this binding first (docs/bringup.md)
 COMPLEX_STATE(002662D0, gpu::kRsOcclusionCullEnable)
+// xdk_port: anchored match (not a unique body): suspect this binding first (docs/bringup.md)
 COMPLEX_STATE(00266340, gpu::kRsStencilCullEnable)
+// xdk_port: anchored match (not a unique body): suspect this binding first (docs/bringup.md)
 COMPLEX_STATE(002663B0, gpu::kRsRopZCmpAlwaysRead)
+// xdk_port: anchored match (not a unique body): suspect this binding first (docs/bringup.md)
 COMPLEX_STATE(002663D0, gpu::kRsRopZRead)
+// xdk_port: anchored match (not a unique body): suspect this binding first (docs/bringup.md)
 COMPLEX_STATE(002663F0, gpu::kRsDoNotCullUncompressed)
 
 // D3DDevice_SetTextureState_TexCoordIndex(stage, value)

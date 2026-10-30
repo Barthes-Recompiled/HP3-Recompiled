@@ -862,6 +862,7 @@ void sub_001A6DF2(void) { FALLBACK(001A6DF2); ret_stdcall(S_OK_, 1); }
 
 /* IDirectSound_SetI3DL2Listener(this, pds3dl, dwApply): no room reverb here */
 extern void sub_002B8584_gen(void);
+// xdk_port: anchored match (not a unique body): suspect this binding first (docs/bringup.md)
 void sub_002B8584(void) { FALLBACK(002B8584); ret_stdcall(S_OK_, 3); }
 
 /* IDirectSound_DownloadEffectsImage(this, pvImageBuffer, dwImageSize,
@@ -1297,8 +1298,10 @@ STREAM(Pause)
 extern void sub_002B6978_gen(void);
 void sub_002B6978(void) { buffer_call(sub_002B6978_gen, buf_Release, "Release", 1); }
 extern void sub_002B7FAE_gen(void);
+// xdk_port: whole-library run match (not a unique body): suspect this binding first (docs/bringup.md)
 void sub_002B7FAE(void) { buffer_call(sub_002B7FAE_gen, buf_SetBufferData, "SetBufferData", 3); }
 extern void sub_002B75A3_gen(void);
+// xdk_port: anchored match (not a unique body): suspect this binding first (docs/bringup.md)
 void sub_002B75A3(void) { buffer_call(sub_002B75A3_gen, buf_Play, "Play", 4); }
 extern void sub_002B75C7_gen(void);
 void sub_002B75C7(void) { buffer_call(sub_002B75C7_gen, buf_Stop, "Stop", 1); }
@@ -1312,6 +1315,7 @@ void sub_001A6E82(void) { buffer_call(sub_001A6E82_gen, buf_GetStatus, "GetStatu
 void sub_001A6E9E(void) { buffer_call(sub_001A6E9E_gen, buf_SetCurrentPosition, "SetCurrentPosition", 2); }
 #endif
 extern void sub_002B7587_gen(void);
+// xdk_port: anchored match (not a unique body): suspect this binding first (docs/bringup.md)
 void sub_002B7587(void) { buffer_call(sub_002B7587_gen, buf_SetVolume, "SetVolume", 2); }
 #if 0  /* PoA: hp1 001A77EF has no match in PoA yet (docs/bringup.md) */
 void sub_001A77EF(void) { buffer_call(sub_001A77EF_gen, buf_SetFrequency, "SetFrequency", 2); }

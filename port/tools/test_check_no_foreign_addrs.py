@@ -57,9 +57,54 @@ def test_clean_file_passes():
     assert rc == 0, out
 
 
+DATA_SRC = """\
+constexpr uint32_t kGood = 0x00012004;   // referenced by the title's code
+constexpr uint32_t kBad = 0x00012000;    // in the image, referenced by nothing
+constexpr uint32_t kNumber = 0x00020000; // a plain number (retarget.json numbers)
+constexpr uint32_t kEnd = 0x00013000;    // xref-free: section end
+uint32_t kFar = 0x10000000;              // outside the image
+#if 0
+uint32_t kOff = 0x00012008;
+#endif
+"""
+
+
+def run_data(src, asm, numbers):
+    with tempfile.TemporaryDirectory() as d:
+        c = os.path.join(d, "x.c")
+        f = os.path.join(d, "functions.json")
+        a = os.path.join(d, "asm")
+        os.mkdir(a)
+        with open(c, "w") as fh:
+            fh.write(src)
+        with open(f, "w") as fh:
+            json.dump([{"start": "0x00011000", "section": ".text"}], fh)
+        with open(os.path.join(a, "text.asm"), "w") as fh:
+            fh.write(asm)
+        r = os.path.join(d, "retarget.json")
+        with open(r, "w") as fh:
+            json.dump({"numbers": [{"values": numbers, "files": ["x.c"]}]}, fh)
+        p = subprocess.run([sys.executable, TOOL, "--functions", f, "--asm-dir", a, "--image-range", "0x10000-0x14000",
+                            "--numbers", r, c], capture_output=True, text=True)
+        return p.returncode, p.stdout + p.stderr
+
+
+def test_flags_unreferenced_data_literal():
+    rc, out = run_data(DATA_SRC, "  00011000: mov eax, dword ptr [0x12004]\n", ["0x20000"])
+    assert rc == 1, out
+    assert "x.c:2" in out and "00012000" in out, out
+    for quiet in ("00012004", "00020000", "00013000", "10000000", "00012008"):
+        assert quiet not in out, out
+
+
+def test_referenced_data_passes():
+    rc, out = run_data(DATA_SRC.replace("0x00012000", "0x00012004"), "  mov eax, [0x12004]\n", ["0x20000"])
+    assert rc == 0, out
+
 if __name__ == "__main__":
     failed = 0
-    for t in (test_flags_only_live_foreign_names, test_clean_file_passes):
+    for t in (test_flags_only_live_foreign_names, test_clean_file_passes, test_flags_unreferenced_data_literal,
+              test_referenced_data_passes):
         try:
             t()
             print("ok   ", t.__name__)

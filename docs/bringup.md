@@ -17,32 +17,55 @@ Maps (addresses only, not in git): `tools/xdk_port/output/map_hp1_to_poa.json`, 
 `lib_hp1_to_poa.json`. `port/tools/check_no_foreign_addrs.py` (run by regen.sh) fails on any name in live code
 that is not a PoA function start.
 
+## Bindings to suspect first
+
+Live bindings that do not rest on a unique body match (marked `// xdk_port: ... match` in the code):
+
+| PoA | hp1 | Function | How |
+|---|---|---|---|
+| 0x00267550 | 0x00192170 | D3DDevice_InsertFence | anchored |
+| 0x002662D0, 0x00266340, 0x002663B0, 0x002663D0, 0x002663F0 | 0x00191B60 ... 0x00191C80 | SetRenderState YuvEnable, OcclusionCullEnable, StencilCullEnable, RopZCmpAlwaysRead, RopZRead | anchored |
+| 0x0026AA80 | 0x00194CE0 | D3DResource_BlockUntilNotBusy (a jmp to the uniquely matched D3D_BlockOnResource, as in hp1) | whole-library run |
+| 0x002B8584 | 0x001A87DC | DirectSound SetI3DL2Listener | anchored |
+| 0x002B7FAE | 0x001A7F53 | IDirectSoundBuffer SetBufferData | whole-library run |
+| 0x002B75A3 | 0x001A6E26 | IDirectSoundBuffer Play | anchored |
+| 0x002B7587 | 0x001A6E0A | IDirectSoundBuffer SetVolume | anchored |
+| 0x002C09C2 | 0x001F5038 | XInputClose | anchored |
+
+The final review checked the DirectSound ones byte for byte against hp1's (same shape, same `ret n`, same spacing).
+
 ## Globals and code addresses carried by evidence (verify in M2)
 
 Derived from matched function pairs: the same instruction in hp1's and PoA's copy of a function, one vote per
-occurrence (`tools.xdk_port.match.data_map`), or by reading the same table in both images.
+occurrence (`tools.xdk_port.match.data_map` over `tools/xdk_port/output/lib_hp1_to_poa.json`), or by reading the same
+table in both images. The vote rows below are printed by a script from that file, not typed (a hand conversion
+first put five of them 0x400 too high; the final review caught it). `check_no_foreign_addrs.py` now also fails on any
+address literal PoA's code never mentions.
 
 | Name (file) | hp1 | PoA | Evidence |
 |---|---|---|---|
-| D3D__pDevice (hle_d3d8.cpp kDevicePtr, main.c fence) | 0x001A13D8 | 0x002763E8 | 101 votes, no other candidate |
-| static CDevice (kDevice) | 0x001A13E0 | 0x002763F0 | 3 votes; pDevice + 8 in both |
-| D3D__DirtyFlags | 0x001A0F38 | 0x00275F48 | 59 votes |
-| D3D__TextureState | 0x001A0F40 | 0x00275F50 | 6 votes; DirtyFlags + 8 in both |
-| D3D__RenderState | 0x001A1140 | 0x00276150 | 11 votes; TextureState + 0x200 in both |
-| g_Stream | 0x001A3898 | 0x00278490 | 6 votes. CDevice to g_Stream is 0x24B8 in hp1, 0x20A0 in PoA: the device layout changed |
-| D3DSIMPLERENDERSTATEENCODE (kSimpleEncode) | 0x001FB2B0 | 0x002C7AD8 | 1 vote: check |
+| D3D__pDevice (kDevicePtr; main.c fence) | 0x001A13D8 | 0x00275FE8 | 101 votes, no other candidate; PoA code mentions it 112 times |
+| static CDevice (kDevice) | 0x001A13E0 | 0x00275FF0 | 3 votes, no other candidate; PoA code mentions it 6 times |
+| D3D__DirtyFlags | 0x001A0F38 | 0x00275B48 | 59 votes, no other candidate; PoA code mentions it 479 times |
+| D3D__TextureState | 0x001A0F40 | 0x00275B50 | 6 votes, no other candidate; PoA code mentions it 24 times |
+| D3D__RenderState | 0x001A1140 | 0x00275D50 | 11 votes, no other candidate; PoA code mentions it 14 times |
+| g_Stream | 0x001A3898 | 0x00278490 | 6 votes, no other candidate; PoA code mentions it 6 times |
+| D3DSIMPLERENDERSTATEENCODE (kSimpleEncode) | 0x001FB2B0 | 0x002C7AD8 | 1 votes, no other candidate; PoA code mentions it 2 times |
+| XPP device type table begin | 0x001F4204 | 0x002BF924 | 2 votes, no other candidate; PoA code mentions it 4 times |
+| XPP device type table end | 0x001F420C | 0x002BF92C | 2 votes, no other candidate; PoA code mentions it 3 times |
 | D3D_DestroyResource | 0x00194A70 | 0x0026A810 | matched function |
 | default state init (kInitDefaultState) | 0x00196D50 | 0x0026B180 | matched function |
-| XPP device type table begin / end | 0x001F4204 / 0x001F420C | 0x002BF924 / 0x002BF92C | 2 votes each |
-| g_DeviceType_Gamepad | 0x001F422C | 0x002BF9F4 | the gamepad's XPP_DEVICE_TYPE_INFO (+4) in both tables; same layout |
+| g_DeviceType_Gamepad | 0x001F422C | 0x002BF9F4 | the gamepad's XPP_DEVICE_TYPE_INFO (+4) in both tables; same layout; the title pushes it as the gamepad type |
 | entry point (main.c) | 0x00154331 | 0x000111DB | the XBE header |
 | title .text end (hle_d3d8.cpp stack scan) | 0x00190714 | 0x00264C64 | the XBE section table |
 
-**Unverified for 5849:** every CDevice field offset hle_d3d8.cpp uses (PsTextureModes +0x790, m_VertexShader +0x794,
-ZScale +0x948, SuperX/Y +0x95C/+0x960, transforms +0xC60, viewport +0xEE0, textures +0xF88, palettes +0xF98,
-RT/depth +0x1A04/+0x1A08, vblank count +0x1DE8, VBlankCallback +0x1DB8, swap count +0x2478). An offset that a
-matched function also uses is confirmed (it is part of the bytes that matched); the rest must be checked against
-PoA's code in M2. The g_Stream distance above shows the device did change size.
+Spacing is the same in both titles: pDevice to CDevice 8, DirtyFlags to TextureState 8, TextureState to RenderState
+0x200, CDevice to g_Stream 0x24A0 = 0x928 dwords, the device size Direct3D_CreateDevice clears in both.
+
+**CDevice field offsets:** the final review compared every offset hle_d3d8.cpp uses (+0x2C, +0x30, +0x790, +0x794,
++0x948, +0x95C/+0x960, +0xC60, +0xEE0, +0xEF8, +0xF98, +0x1A04, +0x1A08, +0x1A14, +0x2478) in hp1's and PoA's D3D code:
+the same use counts in both (Swap uses +0x2478 five times in each). The device layout looks unchanged; still to be
+confirmed by running (M2): vblank count +0x1DE8 and VBlankCallback +0x1DB8 were not in that comparison.
 
 **Not found:** CDirectSoundStream vtables (hle_dsound.c STREAM_VTABLE/2, hp1 0x0020F098 / 0x0020F08C): set to 0.
 

@@ -197,7 +197,7 @@ D3DX8, DSOUND, LIBCMT, XAPILIB, XBOXKRNL, XGRAPHC), title id 4541004C ("Harry Po
 `.text` 0x11000-0x264C64, library sections D3D 0x264C80, D3DX 0x278A20, XGRPH 0x295480, DSOUND 0x2B66E0, XPP
 0x2BF920 (no XMV: movies are EA's own `.mad` player). Guest memory is mapped at host = guest + 0x10000; the 64 MB
 contiguous window at 0x80000000.
-D3D: g_pDevice 0x2763E8, CDevice 0x2763F0, DirtyFlags 0x275F48, TextureState 0x275F50, RenderState 0x276150,
+D3D: g_pDevice 0x275FE8, CDevice 0x275FF0, DirtyFlags 0x275B48, TextureState 0x275B50, RenderState 0x275D50,
 g_Stream 0x278490, carried over from hp1 by matched code and unverified, as are the CDevice field offsets (see
 docs/bringup.md). Frame timing follows the video standard (25 fps PAL, 30 fps NTSC).
 

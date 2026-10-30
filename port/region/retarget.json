@@ -1,17 +1,90 @@
 {
  "_doc": "tools/region/retarget.py: the hand-written files that hold guest addresses, and the number-like values in the image's range that are plain numbers (kept) or addresses (mapped)",
- "scan": ["src/**/*.c", "src/**/*.cpp", "src/**/*.h", "icall_seeds.json", "tools/patch_gen.py"],
- "skip": ["src/recomp/gen/*", "src/recomp/region/*"],
- "include_dirs": ["src", "src/recomp", "src/scda"],
+ "scan": [
+  "src/**/*.c",
+  "src/**/*.cpp",
+  "src/**/*.h",
+  "icall_seeds.json",
+  "tools/patch_gen.py"
+ ],
+ "skip": [
+  "src/recomp/gen/*",
+  "src/recomp/region/*"
+ ],
+ "include_dirs": [
+  "src",
+  "src/recomp",
+  "src/scda"
+ ],
  "numbers": [
-  {"values": ["0x20000", "0x30000", "0x40000", "0x50000", "0x70000"],
-   "files": ["src/scda/gpu/render_thread.cpp", "src/scda/gpu/texture.cpp", "src/scda/xdk/hle_d3d8.cpp"],
-   "why": "D3D resource Common type bits (0x70000 mask; 0x40000 texture, 0x50000 surface)"},
-  {"values": ["0x80000"], "files": ["src/scda/xdk/hle_d3d8.cpp"],
-   "why": "D3D resource Common internal reference count increment"}
+  {
+   "values": [
+    "0x20000",
+    "0x30000",
+    "0x40000",
+    "0x50000",
+    "0x70000"
+   ],
+   "files": [
+    "src/scda/gpu/render_thread.cpp",
+    "src/scda/gpu/texture.cpp",
+    "src/scda/xdk/hle_d3d8.cpp"
+   ],
+   "why": "D3D resource Common type bits (0x70000 mask; 0x40000 texture, 0x50000 surface)"
+  },
+  {
+   "values": [
+    "0x80000"
+   ],
+   "files": [
+    "src/scda/xdk/hle_d3d8.cpp"
+   ],
+   "why": "D3D resource Common internal reference count increment"
+  },
+  {
+   "values": [
+    "0x382010"
+   ],
+   "files": [
+    "src/hle_dsound.c"
+   ],
+   "why": "DirectSound buffer flag mask (default_headroom), not an address"
+  },
+  {
+   "values": [
+    "0x000D0001",
+    "0x00010021"
+   ],
+   "files": [
+    "src/scda/xdk/hle_d3d8.cpp"
+   ],
+   "why": "D3D resource Common words (surface type, reference counts), not addresses"
+  },
+  {
+   "values": [
+    "0x00011005"
+   ],
+   "files": [
+    "src/scda/xdk/hle_d3d8.cpp"
+   ],
+   "why": "lower bound of the title's code for a return-address scan (.text starts at 0x11000), not an address"
+  }
  ],
  "addresses": [
-  {"values": ["0x00191D00", "0x00192C00", "0x00193400", "0x00193500", "0x00195300", "0x00195500", "0x00195F00"],
-   "files": ["src/difftest_hle.h"], "why": "the D3D functions difftest runs as HLE (a table of entry points)"}
+  {
+   "values": [
+    "0x00191D00",
+    "0x00192C00",
+    "0x00193400",
+    "0x00193500",
+    "0x00195300",
+    "0x00195500",
+    "0x00195F00"
+   ],
+   "files": [
+    "src/difftest_hle.h"
+   ],
+   "why": "the D3D functions difftest runs as HLE (a table of entry points)"
+  }
  ]
 }
