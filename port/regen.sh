@@ -31,3 +31,6 @@ python3 -m tools.recomp game/default.xbe --all --split 1000 --gen-dir port/src/r
     --exclude-manual "$(src src/scda/xdk/hle_d3d8.cpp)"
 # hooks inside generated functions (debug traces) that an override file can't express
 python3 "$(src tools/patch_gen.py)" port/src/recomp/gen
+# title-called Direct3D / DirectSound functions the HLE does not replace (report only while bringing the game up)
+python3 port/tools/check_hle_coverage.py --gen port/src/recomp/gen --analysis game/default_analysis.json \
+    --allow port/hle_coverage_allow.txt

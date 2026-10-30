@@ -237,3 +237,13 @@ Other lines: `d3d: Begin/End immediate mode is not supported (from 00049DD4)` an
 renderer has no immediate mode (Begin/End + SetVertexData*). Missing files the console misses too (path joined
 without a separator, so not ours): `fontsfonts.ini`, `texturessymbols.xsh`, `variablesthingvars.txt`.
 Counts: 0 `MakeSpace from`, 0 `ICALL`, 0 `[CRASH]`, 0 unknown shader handles.
+
+**Static coverage (Task 2, `port/tools/check_hle_coverage.py`, run by regen.sh).** Title-called library functions
+the HLE does not replace, at m2-boot be2dd60+:
+
+- DSOUND, 12: 0x002B752F (7 callers), 0x002B754F, 0x002B756B, 0x002B75DF, 0x002B7603, 0x002B761F, 0x002B763F,
+  0x002B765B (4), 0x002B767B (3), 0x002B7A60, 0x002B7A7C, 0x002B9760. The Codex survey's unnamed set, except that
+  0x002B9760 appears and 0x002B8791 does not (not called directly from `.text`).
+- D3D, 7 that reach MakeSpace / MakeRequestedSpace / BeginStateBig: 0x00266190 (9 callers), 0x00266230 (3),
+  0x00266BD0 SetVertexShaderConstantNotInlineFast (2), 0x00268E10 (20), 0x00269050 (7), 0x00269640
+  DrawIndexedVerticesUP (1), 0x00269AC0 (32). No address-taken library functions.

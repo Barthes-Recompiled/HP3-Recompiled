@@ -1,0 +1,2 @@
+# check_hle_coverage.py allowlist: title-called D3D/DSOUND functions that may run the XDK's own body.
+# 0x<addr> <name>: <reason why running the original is right>
