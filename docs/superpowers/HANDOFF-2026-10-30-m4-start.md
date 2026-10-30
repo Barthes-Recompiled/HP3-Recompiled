@@ -1,7 +1,6 @@
 # Handoff 2026-10-30: M3 merged, M4 next
 
-`main` (local) = merge 3a169bc of `m3-60fps` (M3 in-game + 16:9 Hor+ + 60 fps default). `github/m3-60fps` has
-everything up to 94e31c2; main and the commits after it are **not pushed** (ask Austin).
+`main` = merge 3a169bc of `m3-60fps` (M3 in-game + 16:9 Hor+ + 60 fps default), pushed to `github/main` 2026-10-30.
 
 ## M3 result (Austin's play-check 2026-10-30: "Play felt good")
 
