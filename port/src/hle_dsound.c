@@ -16,7 +16,8 @@
  * XbSymbolDatabase, argument counts from each function's `ret n`.
  *
  * Every entry point keeps the generated XDK body as sub_X_gen, so
- * RECOMP_HLE_DSOUND=0 runs the original DirectSound on the emulated APU.
+ * RECOMP_HLE_DSOUND=0 runs the original DirectSound on the emulated APU (for
+ * PoA, XDK 5849, that crashes at init; the HLE is on by default).
  * RECOMP_DSOUND_TRACE=1 logs the calls.
  *
  * Built into the recompile with --exclude-manual pointing at this file.
@@ -75,9 +76,9 @@ static int hle_on(void)
     if (g_hle < 0) {
         const char *e = getenv("RECOMP_HLE_DSOUND");
         const char *t = getenv("RECOMP_DSOUND_TRACE");
-        /* PoA: off unless RECOMP_HLE_DSOUND=1 until every entry point is bound (docs/bringup.md): part host
-         * mixer, part XDK DirectSound would share voices between the two */
-        g_hle = e && *e == '1';
+        /* On unless RECOMP_HLE_DSOUND=0. PoA's own DirectSound crashes on the emulated APU at DirectSoundCreate
+         * (docs/bringup.md, M2 baseline 1), so =0 is only for comparing the two at init. */
+        g_hle = !(e && *e == '0');
         g_trace = t && *t && *t != '0';
         fprintf(stderr, "[DSOUND] %s\n", g_hle ? "host mixer (HLE)" : "XDK DirectSound on the emulated APU");
     }

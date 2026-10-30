@@ -206,7 +206,7 @@ docs/bringup.md). Frame timing follows the video standard (25 fps PAL, 30 fps NT
 | File | What it does |
 |---|---|
 | `scda/xdk/hle_d3d8.cpp` | the XDK's D3D8 entry points onto the D3D12 backend; Swap, frame pacing, captures (a few unbound, docs/bringup.md) |
-| `hle_dsound.c` | DirectSound on XAudio2; **off by default** (`RECOMP_HLE_DSOUND=1`) until all its entry points are bound |
+| `hle_dsound.c` | DirectSound on XAudio2; on by default, every title-called entry point bound (`RECOMP_HLE_DSOUND=0` falls back to the XDK on the emulated APU, which crashes at init for PoA) |
 | `hle_video.c` | display timing for the HLE device (vblank overrides unbound for PoA); the renderer's screen hooks (answer 0) |
 | `hle_input.c` | XInput onto the PC pad (`app/input.cpp`: remap, deadzones, keyboard and mouse); rumble forwarded on change only |
 | `hle_xapi.c` | XAPI disc authentication (unbound for PoA) |

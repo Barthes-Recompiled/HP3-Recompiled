@@ -325,3 +325,17 @@ reproduced, S_OK), IDirectSound_SetMixBinHeadroom 0x002B752F (S_OK), DirectSound
 `ret n` checked. 0x002B9760 (CMcpxAPU's scalar deleting destructor, only reached through the vtable thunk
 `sub_002223E0`) is allowlisted. `check_hle_coverage.py --section DSOUND --strict` passes. Not yet run; the HLE is
 still off by default (steps 3-4).
+
+**DirectSound run (Task 7, step 3; 2026-10-30, m2-boot at 2c303b8, `RECOMP_HLE_DSOUND=1 RECOMP_DSOUND_TRACE=1
+RECOMP_DSOUND_WAV`, 90 s, no pad).** The logo-movie hang is gone: `eac_usa.mad`, `wb.mad`, `poa_legal_eng.big`,
+`intro.mad`, then `poa_transitional.big` and `poa_fe_eng.big` (the front end) about 65 s in; Swaps never stop
+(41-60 fps during the movies, 59-60 fps after). Trace: DirectSoundCreate, DownloadEffectsImage, 181
+CreateSoundBuffer (180 mono with SetEG + SetMixBins, never played: the front end's sound effects; one 6-channel buffer
+with SetBufferData + Play, then refilled by polling GetCurrentPosition, 8424 calls: the movie audio), 0 FALLBACK.
+The recorded mix (85 s) has RMS 3297 and changes like real audio through the logos and intro (5 s windows: RMS
+300-6000, zero crossings 270-1600 Hz, nothing clipped), and is silent from the front end on (65-85 s). Counts: 0
+`MakeSpace from`, 0 `ICALL`, 0 `[CRASH]`, 0 unknown handle; the two `Begin/End immediate mode` lines as before.
+**Open (Task 9):** all four captures (20/40/60/80 s, two in the intro, one after the front end loads) hold a single
+draw, a 640x480 screen-space quad (FVF 0x144, diffuse 0xFF7F7F7F, alpha blend, no texture listed, fixed-function
+pixel stage), and the final picture is flat white (254,254,254): no movie picture and no front end, and no music on
+the front end. The deferred Task 5/6 checks (cleared frames, skinned draws) are still open with it.
