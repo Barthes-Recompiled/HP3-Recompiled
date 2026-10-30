@@ -4,7 +4,7 @@ Static recompilation of the original Xbox game on the xboxrecomp toolkit (repo r
 `port/`. **Read [port/DEVELOPING.md](port/DEVELOPING.md) first**: setup, regenerating `port/src/recomp/gen/` from
 `game/default.xbe`, building, the run folder, debugging tools, engine facts and open issues.
 
-State: regenerates and links on the USA disc, not run yet; start from [docs/bringup.md](docs/bringup.md) and the plans in `docs/superpowers/`.
+State: M2 merged (boots to the title + attract loop at 60 fps); start from the newest `docs/superpowers/HANDOFF-*.md`, then [docs/bringup.md](docs/bringup.md) and the plans in `docs/superpowers/`.
 
 Essentials:
 
@@ -26,4 +26,4 @@ Essentials:
 - Every address in hand-written code must be a PoA function start (`port/tools/check_no_foreign_addrs.py`, run by
   regen.sh). Move addresses from another title with `tools/xdk_port`, never by hand; record evidence in
   docs/bringup.md or docs/re-notes.md (randomizer-relevant finds: pickups, collectibles, spells, scripts).
-- Bulk reading (generated code, logs, diffs) goes to Codex or agy, read-only.
+- Bulk reading (generated code, logs, diffs) goes to DeepCode (`deepcode -x -p "<one-line prompt>"`, no shell, this folder only; see the newest handoff), Codex or agy, read-only.
