@@ -530,3 +530,13 @@ Harry Potter POA. Please don't turn off your Xbox console." and writes `saves\UD
 predicted (`.superpowers/dc-m3-saves.txt`: title ID 0x4541004C, `XapiSetupPerTitleDriveLetters` maps U:/T:). A
 third A on the slot asked "Are you sure you want to overwrite Harry Potter POA?" (Yes/No): the game sees its save.
 Not checked yet: Load Game from the main menu restores it.
+
+**m3voice, m3voice2, m3voice3 (no voice lines; user, 2026-10-30).** With the pops gone the user heard no dialogue at
+all. Trace (m3voice2, `RECOMP_DSOUND_TRACE=1`): only ~17 `Play` calls in two minutes, all short sound effects or
+looping ADPCM rings; the dialogue and music come through one **6-channel 16-bit PCM buffer at 48 kHz** (0x7080
+bytes = a 50 ms ring, played looping at start-up): EA's own software mixer writes a 5.1 mix into it. Our stereo
+`render` read only channels 0 and 1 of any buffer, so everything on the centre (the dialogue) and the backs was
+dropped. Fix: a buffer of more than two channels is folded to stereo (centre and backs at -3 dB, LFE left out); 5.1
+output (`render6`) already sent each channel to its speaker. m3voice3: per-second RMS on the swear screen and in the
+first cutscene roughly doubles (e.g. 400-900 -> 950-1300), 0 full-scale samples. Clip for the user's ear:
+`Harry Potter Xbox Decomps\clips\poa_voice_check.wav` (swear screen 76-86 s, cutscenes 100-122 s).

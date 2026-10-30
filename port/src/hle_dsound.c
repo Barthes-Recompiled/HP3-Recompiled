@@ -496,6 +496,7 @@ static void render(float *out, uint32_t frames)
                     if (!v->looping || !end) {
                         v->playing = 0;
                         v->pos = 0;
+                        TRACE("voice %08X played to its end (%u frames)", v->obj, end);
                         break;
                     }
                     start = v->loop_len ? frames_of(v, v->loop_start) : 0;
@@ -508,6 +509,16 @@ static void render(float *out, uint32_t frames)
                 nx = f + 1 < end ? f + 1 : v->looping && end ? (v->loop_len ? frames_of(v, v->loop_start) : 0) : f;
                 a1 = sample(v, v->data, nx, 0);
                 b1 = sample(v, v->data, nx, 1);
+                if (v->channels > 2) {
+                    /* xboxrecomp: a title's own 5.1 mix (PoA's software mixer: its dialogue is on the centre) folded
+                     * to stereo, as the console's stereo output does: centre and backs at -3 dB, LFE left out.
+                     * Reading only the front pair lost every voice line (2026-10-30, run m3voice2) */
+                    float c0 = sample(v, v->data, f, 2), c1 = sample(v, v->data, nx, 2);
+                    a += 0.707f * (c0 + (v->channels > 4 ? sample(v, v->data, f, 4) : 0.0f));
+                    b += 0.707f * (c0 + (v->channels > 5 ? sample(v, v->data, f, 5) : 0.0f));
+                    a1 += 0.707f * (c1 + (v->channels > 4 ? sample(v, v->data, nx, 4) : 0.0f));
+                    b1 += 0.707f * (c1 + (v->channels > 5 ? sample(v, v->data, nx, 5) : 0.0f));
+                }
             }
             t = (float)(v->pos - f);
             x0 = a + (a1 - a) * t;
@@ -946,7 +957,8 @@ static void buffer_call(void (*gen)(void), buf_fn fn, const char *name, int narg
     v = find(ARG(0));
     r = v ? fn(v) : E_FAIL_;
     LeaveCriticalSection(&g_lock);
-    TRACE("Buffer_%s(%08X, %08X, %08X) = %08X", name, ARG(0), nargs > 1 ? ARG(1) : 0, nargs > 2 ? ARG(2) : 0, r);
+    TRACE("Buffer_%s(%08X, %08X, %08X, %08X) = %08X", name, ARG(0), nargs > 1 ? ARG(1) : 0, nargs > 2 ? ARG(2) : 0,
+          nargs > 3 ? ARG(3) : 0, r);
     ret_stdcall(r, nargs);
 }
 
@@ -1057,7 +1069,10 @@ BUFFER(SetMixBinVolumes)
     if (!mixbins) return S_OK_;
     n = MEM32(mixbins);
     pairs = MEM32(mixbins + 4);
-    for (uint32_t i = 0; i < n && i < 32; i++) v->bin_mb[MEM32(pairs + i * 8) & 31] = (int32_t)MEM32(pairs + i * 8 + 4);
+    for (uint32_t i = 0; i < n && i < 32; i++) {
+        v->bin_mb[MEM32(pairs + i * 8) & 31] = (int32_t)MEM32(pairs + i * 8 + 4);
+        TRACE("  bin %u: %d mB", MEM32(pairs + i * 8) & 31, (int32_t)MEM32(pairs + i * 8 + 4));
+    }
     return S_OK_;
 }
 
