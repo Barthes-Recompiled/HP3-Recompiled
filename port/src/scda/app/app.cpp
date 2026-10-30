@@ -75,6 +75,8 @@ const Entry kEntries[] = {
      "hppoa_run.log and xbox_kernel.log beside the exe, for reporting a problem; from the next start (F10 > Debug)"},
     {"controller", nullptr, Kind::Bool, FIELD(controller), 0, 0,
      "false: the game ignores the PC's controller (keyboard and mouse still play)"},
+    {"background_input", nullptr, Kind::Bool, FIELD(background_pad), 0, 0,
+     "false: the controller is ignored while another window has the focus; true reads it anyway (as before)"},
     {"async_shaders", "RECOMP_ASYNC_SHADERS", Kind::Bool, FIELD(async_shaders), 0, 0,
      "a draw whose pipeline is still compiling is skipped instead of waited for"},
     {"show_launcher", nullptr, Kind::Bool, FIELD(show_launcher), 0, 0,
