@@ -387,3 +387,26 @@ title screen** (60 s and 140 s windows): whether the console's title screen has 
 (`sub_00049A70` and its neighbour from `sub_0004A3C0`: SetRenderTarget, then two immediate-mode quads), so nothing on
 the boot path to the title is drawn through it; what that start-up pass renders (and whether a level samples it) is
 an M3 item, with immediate mode in the renderer.
+
+**Boot fix 2 (Task 9): the stall at the first movie = a lost KTIMER expiry (static analysis, 2026-10-30).** The movie
+loop at 0x0005E6E4 (`sub_0005E6D0`) spins on the timer-callback dispatcher `sub_00147BC0`, which runs callbacks as
+the game clock 0x3836C4 passes their due ticks; it leaves only when a callback produces work, so a clock that stops
+is an endless spin with no kernel calls (no log output), as runs 7, 8 and 11 show. The clock: engine init
+(`sub_001A6D30` -> `sub_001A8AB0` -> `sub_00222C40(rate)`) starts a tick thread `sub_00222B10` that waits on the NT
+event at 0x3C2C58 and increments 0x3836C0 / 0x3836C4; the event is set (`sub_00222570`, NtSetEvent) by the callback
+`sub_00222B90`, which re-arms itself each time through XAPI's `timeSetEvent` (0x00247768, the only caller) with a
+1 ms relative delay (its floor, 0x00222C03). XAPI's timer service thread (0x00247580) keeps 63 KTIMERs (type 1),
+waits on them and a control KEVENT with KeWaitForMultipleObjects, and runs the callback on itself; `timeSetEvent`
+arms one KTIMER (KeSetTimerEx, due = -delay x 10000 via `_allmul` `sub_0013E2B0`) and sets the control event. The
+runtime's KeSetTimerEx (`kernel_set_timer`) armed the slot under its timer lock but reset the timer's shadow event
+after dropping it; its timer thread (1 ms loop, due times in GetTickCount64 steps of ~15.6 ms, pinned to the guest
+core like every guest thread) could fire the timer in between, and the late ResetEvent erased the expiry of a
+one-shot whose slot was already free: the timer never fires again, XAPI's thread and the tick thread wait forever.
+The window is a whole scheduler quantum when the arming thread is preempted there, which is what happens once the
+main thread starts busy-spinning in the movie loop on the same core: hence the first movie. gdb of run 8 matches:
+tick thread in NtWaitForSingleObjectEx (`sub_00222580`), XAPI timer thread in KeWaitForMultipleObjects, the runtime
+timer thread idle in Sleep(1), main thread in `sub_00147BC0` under `sub_001AC0A0`. Ruled out: the 32-entry armed
+timer table overflowing (one timeSetEvent caller, two KeSetTimerEx sites), the 4096-entry shadow table, NtPulseEvent
+(the tick event is set, not pulsed), a timer restart per movie (start/stop only at engine init/shutdown). Fix
+(3e7e884, toolkit `src/kernel/kernel_bridge.c`): reset + arm in one step under the lock, and an expiry signals under
+the lock before its DPC (KiTimerExpiration's order). To confirm with runs once the PC is free.
