@@ -416,3 +416,7 @@ pass the first movie: each log opens `eac_usa.mad`, `wb.mad`, `poa_legal_eng.big
 no stall. conf6 stopped during startup at 12:26:55, before any movie (the session driving it ended; no Windows
 Application Error for hppoa). 5/5 clean vs 3/7 stalled before the fix (chance of 5 clean in a row at the old rate
 ~6%): the lost-KTIMER fix is confirmed.
+
+**Task 11 user check (2026-10-30, exe CF685B849B99, test\PoA_USA).** The user ran it and confirmed that logos,
+title, front-end menu, menu sounds and music work. Not answered: whether the console's title screen is also silent,
+and whether the `debug_menu` setting lets a title-screen button open the debug menu (both carried to M3).
