@@ -151,3 +151,38 @@ guesses in gaps between code: data). The other 7 to look at if they come up at r
 | sub_0028E898 (prologue, 1 caller) | D3DX | 0x28F042, 0xEA31F039 (outside the image) |
 | sub_002B48AE (call_target, no callers) | XGRPH | 0x2B5A67, 0x2B5A68, 0x2B5A6D, 0x2B5A7B, 0x2B5A83 |
 | sub_002C7768 (cc_boundary) | XPP | 0x2C77D6, 0x2C77E6 (.rdata) |
+
+## Survey of PoA's code (Codex, read-only, 2026-10-30)
+
+Static evidence (call sites in the title's code), not observed execution.
+
+- **Vertex shaders: yes.** SetVertexShader (0x00267090) from 20 call sites; renderer init `sub_00034750` calls
+  `sub_00030850`, which assembles 2,900 bytes of embedded `xvs.1.1` source (0x002CA8C0) with XGRPH's assembler
+  (`sub_0029D050`) and creates it (CreateVertexShader 0x00266A90): four-bone skinning, normals, view/projection,
+  lighting, texture coordinates; constants 0-47 bones, 48-55 view/projection, uploaded from `sub_0002F420` /
+  `sub_0002F520` through SetVertexShaderConstantNotInlineFast (0x00266BD0). Declaration at 0x002FA6B4. **M2 needs
+  hp2's vertex shader HLE.** Pixel shaders: no title call found (SetPixelShader is called only inside D3D).
+- **Draws:** DrawVerticesUP 0x002694D0 (20 sites), DrawVertices 0x00269780 (3), DrawIndexedVertices 0x00269820 (1),
+  DrawIndexedVerticesUP 0x00269640 (1, probable), Begin/End immediate mode 0x00269B20/0x00269B60 (4 each). Push
+  buffer APIs: not identified.
+- **Other D3D:** CopyRects 0x00267A60 (1), SetPalette 0x002685B0 (10), InsertFence 0x00267550 / BlockOnFence
+  0x00267460 (1 each, in `sub_000345B0` with Swap), SetGammaRamp 0x00267230 (1), SetRenderTarget 0x00267720 (15),
+  Swap 0x0026A610 (3). No overlay (movies are drawn as YUY2 textures).
+- **DirectSound:** 44 call sites into 21 entry points, all from EA's audio layer (TbAudioBody, TbSoundManager,
+  TbMapStreamer). `sub_0014EC90` creates DirectSound and downloads an embedded DSP image (0x002DCD28, 0x3360 bytes).
+  Bound so far: DirectSoundCreate 0x002B874A, CreateSoundBuffer 0x002B8560, DownloadEffectsImage 0x002B7508,
+  SetI3DL2Listener 0x002B8584, Release 0x002B6962/0x002B6978, SetBufferData 0x002B7FAE, Play 0x002B75A3, SetVolume
+  0x002B7587. Unnamed and called: 0x002B752F (7), 0x002B754F, 0x002B756B, 0x002B75DF, 0x002B7603, 0x002B761F,
+  0x002B763F, 0x002B765B, 0x002B767B, 0x002B7A60, 0x002B7A7C, 0x002B8791. Naming these is the DirectSound part of M2.
+- **Threads:** one PsCreateSystemThreadEx site (XAPI CreateThread `sub_00011DD1`), five callers: title main thread
+  (start 0x00011167 -> main 0x0001A5F0), a callback dispatcher (0x00147CE0, twice: archive worker 0x0014A650 "BF
+  Header", timing worker 0x00222B10, memory-card worker 0x00223A60), audio worker 0x0014E9C0, XAPI timer 0x00247580.
+- **Timing:** XGetVideoStandard (`sub_00195024`) is read once at renderer init (0x000349E5); the init sets a minimum
+  frame time of 1000/30 or 1000/25 ms through `sub_00096520`; the timer `sub_001A7450` uses it as the minimum elapsed
+  delta (0x001A74A0) and caps a delta at 100 ms (0x001A74A9): a variable time step with a 33/40 ms floor. The game
+  clock is QPC `sub_00195129` (rdtsc) via `sub_001A7610`, read by the frame timer `sub_00026A50`.
+  BlockUntilVerticalBlank is not called by the title directly. **For 60 fps: check what lowering that floor does.**
+- **Movies:** `sub_001AC0A0` builds `<Movie>%s.mad` and plays it (`sub_0005DCD0`); frames are converted from
+  planar YUV to YUY2 with MMX (`sub_0005D3C0`) and drawn as a textured quad with D3D's YUV path. Six movies:
+  `attract`, `eac_usa`, `filmus`, `gallery`, `intro`, `wb` (`eac_usa`, `wb`, `intro` are the start-up skip candidates).
+- **Debug menu:** see docs/re-notes.md.
