@@ -15,7 +15,7 @@ Branch `m4-widescreen-menus` (off main 0256ed1), PR on Barthes-Recompiled/HP3-Re
 ## Open / decisions
 
 - **Cutscenes:** left at 2.72:1 letterbox (Hor+ with PoA's own bars at rows 57.5/371). A zoom to fill 16:9 would
-  crop ~13% of the original's sides. Asked Austin; nothing done.
+  crop ~13% of the original's sides. **Austin 2026-10-30: no zoom** (keep the letterbox).
 - Left edge of the pause menu: the menu's left panel now starts at the 4:3 edge, so a strip of undimmed scene shows
   left of it. Cosmetic.
 - No inventory/map screen exists in PoA (pause = Resume/Save/Options/Quit).

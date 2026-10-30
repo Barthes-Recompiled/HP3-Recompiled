@@ -582,7 +582,7 @@ Checked with window screenshots (PrintWindow every 2-3 s, runs ws4-ws7) and gues
 - **Cutscenes** are left as they are: PoA's bars are not HP:PS's (a 4x4 texture at rows 0-57.5 and 371-481, faded
   in by vertex alpha 00 -> FF, drawn every frame), so hp1's zoom does not trigger. The picture between them is
   2.72:1 (Hor+, more at the sides than the console), subtitles in the bottom bar, correct shape. Zooming would crop
-  the original's sides (16:9 from 313 rows = 418 of the 480 columns the 4:3 view had): Austin's call.
+  the original's sides (16:9 from 313 rows = 418 of the 480 columns the 4:3 view had). Austin's call (2026-10-30): **no zoom**.
 - PoA has no inventory/map screen: pause is Resume / Save / Options / Quit, Back in gameplay does nothing.
 
 
