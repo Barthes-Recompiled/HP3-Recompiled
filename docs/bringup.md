@@ -610,3 +610,6 @@ Austin (2026-10-30, own play): "everything seems good with task 7" (save and loa
 
 **Task 8 (swear-screen voice line): fixed by e8f0aff** (the 5.1 fold: the line is on the centre channel). Austin
 (2026-10-30): the "I solemnly swear" screen plays its voice line after Start (a narrator's voice, not Harry's).
+
+**M3 user check (Task 10, Austin, 2026-10-30, 60 fps build).** Saves/load good (Task 7), swear-screen line plays
+(Task 8), "Play felt good." Merge approved after the code review.
