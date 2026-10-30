@@ -29,7 +29,7 @@ Live bindings that do not rest on a unique body match (marked `// xdk_port: ... 
 | 0x002B8584 | 0x001A87DC | DirectSound SetI3DL2Listener | anchored |
 | 0x002B7FAE | 0x001A7F53 | IDirectSoundBuffer SetBufferData | whole-library run |
 | 0x002B75A3 | 0x001A6E26 | IDirectSoundBuffer Play | anchored |
-| 0x002B7587 | 0x001A6E0A | IDirectSoundBuffer SetVolume | anchored |
+| 0x002B7587 | 0x001A6E0A | ~~IDirectSoundBuffer SetVolume~~ **wrong: it is SetMixBinVolumes** (M3, see "M3 audio pops") | anchored |
 | 0x002C09C2 | 0x001F5038 | XInputClose | anchored |
 
 The final review checked the DirectSound ones byte for byte against hp1's (same shape, same `ret n`, same spacing).
@@ -144,6 +144,51 @@ Consequences until they are bound:
   SetVertexShaderConstant*, LoadVertexShader, SetShaderConstantMode). PoA calls those (hp2 donor matched them, e.g.
   SetPixelShader 0x00270D00, LoadVertexShader 0x00266D40, SetShaderConstantMode 0x00266E40). The survey below
   confirms PoA draws with a programmable vertex shader: port hp2's vertex shader path in M2.
+
+**Immediate mode (M3 Task 4).** `D3DDevice_Begin` 0x00269B20, `End` 0x00269B60, `SetVertexData2f` 0x00269A80 and
+`SetVertexData4f` 0x00269AC0 (5 args, `ret 20`) are bound (`gpu/immediate.h`, tests `port/tests/immediate`): a
+register keeps its value like the NV2A's inline attributes, D3DVSDE_VERTEX (0xFFFFFFFF) writes v0 and emits a
+vertex, End packs the list in the stream-0 layout (FVF or declaration) for one UP draw. Users (DeepCode read,
+spot-checked in recomp_0001.c): an effect object (constructor `sub_0004B190`; 32 slots of 0x2500 bytes at
+`this+0x140`; three 32x32 texture wrappers at +0x4A1C8 / +0x4A210 / +0x4A258) drawn by `sub_0004A3C0`, which returns
+early while `[0x313A6C] != 0`. `sub_00049A70` (once, guard +0x4A2A4) sets FVF 0x42 through `sub_00267090` and draws
+`Begin(6)` (6-vertex gradient strip; register 3 diffuse, then 0xFFFFFFFF) and `Begin(4)` (2-vertex transparent line)
+into the +0x4A288 target; `sub_00049F70` (each time the effect renders) sets FVF 0x144 and draws two 4-vertex
+strips (diffuse, `SetVertexData2f(9, u, v)` texcoord 0, position) into +0x4A240; the per-slot draw `sub_00043C00`
+samples all three textures. Run m3t4b: `immediate mode prim 6, 6 vertices, stride 16 (from 00049DD4)` and `prim 4,
+2 vertices, stride 16 (from 00049EF8)`, no `not supported` line, boot unchanged. `check_hle_coverage`: D3D 0 gaps,
+DSOUND 0 gaps. The start-up pass draws before the first Swap, so a timed capture can't show its target; the
+level-side pass is checked in Task 5.
+
+**Frame rate (M3 Task 6).** PoA's frame timer `sub_001A7450` *clamps* a short frame's delta up to the minimum at
+0x38BA84 (1000/30 or 1000/25 ms, set by `sub_00096520` from renderer init) and does not wait; its delta 0x38BA74 has
+no consumer found (DeepCode read; `sub_00026A50` measures QPC itself). The real 30 Hz limiter is the presentation
+interval: `sub_00034750` creates the device with `0x80000002` (D3DPRESENT_INTERVAL_TWO_OR_IMMEDIATE, the log's
+`CreateDevice ... interval 80000002`). The HLE decoded only 2/3/4 and ran it at one vblank, so the game ran at 60 and
+its per-frame logic at double speed (the user saw the opening cutscene run fast). Fix: `xdk/present_interval.h`
+(XDK ONE 1, TWO 2, THREE 4, FOUR 8, IMMEDIATE 0x80000000 ored in; test `port/tests/present_interval`, the old mapping
+fails on 0x80000002). Runs m3t6 / m3t6c / m3t6d: 29.9-30.0 fps. Speed: by eye at the user check (Task 10). A real
+60 fps for PoA needs its frame-stepped logic decoupled: its own plan after M3; caps above 30 (`fps_limit` 120+,
+unlocked) still bypass the interval and run the game fast.
+
+**Missed functions (M3 Task 5).** `[ICALL] Failed to resolve VA 0x000CBEE0` in the level (m3t3): a method stored
+by a static initializer (0x0026023D `mov eax, 0xcbee0`, into the table at 0x2FE200, beside 0xCBE20 / 0xCA090) and
+never found by the disassembler. A sweep of code immediates for unknown 16-aligned function-like targets found it
+and 0x243390 (after int3 padding, merged into 0x243370's span; a callback a getter returns at 0x244561);
+`scan_code_ptrs.py` (data tables) adds 0x777F0 (`push ebp` after a table). All three are in `port/icall_seeds.json`;
+0x5E040 / 0x5E050 (start with an int3 byte, never called) are left out. m3t6d: 0 ICALL failures in the level.
+`MakeSpace from 00268E2D` (16 per level load) is D3DVertexBuffer_Lock2's vertex-cache invalidate, allowlisted in M2.
+
+**m3t6c / m3t6d (30 fps; Start 65 s, Start 80 s, A 88 / 96 / 104 s).** At 30 fps the first Start skips the intro
+movie; the second leaves the title for the "I solemnly swear that I am up to no good" screen (`poa_trc.big`,
+`frontendspeech.pkg`, `frontendaudio.pkg`), A gives the main menu (`poa_fe.big`: New Game / Load Game / Bonus
+Activities / Options), A on New Game loads the Hogwarts Express. Audio (`RECOMP_DSOUND_WAV`): RMS 0 on the
+"Press START" title only; quiet, rising sound from the swear screen on. **In the level, popping (user) = one
+repeating burst**: every 3-5 s a one-second window with RMS ~2420, 164 or 284 full-scale samples and 15-16
+sample-to-sample jumps over 8000, identical each time: one sound decoded or mixed wrongly (next to check: which
+voice/format plays then, `RECOMP_DSOUND_TRACE`). **User (2026-10-30):** on the console the Press START screen has no
+music (ours matches), and the swear screen plays a spoken voice line; ours has only the quiet music fade there
+(RMS 50-800), so the line is missing (Task 8).
 
 ## Title facts so far
 
@@ -422,8 +467,165 @@ title, front-end menu, menu sounds and music work. Not answered: whether the con
 and whether the `debug_menu` setting lets a title-screen button open the debug menu (both carried to M3).
 
 **M2 review follow-ups (DeepCode whole-branch review, 2026-10-30; all pre-existing on main, none hit in PoA runs).**
-- `tools/xdk_port/match.py` unique-body pass (`matched[a] = at[0]`): no check that another donor already took the
-  target, so two byte-identical donor wrappers can map to one PoA address. Demote such pairs to ambiguous.
-- `src/kernel/kernel_bridge.c` `kernel_set_timer`: the lazy `g_timer_lock` init and timer-thread start are unguarded
-  (two first callers at once would double-init). Move them to kernel init or use InitOnce.
+- **Done (M3 Task 1):** `tools/xdk_port/match.py` unique-body pass (`matched[a] = at[0]`): no check that another
+  donor already took the target, so two byte-identical donor wrappers can map to one PoA address. Such pairs are now
+  ambiguous (`test_unique_body_shared_target_is_ambiguous`). Rerun over the 1094 hp1 library functions of
+  `lib2_hp1_to_poa.json` (old vs new matcher): one real collision, hp1 0x001A5DD4 and 0x001A8D35 (two copies of a
+  DSOUND float-to-volume helper: `fcomp`, returns 0xFFFFD8F0 = -10000) both on PoA 0x002B67CB, now unbound; with
+  that contradiction gone, hp1 0x001A6FF0 (was callee-conflict) binds to PoA 0x002B777D (same prologue, calls the
+  same 0x2B6710 counterpart). No override uses any of these addresses, so no binding changed.
+- **Done (M3 Task 2):** `src/kernel/kernel_bridge.c` `kernel_set_timer`: the lazy `g_timer_lock` init and
+  timer-thread start were unguarded (two first callers at once would double-init). Now `timer_init()` with
+  InitOnceExecuteOnce, as `g_dpc_lock` already does; `xbox_kernel_cancel_timer` uses it too.
 - `port/src/hle_dsound.c` `Play` does not clear `paused`: check what XDK Play does on a paused buffer before changing.
+
+## M3 runs
+
+Test folder `test\PoA_USA`, started by `poarun.ps1` (scratchpad helper: copies the exe, `HPPOA_LAUNCHER=1`,
+`debug.env` = launcher defaults, kills only its own PID).
+
+**m3t2 (Task 2, InitOnce timer init; 120 s, nothing pressed).** Hypothesis: the timer-init change keeps M2's boot.
+Result: `eac_usa.mad`, `wb.mad`, `intro.mad`, title (`poa_fe_eng.big`), `attract.mad`, back to the title; 23
+`[FRAME]` lines, 0 `MakeSpace from` / `ICALL` / `[CRASH]` / unknown handle; the two `not supported` immediate-mode
+lines as before; 50 `[UNIMPL]` = the same pushfd/popfd no-op notes as conf5 (44 in a shorter run).
+
+**m3t3 (Task 3, pad injection; 150 s, Start at 65 s, A at 72 s via `poatrainer.py`).** Hypothesis: injected Start
+leaves the title and A picks the highlighted entry. Result: both `[TRAINER] input` lines; New Game was the
+highlighted entry, so the run went straight on: `system_systemgui.hpb`, the Loading screen (the train on the
+viaduct), `packages\level\hogwartsexpressizcell_pasengercar.pkg`, `ar3_ws_he_*.pkg`, speech `day5.sdt` /
+`hogwarts_express.sdt`, sfx `hogex_amb_str.sdt`; the 150 s capture shows Harry in the train corridor with the HUD.
+New in the level: **massive audio clipping** (heard by the user), `[ICALL] Failed to resolve VA 0x000CBEE0`
+(repeating), 16 x `MakeSpace from 00268E2D`. 0 `[CRASH]`. These are Task 5's first blockers.
+
+**M3 audio pops (2026-10-30, runs m3nan and m3fix).** The m3t6d recording, read sample by sample: every burst is
+exactly one 256-frame mixer pass of +-32767 with the zero samples left at 0 (a gain of +inf: x * inf = +-inf, clamped;
+0 * inf = NaN, written as 0), and from the New Game press on whole passes are 0 (the log's "960000 clipped samples"
+in 10 s = every sample NaN: the inf gain ramp turns into inf - inf). m3nan logged the voice: `vol inf`, ADPCM 22050
+Hz, 7 mix bins, not 3D. The cause is the anchored binding at **0x002B7587**: its body (0x002B74BA -> 0x002B6C64 ->
+0x002B6B45) loops over `DSMIXBINS { count, pairs[] }` storing each volume at `settings + 0x30 + bin * 4`, then commits
+the voice (0x002BB2D6): it is **IDirectSoundBuffer_SetMixBinVolumes**. Our override read its DSMIXBINS pointer as
+`lVolume`, and `db(pointer)` = inf. Fix: `buf_SetMixBinVolumes` (sets the per-bin volumes, keeps the bins). The
+neighbours 0x002B754F / 0x002B756B go through 0x002B6C3E / 0x002B6C51 to 0x002BACFF (an envelope struct: SetEG) and
+0x002BAE91 (a 24-byte struct or 0xFFFF defaults: SetFilter); PoA's real SetVolume is not among the called entry
+points. m3fix (same New Game script, 145 s): **0 clipped samples** (was 74,290 to 960,000 per 10 s), no full-scale
+pass anywhere in the WAV, no silent stretches in the level (zero fraction 0.00 from 95 s on; m3t6d had 0.35-1.00).
+The few single samples with jumps over 8000 left are in the intro movie (20-56 s), as in m3t6d. Same run: the pause
+menu opens on Start (Resume Game / Save Game / Options / Quit Game).
+
+**m3quit, m3quit2 (Task 5 exit run; `poa_quit2.pad`: New Game, left stick forward 6 s at 119 s, Start, Quit Game,
+Yes, then Start/A/A/A on the menu).** Captures: Harry runs down the corridor on the injected stick (moved between
+the 120 s and 132 s frames); Start opens Game Paused; Quit Game asks No/Yes (No highlighted); Yes goes back to the
+main menu (New Game / Load Game / Bonus Activities / Options); New Game loads the level a second time (Loading
+viaduct, the Ron and Lupin cutscenes, Harry in the corridor with the HUD). 30.0 fps after the reload, 0 `[CRASH]` /
+`ICALL` / unknown handle. Not checked: the immediate-mode effect in the level (`sub_00049F70`).
+
+**m3fps (fps clamp; 70 s, `RECOMP_FPS_LIMIT=unlocked`).** The fps choices are now the game's rate and 30 only
+(caps above 60 and unlocked map to the game's rate). Result: 30.0 fps through the intro movie and title (unlocked
+used to skip the presentation interval).
+
+**m3save (Task 7 first look; `poa_save.pad`: pause, Save Game, A on the first Empty slot).** The game shows "Saving
+Harry Potter POA. Please don't turn off your Xbox console." and writes `saves\UDATA\4541004c\71370821DB7F\`
+(`SaveGame-0` 16384 bytes, `SaveMeta.xbx` 48 bytes, `Name=Harry Potter POA`) plus `TitleMeta.xbx` 598,
+`TitleImage.xbx` 10240, `SaveImage.xbx` 4096 next to it: the exe-beside `saves` tree, as the DeepCode read
+predicted (`.superpowers/dc-m3-saves.txt`: title ID 0x4541004C, `XapiSetupPerTitleDriveLetters` maps U:/T:). A
+third A on the slot asked "Are you sure you want to overwrite Harry Potter POA?" (Yes/No): the game sees its save.
+Load Game: see m3load below.
+
+**m3voice, m3voice2, m3voice3 (no voice lines; user, 2026-10-30).** With the pops gone the user heard no dialogue at
+all. Trace (m3voice2, `RECOMP_DSOUND_TRACE=1`): only ~17 `Play` calls in two minutes, all short sound effects or
+looping ADPCM rings; the dialogue and music come through one **6-channel 16-bit PCM buffer at 48 kHz** (0x7080
+bytes = a 50 ms ring, played looping at start-up): EA's own software mixer writes a 5.1 mix into it. Our stereo
+`render` read only channels 0 and 1 of any buffer, so everything on the centre (the dialogue) and the backs was
+dropped. Fix: a buffer of more than two channels is folded to stereo (centre and backs at -3 dB, LFE left out); 5.1
+output (`render6`) already sent each channel to its speaker. m3voice3: per-second RMS on the swear screen and in the
+first cutscene roughly doubles (e.g. 400-900 -> 950-1300), 0 full-scale samples. Clip for the user's ear:
+`Harry Potter Xbox Decomps\clips\poa_voice_check.wav` (swear screen 76-86 s, cutscenes 100-122 s).
+
+## Widescreen 16:9 Hor+ (2026-10-30)
+
+- **Camera.** The camera keeps a horizontal field of view (cam+0x6C, degrees; 87 on the Hogwarts Express) and makes
+  the vertical one from the screen's aspect: `sub_000264F0(w, h)` = (w/640)/(h/480) * display+0x34, with display =
+  [0x30F948]+0x2E14 and +0x34 = 4/3 written once by `sub_00034750` (`mov [ebx+0x34], 0x3FAAAAAB`). A 16:9 value there
+  would be Vert- (top and bottom cut), so it is left alone.
+- **Projections** (all D3D row-vector, x scale in m[0]): `sub_000376E0(this=cam, out, aspect)` (perspective when
+  cam+0x80 is 0: m[0] = 1/tan(fov*pi/360), m[5] = m[0]*aspect; called from `sub_00031B40` at 0x31BBB, which then builds
+  the culling and view*projection matrices from it), `sub_00037000(this=out, fovx, fovy, ...)` (from `sub_000377B0`)
+  and `sub_000518D0` (view*projection for the vertex programs at 0x2FAA78, copied to 0x3603A8 by `sub_00051DC0`).
+- **Hook** (hle_video.c): in 16:9 each perspective result gets its x column (m[0], m[4], m[8], m[12]) times 3/4:
+  same vertical view, wider sides. The frame stays 640x480 and is shown 16:9; d3d12.cpp's Squeeze2D (from hp1) keeps
+  the 2D 4:3-shaped and side-anchors the HUD. [CAM] logs each camera/caller once.
+- **Run ws1** (RECOMP_ASPECT=16:9, poa_newgame.pad, 140 s): New Game to the Hogwarts Express; only cam path
+  0x31BC0 used (two cameras, persp, fov 87, aspect 4/3); 0 crashes. Screenshot: corridor undistorted and wider,
+  spell/button HUD round and anchored bottom right.
+- **Not checked yet:** menus/APT GUI and loading screens in 16:9 (hppoa_MenuMovie / LoadingScreen hooks are still
+  stubs, so a full-frame picture over no scene shows 4:3 in the middle), cutscene bars, the inventory/map screens,
+  and whether any 3D-in-menu camera needs to stay 4:3 (hp1 needed that for its Remembrall).
+
+## 60 fps (2026-10-30, branch m3-60fps)
+
+**Coupling.** The double speed at 60 fps (M3 Task 6) is one value, not frame-stepped logic. The frame timer
+`sub_001A7450` (this = 0x38BA6C, ticked once a frame; callers 0x7C3E0, 0x7C430, 0x115CE0, 0x217DC0) keeps a counter
+(+0), the game clock in ms (+4), the last delta (+8), the real-clock base (+0x10), a pause flag (+0x14) and a minimum
+frame time (+0x18). Each tick adds the real time elapsed, at least +0x18 and at most 100 ms. Renderer init sets +0x18
+once (0x00034A26 -> `sub_00096520`, 1000/30 or 1000/25 from XGetVideoStandard). About 70 call sites read the game clock
+through the getter `sub_001A8C30` (returns +4); 30 read the real clock through `sub_001A7520`. No fixed
+1/30 s or 33.3 ms step exists in the XBE (no 1/30 float or double; two 1/60 floats, file offsets 0x2C6E78 and 0x2D32C0, not traced).
+At 60 fps each frame is shorter than 33 ms, so the clock gained 33 ms a frame: 2x speed.
+
+**Fix.** `hle_video.c` overrides `sub_001A7450`: for this timer, with `fps_limit` above 30 the floor is 1 ms
+(first 600/fps, see play60 below), put back each tick (the F10 panel applies at once); at 0 / 30 the game's own value
+stays. `Pace` shows a frame for one vblank at `fps_limit = 60` whatever interval the title asked for (PoA asks for
+TWO_OR_IMMEDIATE). The choices 60, 120-240 and unlocked are offered again (app.h, launcher). A `[CLOCK]` line every
+10 s prints game ms against real ms (GetTickCount64, so ±2% per window).
+
+**Runs (poa_newgame.pad: title -> swear screen -> main menu -> New Game -> Hogwarts Express, 140-150 s).**
+
+| Run | fps_limit | fps in the level | game clock / real time | notes |
+|---|---|---|---|---|
+| f60a | 0 (30) | 29.9-30.0 | x1.00-1.02 | baseline, WAV f60a.wav |
+| f60b | 60, floor 16 | 59.3-60.0 | x0.99-1.05 | WAV f60b.wav |
+| f60c | 60, floor 10 | 59.4-59.7 | x0.99-1.02 | |
+| f60d | 120, floor 5 | 115-120 | x1.01-1.03 | `PaceAbove` path |
+
+Every run: 0 ICALL, 0 CRASH, 0 unknown handle. The level load shows one window of x20-x30 in every run, 30 fps too
+(the load loop ticks ~500 times a second), so it is the game's own. **Audio timing:** the Hogwarts Express part of
+f60a.wav and f60b.wav (RMS envelope at 50 ms, from each level's first sound after the load silence) correlates best at
+a time scale of 1.00 (r 0.50; 0.98 and 1.02 lower, 2.0 none): the scripted opening and its dialogue run at the
+console's speed at 60 fps. **Not checked yet:** Harry's walk/run speed, animation and particle speed by eye, and the
+movies at 60 (Austin's play-test).
+
+**play60 / play60b (Austin's play-test, 60 fps).** With the 600/fps floor (10 ms) Austin found movement odd and
+Flippendo's sounds held back until a pause. play60's [CLOCK] showed x1.13-1.32 in play: a frame shorter than the floor
+puts the clock ahead of real time, and when the next frame is sooner than that lead the timer's elapsed time is
+negative, which its unsigned compares (0x001A749D jae, 0x001A74A9 jbe) take for a hitch: +100 ms. Floor 1 ms
+(play60b): x0.95-1.00 in play with 0-3 100 ms steps per 10 s (real hitches), one x1.23 window (unexplained, 2 steps);
+the level load's x55 window is the load loop (x30 at 30 fps too). Austin: "Good."
+
+**m3load (Task 7, Load Game; `poa_load.pad`: title, swear screen, main menu, Down to Load Game, A, A on the slot,
+60 fps build 94e31c2).** The Load Game page lists the m3save slot as "The Dementor" with two Empty slots; A on it reads
+`UDATA\4541004c\71370821DB7F\SaveMeta.xbx` and `SaveGame-0` and loads the Hogwarts Express (`hogwartsexpress`,
+`ar3_ws_he_*` packages); Harry stands in the train corridor with the HUD (captures 181039-181151). 0 CRASH, 0 ICALL.
+Task 7 done: saves write and load from the exe-beside `saves` tree.
+Austin (2026-10-30, own play): "everything seems good with task 7" (save and load).
+
+**Task 8 (swear-screen voice line): fixed by e8f0aff** (the 5.1 fold: the line is on the centre channel). Austin
+(2026-10-30): the "I solemnly swear" screen plays its voice line after Start (a narrator's voice, not Harry's).
+
+**M3 user check (Task 10, Austin, 2026-10-30, 60 fps build).** Saves/load good (Task 7), swear-screen line plays
+(Task 8), "Play felt good." Merge approved after the code review.
+
+## M3 review follow-ups (DeepCode whole-branch review, 2026-10-30, `.superpowers/dc-m3-review.txt`)
+
+Fixed: **PAL at 30 fps** (finding 5): the game's 40 ms floor on PAL ran the clock 1.2x on the HLE's 59.94 Hz
+two-vblank frames; the floor at 0/30 is now capped at 33 ms (`hle_video.c`). NTSC unchanged (33 ms either way).
+Open, each checked against the code and latent for PoA's tested paths:
+- DirectSound 5.1 fold (`hle_dsound.c`): centre/back take the front pair's gains, not their own mix-bin volumes
+  (`levels()` builds 2x2); every >2-channel format is read as 5.1 (`dwChannelMask` unread); streams don't fold;
+  `SetMixBinVolumes` on a voice with no bin list stores volumes nobody reads.
+- Clock floor 1 ms above 30 fps: still gains time if ticked more than 1000 times a second (unlocked, menus).
+- `present_interval.h`: bare IMMEDIATE means one vblank; `PaceAbove` makes up stalls of 2-4 periods back to back;
+  `fps_limit = 60` ignores any title's interval (fine for PoA's TWO_OR_IMMEDIATE).
+- 16:9: `d3d12.cpp` `Squeeze2D`'s menu-camera tag (`kMenuX`) comes from hp1's hook; PoA's `hle_video.c` never tags,
+  so menu 3D (inventory) is treated as scene. Part of the open menus/inventory 16:9 pass.
+- `immediate.h`: unsupported vertex types or streams other than 0 drop or zero an immediate draw (PoA's FVF
+  0x42/0x144 is covered).

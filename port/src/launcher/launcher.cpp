@@ -38,10 +38,10 @@ namespace {
 // ── settings: hppoa.toml, the keys the game reads (scda/app/app.cpp) ─────────────────────────────────────────────
 
 // fps_limit's choices, as the game's F10 panel offers them (scda/app/app.h kFpsChoices): 0 the game's rate,
-// 30, caps above 60, 'unlocked'
-const char* const kFpsValues[] = {"0", "30", "120", "144", "165", "240", "'unlocked'"};
-const char* const kFpsNames[] = {"Game's rate (60 fps)", "30 fps", "120 fps", "144 fps", "165 fps", "240 fps",
-                                 "Unlocked"};
+// 30, 60, caps above 60, 'unlocked'
+const char* const kFpsValues[] = {"0", "30", "60", "120", "144", "165", "240", "'unlocked'"};
+const char* const kFpsNames[] = {"Game's rate (30 fps)", "30 fps", "60 fps", "120 fps", "144 fps", "165 fps",
+                                 "240 fps", "Unlocked"};
 
 struct Settings {
     bool wide = false;            // aspect '16:9', otherwise '4:3'
@@ -51,7 +51,7 @@ struct Settings {
     uint32_t msaa = 0, aniso = 0;
     bool smaa = false, vsync = true;
     bool show = true;             // show_launcher: false starts the game without this page
-    int fps = 0;                  // fps_limit: an index into kFpsValues
+    int fps = 2;                  // fps_limit: an index into kFpsValues (default 60 fps)
     int colorblind = 0;           // 'off', 'protanopia', 'deuteranopia', 'tritanopia'
     uint32_t cb_strength = 100;
     bool kbm = true;              // keyboard_mouse
@@ -144,7 +144,7 @@ Settings Load() {
     s.smaa = Value("smaa") == "true";
     s.vsync = Value("vsync") != "false";
     s.show = Value("show_launcher") != "false";
-    s.fps = 0;
+    s.fps = 2;  // 60 fps unless the file says otherwise
     for (int i = 0; i < int(std::size(kFpsValues)); i++) {
         std::string v = kFpsValues[i];
         if (v.front() == '\'') v = v.substr(1, v.size() - 2);

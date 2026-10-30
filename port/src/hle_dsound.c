@@ -496,6 +496,7 @@ static void render(float *out, uint32_t frames)
                     if (!v->looping || !end) {
                         v->playing = 0;
                         v->pos = 0;
+                        TRACE("voice %08X played to its end (%u frames)", v->obj, end);
                         break;
                     }
                     start = v->loop_len ? frames_of(v, v->loop_start) : 0;
@@ -508,6 +509,16 @@ static void render(float *out, uint32_t frames)
                 nx = f + 1 < end ? f + 1 : v->looping && end ? (v->loop_len ? frames_of(v, v->loop_start) : 0) : f;
                 a1 = sample(v, v->data, nx, 0);
                 b1 = sample(v, v->data, nx, 1);
+                if (v->channels > 2) {
+                    /* xboxrecomp: a title's own 5.1 mix (PoA's software mixer: its dialogue is on the centre) folded
+                     * to stereo, as the console's stereo output does: centre and backs at -3 dB, LFE left out.
+                     * Reading only the front pair lost every voice line (2026-10-30, run m3voice2) */
+                    float c0 = sample(v, v->data, f, 2), c1 = sample(v, v->data, nx, 2);
+                    a += 0.707f * (c0 + (v->channels > 4 ? sample(v, v->data, f, 4) : 0.0f));
+                    b += 0.707f * (c0 + (v->channels > 5 ? sample(v, v->data, f, 5) : 0.0f));
+                    a1 += 0.707f * (c1 + (v->channels > 4 ? sample(v, v->data, nx, 4) : 0.0f));
+                    b1 += 0.707f * (c1 + (v->channels > 5 ? sample(v, v->data, nx, 5) : 0.0f));
+                }
             }
             t = (float)(v->pos - f);
             x0 = a + (a1 - a) * t;
@@ -946,7 +957,8 @@ static void buffer_call(void (*gen)(void), buf_fn fn, const char *name, int narg
     v = find(ARG(0));
     r = v ? fn(v) : E_FAIL_;
     LeaveCriticalSection(&g_lock);
-    TRACE("Buffer_%s(%08X, %08X, %08X) = %08X", name, ARG(0), nargs > 1 ? ARG(1) : 0, nargs > 2 ? ARG(2) : 0, r);
+    TRACE("Buffer_%s(%08X, %08X, %08X, %08X) = %08X", name, ARG(0), nargs > 1 ? ARG(1) : 0, nargs > 2 ? ARG(2) : 0,
+          nargs > 3 ? ARG(3) : 0, r);
     ret_stdcall(r, nargs);
 }
 
@@ -1046,6 +1058,21 @@ BUFFER(SetCurrentPosition)
 BUFFER(SetVolume)
 {
     v->volume = db((int32_t)ARG(1));
+    return S_OK_;
+}
+
+/* SetMixBinVolumes(this, pMixBins): DSMIXBINS { count, pairs[] of { bin, volume } }, the volumes only: the XDK
+ * (0x002B6B45) stores each pair's volume in the voice's per-bin table and keeps the voice's bins */
+BUFFER(SetMixBinVolumes)
+{
+    uint32_t mixbins = ARG(1), n, pairs;
+    if (!mixbins) return S_OK_;
+    n = MEM32(mixbins);
+    pairs = MEM32(mixbins + 4);
+    for (uint32_t i = 0; i < n && i < 32; i++) {
+        v->bin_mb[MEM32(pairs + i * 8) & 31] = (int32_t)MEM32(pairs + i * 8 + 4);
+        TRACE("  bin %u: %d mB", MEM32(pairs + i * 8) & 31, (int32_t)MEM32(pairs + i * 8 + 4));
+    }
     return S_OK_;
 }
 
@@ -1317,8 +1344,10 @@ extern void sub_002B767B_gen(void);
 // xdk_port: callee match (hp1 and hp2) and XbSymbolDatabase signature agree (docs/bringup.md)
 void sub_002B767B(void) { buffer_call(sub_002B767B_gen, buf_SetCurrentPosition, "SetCurrentPosition", 2); }
 extern void sub_002B7587_gen(void);
-// xdk_port: anchored match (not a unique body): suspect this binding first (docs/bringup.md)
-void sub_002B7587(void) { buffer_call(sub_002B7587_gen, buf_SetVolume, "SetVolume", 2); }
+/* xboxrecomp: SetMixBinVolumes, not SetVolume as the anchored xdk_port match had it: its body (0x002B74BA ->
+ * 0x002B6C64) loops over a DSMIXBINS. Read as SetVolume, the pointer became +inf dB: the gameplay pops and NaN
+ * silences (docs/bringup.md, "M3 audio pops") */
+void sub_002B7587(void) { buffer_call(sub_002B7587_gen, buf_SetMixBinVolumes, "SetMixBinVolumes", 2); }
 extern void sub_002B7A60_gen(void);
 // xdk_port: callee match (hp1 and hp2) and XbSymbolDatabase signature agree (docs/bringup.md)
 void sub_002B7A60(void) { buffer_call(sub_002B7A60_gen, buf_SetFrequency, "SetFrequency", 2); }

@@ -31,7 +31,10 @@
 #include "app/app.h"
 #include "core/log.h"
 #include "gpu/backend.h"
+#include "gpu/immediate.h"
 #include "gpu/texture.h"
+#include "gpu/vertex.h"
+#include "xdk/present_interval.h"
 #include "kernel/kernel.h"
 #include "kernel/memory.h"
 
@@ -243,8 +246,9 @@ void Pace() {
     if (app::Get().fps_limit > 60) return PaceAbove(app::Get().fps_limit);
     static uint32_t last;
     // xboxrecomp: the 30 fps limit (fps_limit) shows each frame for two vblanks at least, as a title asking for
-    // D3DPRESENT_INTERVAL_TWO does
-    uint32_t n = std::max<uint32_t>(g_interval, app::Get().fps_limit == 30 ? 2 : 1);
+    // D3DPRESENT_INTERVAL_TWO does; 60 shows each for one whatever interval the title asked for (PoA asks for
+    // TWO_OR_IMMEDIATE; its game clock follows the rate, hle_video.c sub_001A7450)
+    uint32_t n = app::Get().fps_limit == 60 ? 1 : std::max<uint32_t>(g_interval, app::Get().fps_limit == 30 ? 2 : 1);
     uint32_t now = xbox_Nv2aVblankCount();
     if (now - last < n) WaitVblank(last, n);
     last = xbox_Nv2aVblankCount();
@@ -356,6 +360,7 @@ extern void sub_00269820_gen(void);
 extern void sub_00269A80_gen(void);
 extern void sub_00269B20_gen(void);
 extern void sub_00269B60_gen(void);
+extern void sub_00269AC0_gen(void);
 extern void sub_0026DA30_gen(void);
 }
 
@@ -405,8 +410,8 @@ HLE(00264DD0, 6) {
     g_copy_swap = (multisample >> 8 & 0x30) || swap_effect == 3;
     LOGI("d3d: CreateDevice multisample %X swap effect %u: %s", multisample, swap_effect,
          g_copy_swap ? "copy swaps (one front buffer)" : "flipping swaps");
-    g_interval = interval == 2 ? 2 : interval == 3 ? 3 : interval == 4 ? 4 : 1;
-    if (interval == 0x80000000u) g_interval = 1;
+    // PoA asks for 0x80000002, TWO_OR_IMMEDIATE: 30 fps on the console, and its logic steps per frame
+    g_interval = xdk::PresentIntervalVblanks(interval);
     std::memset(HostPtr(kDevice), 0, kDeviceBytes);
     W32(kDevicePtr, kDevice);
     // anything still pushing hardware commands writes into a scratch buffer that MakeSpace rewinds
@@ -1309,7 +1314,7 @@ namespace {
 constexpr uint32_t kUpRing = 4u << 20, kUpHalf = kUpRing / 2;
 uint32_t g_up_ring = 0, g_up_pos = 0, g_up_header = 0, g_up_fence[2] = {};
 
-uint32_t UpVertices(uint32_t src, uint32_t bytes) {
+uint32_t UpVerticesFrom(const void* src, uint32_t bytes) {
     if (!g_up_ring) {
         g_up_ring = mem::AllocContiguous(kUpRing, 0, 0xFFFFFFFF, 0x1000);
         g_up_header = mem::AllocSystem(20);
@@ -1324,11 +1329,13 @@ uint32_t UpVertices(uint32_t src, uint32_t bytes) {
         g_up_fence[from] = g_backend->Fence();
         g_backend->WaitFence(g_up_fence[to]);
     }
-    std::memcpy(HostPtr(g_up_ring + pos), HostPtr(src), bytes);
+    std::memcpy(HostPtr(g_up_ring + pos), src, bytes);
     g_up_pos = pos + room;
     W32(g_up_header + 4, mem::PhysicalFromVirtual(g_up_ring + pos));
     return g_up_header;
 }
+
+uint32_t UpVertices(uint32_t src, uint32_t bytes) { return UpVerticesFrom(HostPtr(src), bytes); }
 }  // namespace
 
 // D3DDevice_DrawVerticesUP(primitive, count, vertices, stride)
@@ -1363,10 +1370,58 @@ HLE(00269640, 5) {
     return 0;
 }
 
-// immediate mode: not drawn, said once
+// immediate mode (gpu/immediate.h): Begin opens a list, SetVertexData* set registers and D3DVSDE_VERTEX emits a
+// vertex, End draws the list as one UP draw in the current FVF / declaration layout (the primitive passes through:
+// the assembler takes Xbox primitive types, quads included)
+namespace {
+gpu::Immediate g_imm;
+uint32_t g_imm_caller = 0;
+}  // namespace
+
 HLE(00269B20, 1) {  // D3DDevice_Begin(primitive)
-    LOG_FIRST(4, "d3d: Begin/End immediate mode is not supported (from %08X)", R32(g_esp));
+    std::lock_guard<std::recursive_mutex> lock(g_lock);
+    g_imm.Begin(A(0));
+    g_imm_caller = R32(g_esp);
     return 0;
 }
-HLE(00269B60, 0) { return 0; }  // D3DDevice_End
-HLE(00269A80, 3) { return 0; }  // D3DDevice_SetVertexData2f(register, a, b)
+HLE(00269A80, 3) {  // D3DDevice_SetVertexData2f(register, a, b)
+    std::lock_guard<std::recursive_mutex> lock(g_lock);
+    g_imm.Set(A(0), ArgF(A(1)), ArgF(A(2)), 0.0f, 1.0f);
+    return 0;
+}
+HLE(00269AC0, 5) {  // D3DDevice_SetVertexData4f(register, a, b, c, d)
+    std::lock_guard<std::recursive_mutex> lock(g_lock);
+    g_imm.Set(A(0), ArgF(A(1)), ArgF(A(2)), ArgF(A(3)), ArgF(A(4)));
+    return 0;
+}
+HLE(00269B60, 0) {  // D3DDevice_End
+    std::lock_guard<std::recursive_mutex> lock(g_lock);
+    if (g_imm.Overflowed()) LOG_FIRST(4, "d3d: immediate mode list over %u vertices (from %08X)",
+                                      unsigned(gpu::Immediate::kMaxVertices), g_imm_caller);
+    if (g_backend && g_imm.Open() && g_imm.Count()) {
+        gpu::VertexShader fvf;
+        const gpu::VertexShader* layout = &fvf;
+        if (g_state.vs_handle & 1)
+            layout = g_state.vs.get();
+        else
+            gpu::FvfInputs(g_state.vs_handle, fvf);
+        std::vector<uint8_t> packed;
+        uint32_t bad = 0;
+        if (!layout || !layout->stream_stride[0]) {
+            LOG_FIRST(4, "d3d: immediate mode without a stream-0 layout (from %08X)", g_imm_caller);
+        } else if (!g_imm.Pack(*layout, packed, &bad)) {
+            LOG_FIRST(4, "d3d: immediate mode can't write vertex type %02X (from %08X)", bad, g_imm_caller);
+        } else {
+            LOG_FIRST(8, "d3d: immediate mode prim %u, %u vertices, stride %u (from %08X)", g_imm.Prim(),
+                      unsigned(g_imm.Count()), layout->stream_stride[0], g_imm_caller);
+            SyncDeferred();
+            auto stream = g_state.streams[0];
+            g_state.streams[0] = {UpVerticesFrom(packed.data(), uint32_t(packed.size())), layout->stream_stride[0]};
+            g_state.caller = g_imm_caller;
+            g_backend->Draw(g_state, g_imm.Prim(), 0, uint32_t(g_imm.Count()), nullptr);
+            g_state.streams[0] = stream;
+        }
+    }
+    g_imm.End();
+    return 0;
+}

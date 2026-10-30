@@ -247,6 +247,8 @@ bytes) over the block after the 24-byte header.
   textures, shaders, 16:9 squeeze), textures. `RECOMP_CAP_DRAWS=1` also saves the target before every draw;
   `RECOMP_CAP_VERTS=<tex addr hex>` dumps the vertices of draws using that texture;
   `RECOMP_CAPTURE_AFTER=<s>[:<every>:<count>]` captures unattended.
+* **Debug menu:** `debug_menu = true` (F10 > Debug, or `RECOMP_DEBUG_MENU=1`), then the left trigger on the main
+  menu opens the developer CHAPTER SELECTION screen (docs/re-notes.md, Debug menu).
 * `RECOMP_DEBUG_KEYS=1`: F8 log depth for all draws, F9 alpha test off, F7 depth test always passes.
   F6 (non-release builds) moves Harry to the camera.
 
@@ -257,6 +259,13 @@ bytes) over the block after the 24-byte header.
 are still Philosopher's Stone's and do nothing. **Ctrl+Shift+R** writes `reports\<date_time>\`: report.txt, guest
 memory images, logs, settings, all thread stacks and a small state file (from a separate thread, so a hung game
 still answers), plus a capture. `tools/memtool` (hppoa_mem.exe) reads/writes guest memory of a running game.
+
+Unattended runs (developer only, never during someone's play-test): `Harry Potter Xbox Decomps	ools\poatrainer.py`
+(outside the repo, beside `pstrainer.py` / `costrainer.py`) presses pad buttons through the same block, with no
+window focus: `pad <wButtons hex> [ms] [8 analog 0-255 | -] [lx,ly,rx,ry]` (Start = `0010`, A = analog 0:
+`pad 0000 200 255`) and `peek <guest addr> [n]`. `selftest <offsets.txt>` checks its struct against this
+`trainer_shm.h` (offsets printed by `poa_shm_offsets.c`, built with `-I port/src`). From a cold start, Start at
+~65 s and A at ~72 s take New Game into the Hogwarts Express (run m3t3).
 
 ### 7.3 Traces (debug.env)
 

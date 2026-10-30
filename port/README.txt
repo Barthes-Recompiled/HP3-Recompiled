@@ -117,9 +117,8 @@ Graphics
     Resolution           the window's size, or the fullscreen mode; Desktop
                          uses the monitor's own
     Vsync                waits for the monitor's refresh (no tearing)
-    Frame rate           the game's rate (60 fps), 30 fps, or Unlocked
-                         (experimental: the game was made for 60, some timing
-                         may misbehave)
+    Frame rate           60 fps (default), the game's rate (30 fps, as on the Xbox), 30, 120-240
+                         or Unlocked; the game keeps its speed at any rate
   Resolution
     Internal resolution  the lines the 3D is drawn at: 480 is the Xbox's own;
                          720 to 2160 sharpen it; "Follow window" matches the

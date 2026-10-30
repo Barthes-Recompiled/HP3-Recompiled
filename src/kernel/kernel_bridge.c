@@ -2585,7 +2585,7 @@ typedef struct {
 } XboxTimer;
 static XboxTimer g_timers[XBOX_MAX_TIMERS];
 static CRITICAL_SECTION g_timer_lock;
-static int g_timer_started;
+static INIT_ONCE g_timer_once = INIT_ONCE_STATIC_INIT;
 
 static DWORD WINAPI kernel_timer_thread(LPVOID unused)
 {
@@ -2665,6 +2665,21 @@ static DWORD WINAPI kernel_timer_thread(LPVOID unused)
     }
 }
 
+/* The lock and the timer thread, once: two guest threads can arm their first
+ * timers at the same time. */
+static BOOL CALLBACK timer_init_once(PINIT_ONCE o, PVOID p, PVOID *c)
+{
+    (void)o; (void)p; (void)c;
+    InitializeCriticalSection(&g_timer_lock);
+    CloseHandle(CreateThread(NULL, 0, kernel_timer_thread, NULL, 0, NULL));
+    return TRUE;
+}
+
+static void timer_init(void)
+{
+    InitOnceExecuteOnce(&g_timer_once, timer_init_once, NULL, NULL);
+}
+
 /* Shared by KeSetTimer and KeSetTimerEx; period is 0 for the former. */
 static void kernel_set_timer(uint32_t timer_va, long long due_100ns,
                              long period_ms, uint32_t dpc_va)
@@ -2674,12 +2689,7 @@ static void kernel_set_timer(uint32_t timer_va, long long due_100ns,
     uint32_t was_set = 0;
     HANDLE ev = ke_shadow_lookup(timer_va);
 
-    if (!g_timer_started) {
-        InitializeCriticalSection(&g_timer_lock);
-        g_timer_started = 1;
-        CloseHandle(CreateThread(NULL, 0, kernel_timer_thread, NULL, 0, NULL));
-    }
-
+    timer_init();
     EnterCriticalSection(&g_timer_lock);
     /* A set timer starts unsignaled, like the real KeSetTimer, and is reset
      * in the same step that arms it. The reset used to come after the lock
@@ -2727,8 +2737,7 @@ int xbox_kernel_cancel_timer(uint32_t timer_va)
 {
     int i, was_set = 0;
 
-    if (!g_timer_started)
-        return 0;
+    timer_init();
     EnterCriticalSection(&g_timer_lock);
     for (i = 0; i < XBOX_MAX_TIMERS; i++)
         if (g_timers[i].timer_va == timer_va) {
