@@ -653,6 +653,11 @@ struct WideFrame {
     int nbars = 0;
     float bar_area = 0;
     float bar_cover = 0;
+    // xboxrecomp: PoA's in-game menus (pause, options) put a parchment band across the top and bottom of the frame
+    // over the scene; with them up, the menu's 2D goes about the middle as one 4:3 screen (Squeeze2D)
+    bool menu = false;        // this frame's bands
+    bool menu_prev = false;   // the last frame's (the menu's first 2D comes before its bands)
+    bool flat43 = false;      // a 4:3 screen without the scene (loading, title): Present shows only its middle 4:3
 };
 
 // xboxrecomp: HP:PS's cutscene bars in its 640x480 layout, inside its viewport: rows 0-35 and 395-480. The picture
@@ -1061,6 +1066,7 @@ private:
     FILE* cap_ = nullptr;
     WideFrame wf_;                  // xboxrecomp: 16:9, the frame being drawn
     float shown_crop_[4] = {};  // xboxrecomp: 16:9, the shown frame's part filling the screen (WideFrame::crop)
+    bool shown_43_ = false;     // xboxrecomp: 16:9, that part is a 4:3 screen's middle, shown 4:3 (WideFrame::flat43)
     std::filesystem::path cap_dir_;
     uint32_t cap_i_ = 0;
     uint32_t cap_rt_ = 0;
@@ -3749,6 +3755,12 @@ bool Squeeze2D(const State& s, const Assembled& a, const DrawShaders& sh, uint32
             }
             return false;
         }
+        // xboxrecomp: an in-game menu's band across the top or the bottom over the scene (a parchment strip, 512x64:
+        // not the cutscene bars, a 4x4 texture faded in by its vertex alpha)
+        TextureDesc bd;
+        if (wf.scene >= 16 && r[3] - r[1] < fh * 0.25f && (r[1] <= 1.0f || r[3] >= fh - 1.0f) &&
+            Describe(s.textures[0], bd) && bd.width >= 64)
+            wf.menu = true;
         // over the scene (gameplay, a cutscene) a picture across the frame is a screen effect: left as drawn
         if (wf.scene >= 16) return false;
         wf.backdrop = true;
@@ -3772,6 +3784,7 @@ bool Squeeze2D(const State& s, const Assembled& a, const DrawShaders& sh, uint32
             c.squeeze[3] = (r[1] + r[3]) * 0.5f;
             return false;
         }
+        wf.flat43 = true;  // squeezed about the middle below: a 4:3 picture
     }
     // a panel over half the frame or more each way over the scene (the pause menu's box, 60-580 x 64-440): a menu is
     // up, and its text and marks after it in the frame are squeezed about the middle with it, not kept to a side.
@@ -3825,13 +3838,13 @@ bool Squeeze2D(const State& s, const Assembled& a, const DrawShaders& sh, uint32
         if (icon) anchor = fw * 0.5f;
         else if (on_track && !centred) anchor = fw * 0.5f;
         else if (marker) anchor = (r[0] + r[2]) * 0.5f;
-        else if (on_panel) anchor = fw * 0.5f;
+        else if (on_panel || wf.menu || wf.menu_prev) anchor = fw * 0.5f;
         else if (left) anchor = gx;
         else if (right) anchor = fw - gx;
         else anchor = (r[0] + r[2]) * 0.5f;
     }
     // a cutscene's HUD (health, buttons: the sides' 2D over the scene) is not shown; its subtitles are
-    if (wf.cut && live && !marker && !icon && !on_panel && (left || right)) {
+    if (wf.cut && live && !marker && !icon && !on_panel && !wf.menu && !wf.menu_prev && (left || right)) {
         static std::set<uint32_t> told;  // each texture once: what a cutscene left out (an icon not known as one?)
         if (told.insert(s.textures[0]).second)
             fprintf(stderr, "[WIDE] cutscene HUD left out: t0 %08X rect %.0f %.0f %.0f %.0f verts %u\n", s.textures[0], r[0],
@@ -4381,7 +4394,7 @@ void D3D12Backend::BlitFrame(const Target& t, ID3D12Resource* r, bool pillarbox)
     float h = float(bb_h_);
     float vw = std::min(w, h * aspect);
     float vh = vw / aspect;
-    if (pillarbox) vw = vh * 4.0f / 3.0f;
+    if (pillarbox || shown_43_) vw = vh * 4.0f / 3.0f;
     float uv[4] = {0, 0, 1, 1};
     // xboxrecomp: 16:9, the frame's part Present picked (a zoomed cutscene, or the viewport without its overscan)
     if (shown_crop_[2] > 0 && !pillarbox && app::BootAspect() == app::AspectMode::Wide && guest_w_ && guest_h_) {
@@ -4592,12 +4605,16 @@ void D3D12Backend::Present(const Surface& front, bool pillarbox) {
         const bool covered =
             wf_.bars && wf_.scene < 16 && wf_.bar_area > 0 && wf_.bar_cover >= wf_.bar_area * 0.9f;
         WideFrame next{.cut = wf_.bars && !out && !covered, .bars_h_prev = wf_.bars_h, .bars_out = out,
-                       .view_y = wf_.vp_y, .view_h = wf_.vp_h};
+                       .view_y = wf_.vp_y, .view_h = wf_.vp_h, .menu_prev = wf_.menu};
         const bool cut = wf_.cut && !covered;
         float gh = float(guest_h_);
         float cr[4] = {};
         if (gh > 0 && (cut || wf_.vp_h > 0))
             WideCrop(float(guest_w_), gh, wf_.vp_h > 0 ? wf_.vp_y : 0, wf_.vp_h > 0 ? wf_.vp_h : gh, cut, cr);
+        // xboxrecomp: a 4:3 screen without the scene (the loading screen: its clear colour, slate, showed at the sides)
+        // is shown as its middle 4:3 only, black beside it
+        shown_43_ = wf_.flat43 && wf_.scene < 16 && !cut;
+        if (shown_43_) cr[0] = float(guest_w_) / 8, cr[1] = 0, cr[2] = float(guest_w_) * 0.75f, cr[3] = gh;
         std::memcpy(shown_crop_, cr, sizeof(shown_crop_));
         wf_ = next;
     }
