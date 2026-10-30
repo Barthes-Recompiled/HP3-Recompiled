@@ -529,7 +529,7 @@ Harry Potter POA. Please don't turn off your Xbox console." and writes `saves\UD
 `TitleImage.xbx` 10240, `SaveImage.xbx` 4096 next to it: the exe-beside `saves` tree, as the DeepCode read
 predicted (`.superpowers/dc-m3-saves.txt`: title ID 0x4541004C, `XapiSetupPerTitleDriveLetters` maps U:/T:). A
 third A on the slot asked "Are you sure you want to overwrite Harry Potter POA?" (Yes/No): the game sees its save.
-Not checked yet: Load Game from the main menu restores it.
+Load Game: see m3load below.
 
 **m3voice, m3voice2, m3voice3 (no voice lines; user, 2026-10-30).** With the pops gone the user heard no dialogue at
 all. Trace (m3voice2, `RECOMP_DSOUND_TRACE=1`): only ~17 `Play` calls in two minutes, all short sound effects or
@@ -600,3 +600,9 @@ puts the clock ahead of real time, and when the next frame is sooner than that l
 negative, which its unsigned compares (0x001A749D jae, 0x001A74A9 jbe) take for a hitch: +100 ms. Floor 1 ms
 (play60b): x0.95-1.00 in play with 0-3 100 ms steps per 10 s (real hitches), one x1.23 window (unexplained, 2 steps);
 the level load's x55 window is the load loop (x30 at 30 fps too). Austin: "Good."
+
+**m3load (Task 7, Load Game; `poa_load.pad`: title, swear screen, main menu, Down to Load Game, A, A on the slot,
+60 fps build 94e31c2).** The Load Game page lists the m3save slot as "The Dementor" with two Empty slots; A on it reads
+`UDATA\4541004c\71370821DB7F\SaveMeta.xbx` and `SaveGame-0` and loads the Hogwarts Express (`hogwartsexpress`,
+`ar3_ws_he_*` packages); Harry stands in the train corridor with the HUD (captures 181039-181151). 0 CRASH, 0 ICALL.
+Task 7 done: saves write and load from the exe-beside `saves` tree.
