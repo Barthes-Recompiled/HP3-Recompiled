@@ -879,7 +879,7 @@ void sub_002B752F(void) { FALLBACK(002B752F); ret_stdcall(S_OK_, 3); }
 
 /* IDirectSound_SetI3DL2Listener(this, pds3dl, dwApply): no room reverb here */
 extern void sub_002B8584_gen(void);
-// xdk_port: anchored match (not a unique body): suspect this binding first (docs/bringup.md)
+// xdk_port: anchored match; body checked (I3DL2 index, DS3D_DEFERRED): docs/bringup.md, "M4 binding audit"
 void sub_002B8584(void) { FALLBACK(002B8584); ret_stdcall(S_OK_, 3); }
 
 /* IDirectSound_DownloadEffectsImage(this, pvImageBuffer, dwImageSize,
@@ -1327,10 +1327,10 @@ STREAM(Pause)
 extern void sub_002B6978_gen(void);
 void sub_002B6978(void) { buffer_call(sub_002B6978_gen, buf_Release, "Release", 1); }
 extern void sub_002B7FAE_gen(void);
-// xdk_port: whole-library run match (not a unique body): suspect this binding first (docs/bringup.md)
+// xdk_port: whole-library run match; body checked (compares the old pointer/size): docs/bringup.md, "M4 binding audit"
 void sub_002B7FAE(void) { buffer_call(sub_002B7FAE_gen, buf_SetBufferData, "SetBufferData", 3); }
 extern void sub_002B75A3_gen(void);
-// xdk_port: anchored match (not a unique body): suspect this binding first (docs/bringup.md)
+// xdk_port: anchored match; body checked (dwFlags bits 1/2 tested in 0x002BC203): docs/bringup.md, "M4 binding audit"
 void sub_002B75A3(void) { buffer_call(sub_002B75A3_gen, buf_Play, "Play", 4); }
 extern void sub_002B75C7_gen(void);
 void sub_002B75C7(void) { buffer_call(sub_002B75C7_gen, buf_Stop, "Stop", 1); }

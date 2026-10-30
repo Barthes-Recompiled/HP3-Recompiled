@@ -26,9 +26,9 @@ Live bindings that do not rest on a unique body match (marked `// xdk_port: ... 
 | 0x00267550 | 0x00192170 | D3DDevice_InsertFence | anchored |
 | 0x002662D0, 0x00266340, 0x002663B0, 0x002663D0, 0x002663F0 | 0x00191B60 ... 0x00191C80 | SetRenderState YuvEnable, OcclusionCullEnable, StencilCullEnable, RopZCmpAlwaysRead, RopZRead | anchored |
 | 0x0026AA80 | 0x00194CE0 | D3DResource_BlockUntilNotBusy (a jmp to the uniquely matched D3D_BlockOnResource, as in hp1) | whole-library run |
-| 0x002B8584 | 0x001A87DC | DirectSound SetI3DL2Listener | anchored |
+| 0x002B8584 | 0x001A87DC | DirectSound SetI3DL2Listener | anchored; **body checked M4** (see "M4 binding audit") |
 | 0x002B7FAE | 0x001A7F53 | IDirectSoundBuffer SetBufferData | whole-library run |
-| 0x002B75A3 | 0x001A6E26 | IDirectSoundBuffer Play | anchored |
+| 0x002B75A3 | 0x001A6E26 | IDirectSoundBuffer Play | anchored; **body checked M4** (see "M4 binding audit") |
 | 0x002B7587 | 0x001A6E0A | ~~IDirectSoundBuffer SetVolume~~ **wrong: it is SetMixBinVolumes** (M3, see "M3 audio pops") | anchored |
 | 0x002C09C2 | 0x001F5038 | XInputClose | anchored |
 
@@ -629,3 +629,19 @@ Open, each checked against the code and latent for PoA's tested paths:
   so menu 3D (inventory) is treated as scene. Part of the open menus/inventory 16:9 pass.
 - `immediate.h`: unsupported vertex types or streams other than 0 drop or zero an immediate draw (PoA's FVF
   0x42/0x144 is covered).
+
+## M4 binding audit (2026-10-30, static)
+
+The two DirectSound bindings left from the anchored list, read by body after 0x002B7587 turned out to be
+SetMixBinVolumes (lesson: an anchored match says where, not what):
+
+- **0x002B75A3 = IDirectSoundBuffer_Play: confirmed.** `ret 16` (this + 3 args). It enters the DirectSound lock
+  (0x002B6915, EnterCriticalSection through import 0x2C780C), passes its 4th stack argument to 0x002BC203 and leaves
+  the lock. 0x002BC203 tests that argument's bit 2 (DSBPLAY_SYNCHPLAYBACK) and bit 1 (DSBPLAY_FROMSTART): the
+  dwFlags of `Play(this, dwReserved1, dwReserved2, dwFlags)`.
+- **0x002B8584 = IDirectSound_SetI3DL2Listener: confirmed.** `ret 12` (this + 2 args) into 0x002B843D, which takes
+  the lock, skips everything when the I3DL2 effect index (`[ecx+8]`) is -1 (no reverb in the effects image) and,
+  unless `dwApply & 1` (DS3D_DEFERRED), commits through 0x002B8079: `(this, pds3dl, dwApply)`. Our stub returning S_OK
+  with no reverb stays right (the effects image is zeroed, so the title has no I3DL2 effect anyway).
+- Also read: **0x002B7FAE = SetBufferData** (a whole-library run match): `ret 12`; 0x002B7CC0 compares the new
+  pointer and size with the buffer's current ones (+0xBC, +0xC0) before rebuilding it, as SetBufferData does.
