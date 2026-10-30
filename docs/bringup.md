@@ -560,3 +560,36 @@ first cutscene roughly doubles (e.g. 400-900 -> 950-1300), 0 full-scale samples.
 - **Not checked yet:** menus/APT GUI and loading screens in 16:9 (hppoa_MenuMovie / LoadingScreen hooks are still
   stubs, so a full-frame picture over no scene shows 4:3 in the middle), cutscene bars, the inventory/map screens,
   and whether any 3D-in-menu camera needs to stay 4:3 (hp1 needed that for its Remembrall).
+
+## 60 fps (2026-10-30, branch m3-60fps)
+
+**Coupling.** The double speed at 60 fps (M3 Task 6) is one value, not frame-stepped logic. The frame timer
+`sub_001A7450` (this = 0x38BA6C, ticked once a frame; callers 0x7C3E0, 0x7C430, 0x115CE0, 0x217DC0) keeps a counter
+(+0), the game clock in ms (+4), the last delta (+8), the real-clock base (+0x10), a pause flag (+0x14) and a minimum
+frame time (+0x18). Each tick adds the real time elapsed, at least +0x18 and at most 100 ms. Renderer init sets +0x18
+once (0x00034A26 -> `sub_00096520`, 1000/30 or 1000/25 from XGetVideoStandard). About 70 call sites read the game clock
+through the getter `sub_001A8C30` (returns +4); 30 read the real clock through `sub_001A7520`. No fixed
+1/30 s or 33.3 ms step exists in the XBE (no 1/30 float or double; two 1/60 floats, file offsets 0x2C6E78 and 0x2D32C0, not traced).
+At 60 fps each frame is shorter than 33 ms, so the clock gained 33 ms a frame: 2x speed.
+
+**Fix.** `hle_video.c` overrides `sub_001A7450`: for this timer, with `fps_limit` above 30 the floor is 600/fps ms
+(10 at 60, 5 at 120, 1 unlocked), put back each tick (the F10 panel applies at once); at 0 / 30 the game's own value
+stays. `Pace` shows a frame for one vblank at `fps_limit = 60` whatever interval the title asked for (PoA asks for
+TWO_OR_IMMEDIATE). The choices 60, 120-240 and unlocked are offered again (app.h, launcher). A `[CLOCK]` line every
+10 s prints game ms against real ms (GetTickCount64, so ±2% per window).
+
+**Runs (poa_newgame.pad: title -> swear screen -> main menu -> New Game -> Hogwarts Express, 140-150 s).**
+
+| Run | fps_limit | fps in the level | game clock / real time | notes |
+|---|---|---|---|---|
+| f60a | 0 (30) | 29.9-30.0 | x1.00-1.02 | baseline, WAV f60a.wav |
+| f60b | 60, floor 16 | 59.3-60.0 | x0.99-1.05 | WAV f60b.wav |
+| f60c | 60, floor 10 | 59.4-59.7 | x0.99-1.02 | |
+| f60d | 120, floor 5 | 115-120 | x1.01-1.03 | `PaceAbove` path |
+
+Every run: 0 ICALL, 0 CRASH, 0 unknown handle. The level load shows one window of x20-x30 in every run, 30 fps too
+(the load loop ticks ~500 times a second), so it is the game's own. **Audio timing:** the Hogwarts Express part of
+f60a.wav and f60b.wav (RMS envelope at 50 ms, from each level's first sound after the load silence) correlates best at
+a time scale of 1.00 (r 0.50; 0.98 and 1.02 lower, 2.0 none): the scripted opening and its dialogue run at the
+console's speed at 60 fps. **Not checked yet:** Harry's walk/run speed, animation and particle speed by eye, and the
+movies at 60 (Austin's play-test).

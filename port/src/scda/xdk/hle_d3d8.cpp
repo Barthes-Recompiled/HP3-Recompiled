@@ -246,8 +246,9 @@ void Pace() {
     if (app::Get().fps_limit > 60) return PaceAbove(app::Get().fps_limit);
     static uint32_t last;
     // xboxrecomp: the 30 fps limit (fps_limit) shows each frame for two vblanks at least, as a title asking for
-    // D3DPRESENT_INTERVAL_TWO does
-    uint32_t n = std::max<uint32_t>(g_interval, app::Get().fps_limit == 30 ? 2 : 1);
+    // D3DPRESENT_INTERVAL_TWO does; 60 shows each for one whatever interval the title asked for (PoA asks for
+    // TWO_OR_IMMEDIATE; its game clock follows the rate, hle_video.c sub_001A7450)
+    uint32_t n = app::Get().fps_limit == 60 ? 1 : std::max<uint32_t>(g_interval, app::Get().fps_limit == 30 ? 2 : 1);
     uint32_t now = xbox_Nv2aVblankCount();
     if (now - last < n) WaitVblank(last, n);
     last = xbox_Nv2aVblankCount();

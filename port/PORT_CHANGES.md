@@ -16,7 +16,7 @@ checked against PoA yet (the game has not run; docs/bringup.md).
 | Game clock: XAPI's QueryPerformanceCounter (rdtsc) answered by the host, scaled while a cutscene fast-forwards (never yet for PoA: no cutscene state found) | `src/hle_skip.c` over `sub_00195129` (the matched QPC) | `cutscene_skip = false` / `RECOMP_CUTSCENE_SKIP=0` | anything timed by the game clock |
 | Stick radial range compensation | input path | `RECOMP_STICK_RANGE` | walk/run thresholds, all stick input |
 | Settings: fps, keyboard/mouse, colour-blind, controller | `src/scda/app`, launcher | per setting | timing, input |
-| Frame-rate caps above 60 and unlocked: **not offered for PoA** (M3). PoA steps its logic once a frame at its 30 fps presentation interval, so those paths (`PaceAbove`, which skips the interval) ran it 2-4x fast; old settings asking for them get the game's rate. The pacing code stays for the 60 fps decoupling plan | `scda/xdk/hle_d3d8.cpp` `PaceAbove`, `scda/app`, launcher | `fps_limit = 0` (the game's rate, 30 fps) | none: choices are the game's rate and 30 |
+| Frame rates above 30 (60, 120-240, unlocked): PoA's game clock (frame timer `sub_001A7450`, this 0x38BA6C) adds at least a minimum frame time each frame, 33 ms on NTSC, which ran a 60 fps game at double speed. Above 30 fps that floor becomes 0.6 of a frame of the chosen rate, so the clock follows real time; 60 shows each frame for one vblank whatever interval the game asked for, caps above 60 pace on `PaceAbove` | `src/hle_video.c` `sub_001A7450`, `scda/xdk/hle_d3d8.cpp` `Pace`, `scda/app`, launcher | `fps_limit = 0` or `30` (the game's own floor and interval) | anything timed per frame rather than by the game clock (none found: runs f60a-f60d) |
 
 ## Camera / 16:9
 

@@ -161,3 +161,42 @@ void sub_000518D0(void)
     sub_000518D0_gen();
     if (hppoa_Widescreen()) hor_plus(0x002FAA78u);
 }
+
+/* xboxrecomp: 60 fps. PoA's frame timer sub_001A7450 (this = 0x38BA6C, ticked once a frame) keeps the game clock at
+ * +4 that about 70 callers read through sub_001A8C30 (ms): it adds the real time elapsed, but at least the minimum
+ * frame time at +0x18, which renderer init (0x00034A26, sub_00096520) sets to 1000/30 or 1000/25 from the video
+ * standard, and at most 100 ms. At 60 fps every frame was shorter than that floor, so the clock gained 33 ms a frame:
+ * the game ran at double speed. No fixed 1/30 s step was found (no 1/30 constant in the XBE), so with the frame rate
+ * set above 30 the floor drops to 0.6 of a frame of the chosen rate (10 ms at 60 fps; 1 ms unlocked) and the clock
+ * follows real time again; below a whole frame, so a frame the vblank grid cut short is not rounded up. At the game's
+ * own rate and 30 fps the game's value stays. The floor is put back each tick, so the F10 panel's choice applies at
+ * once. Runs f60a-f60d (30, 60, 60, 120 fps): game clock x1.00-1.03 of real time in each ([CLOCK], 10 s windows on a
+ * ~16 ms tick count), and the Hogwarts Express audio at 60 lines up with 30's at a time scale of 1.00 (docs/bringup.md,
+ * "60 fps"). */
+extern uint32_t app_FpsLimit(void); /* scda/app/app.cpp: 0 the game's rate, 30, 60, 1000 unlocked */
+
+extern void sub_001A7450_gen(void);
+void sub_001A7450(void)
+{
+    static uint32_t game_floor, ours;
+    uint32_t t = ecx;
+    if (t == 0x0038BA6Cu) {
+        uint32_t fps = app_FpsLimit();
+        if (MEM32(t + 0x18) != ours) game_floor = MEM32(t + 0x18);  /* the game set it (renderer init) */
+        ours = fps > 30 ? (fps >= 1000 ? 1 : 600 / fps) : game_floor;
+        MEM32(t + 0x18) = ours;
+    }
+    sub_001A7450_gen();
+    if (t == 0x0038BA6Cu) {  /* [CLOCK] every 10 s: the game clock's ms against the real ones (1.00 = right speed) */
+        static ULONGLONG real0;
+        static uint32_t game0, frames0;
+        ULONGLONG now = GetTickCount64();
+        if (!real0 || now - real0 >= 10000) {
+            if (real0)
+                fprintf(stderr, "[CLOCK] floor %u ms: %u frames, game %u ms in %llu real ms (x%.2f)\n", ours,
+                        MEM32(t) - frames0, MEM32(t + 4) - game0, now - real0,
+                        (double)(MEM32(t + 4) - game0) / (double)(now - real0));
+            real0 = now, game0 = MEM32(t + 4), frames0 = MEM32(t);
+        }
+    }
+}

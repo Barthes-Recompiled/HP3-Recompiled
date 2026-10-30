@@ -38,10 +38,10 @@ namespace {
 // ── settings: hppoa.toml, the keys the game reads (scda/app/app.cpp) ─────────────────────────────────────────────
 
 // fps_limit's choices, as the game's F10 panel offers them (scda/app/app.h kFpsChoices): 0 the game's rate,
-// 30, caps above 60, 'unlocked'
-// (PoA: no caps above its 30 fps until 60 fps is decoupled, see app.h)
-const char* const kFpsValues[] = {"0", "30"};
-const char* const kFpsNames[] = {"Game's rate (30 fps)", "30 fps"};
+// 30, 60, caps above 60, 'unlocked'
+const char* const kFpsValues[] = {"0", "30", "60", "120", "144", "165", "240", "'unlocked'"};
+const char* const kFpsNames[] = {"Game's rate (30 fps)", "30 fps", "60 fps", "120 fps", "144 fps", "165 fps",
+                                 "240 fps", "Unlocked"};
 
 struct Settings {
     bool wide = false;            // aspect '16:9', otherwise '4:3'

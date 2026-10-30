@@ -82,7 +82,7 @@ const Entry kEntries[] = {
     {"start_menu", "RECOMP_START_MENU", Kind::Bool, FIELD(start_menu), 0, 0,
      "the settings page before the game starts (aspect ratio, resolution, quality)"},
     {"fps_limit", "RECOMP_FPS_LIMIT", Kind::Fps, FIELD(fps_limit), 0, 0,
-     "frame rate: 0 the game's own (59.94), 30, a cap above it (120, 144, 165, 240), 'unlocked' as fast as vsync / the PC allow; the game's logic runs at 25 Hz on its own clock either way"},
+     "frame rate: 0 the game's own (30, as on the Xbox), 30, 60, a cap above it (120, 144, 165, 240), 'unlocked' as fast as vsync / the PC allow; the game clock keeps its speed at any rate"},
     {"speakers", "RECOMP_SPEAKERS", Kind::U32, FIELD(speakers), 2, 6,
      "2 stereo, 6 5.1 surround (the console's speaker mix, each channel to its own speaker); takes a restart"},
     {"colorblind", nullptr, Kind::ColorBlind, FIELD(colorblind), 0, 0,
@@ -193,10 +193,9 @@ bool Parse(Settings& s, const Entry& e, std::string v) {
             }
             return false;
         case Kind::Fps:
+            if (!_stricmp(v.c_str(), "unlocked")) return U(s, e) = kFpsUnlocked, true;
             for (uint32_t c : kFpsChoices)
-                if (v == std::to_string(c)) return U(s, e) = c, true;
-            // the game's own rate; also caps above 60 and unlocked, which would run PoA fast (app.h kFpsChoices)
-            if (v == "60" || !_stricmp(v.c_str(), "unlocked") || std::atoi(v.c_str()) > 60) return U(s, e) = 0, true;
+                if (c != kFpsUnlocked && v == std::to_string(c)) return U(s, e) = c, true;
             return false;
         case Kind::ColorBlind:
             for (uint32_t i = 0; i < 4; i++) {
@@ -476,6 +475,7 @@ std::recursive_mutex& UiLock() {
 // hle_dsound.c, when the mixer starts: output channels
 extern "C" int app_Speakers(void) { return app::Get().speakers == 6 ? 6 : 2; }
 extern "C" int app_CutsceneSkip(void) { return app::Get().cutscene_skip; }
+extern "C" uint32_t app_FpsLimit(void) { return app::Get().fps_limit; }
 extern "C" int app_DebugMenu(void) { return app::Get().debug_menu; }
 extern "C" int app_IntroSkip(void) { return app::Get().intro_skip; }
 
