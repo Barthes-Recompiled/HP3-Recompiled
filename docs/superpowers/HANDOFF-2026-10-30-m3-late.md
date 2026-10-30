@@ -29,3 +29,19 @@ Pad scripts (outside the repo, `Harry Potter Xbox Decomps\tools\`): `poa_exit.pa
 4. Tasks 9-10 (debug-menu key, user check + merge), the immediate-mode effect in a level (`sub_00049F70`).
 5. A separate plan for real 60 fps (decoupling), from the reference recomps.
 6. `m3-ingame` is 10 commits ahead of `github/m3-ingame` (`git log github/m3-ingame..`); not pushed (ask Austin).
+
+## Later the same evening
+
+- **No voice lines** fixed (e8f0aff): PoA mixes music + dialogue into one 6-channel PCM ring (EA software mixer,
+  dialogue on the centre); the stereo mixer read only the front pair. Now folded to stereo. Austin to confirm by ear
+  (clip `Harry Potter Xbox Decomps\clips\poa_voice_check.wav`).
+- **Austin's next ask (2026-10-30): true widescreen (16:9 Hor+) and 60 fps.** Split into two threads, run one at a time
+  (one game instance on the PC):
+  1. **Widescreen 16:9 Hor+**: the launcher/F10 aspect setting exists but has no PoA hook (mid handoff issue 6). Find
+     PoA's projection/FOV setup (EA engine camera; the PS2 CoS notes in memory `hp-ps2-cos-re` share the engine),
+     widen horizontal FOV, then the 2D (HUD, menus, APT GUI, loading screens) at 4:3 centred or anchored. hp1/hp2's
+     Hor+ hooks are the pattern, not the addresses.
+  2. **60 fps**: PoA's logic is frame-stepped at its 30 fps presentation interval (`present_interval.h`, ruling in
+     the ledger); fps choices are clamped to 30 (c6ba8d4) until this lands. Start from the reference recomps (memory
+     `xbox-recomp-references`), find the per-frame step (timer `sub_001A7450`, 33/40 ms floor at 0x001A74A0) and
+     decouple or interpolate; lift the clamp only with a speed check (cutscene timing vs the console).
