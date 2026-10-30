@@ -606,3 +606,4 @@ the level load's x55 window is the load loop (x30 at 30 fps too). Austin: "Good.
 `UDATA\4541004c\71370821DB7F\SaveMeta.xbx` and `SaveGame-0` and loads the Hogwarts Express (`hogwartsexpress`,
 `ar3_ws_he_*` packages); Harry stands in the train corridor with the HUD (captures 181039-181151). 0 CRASH, 0 ICALL.
 Task 7 done: saves write and load from the exe-beside `saves` tree.
+Austin (2026-10-30, own play): "everything seems good with task 7" (save and load).
