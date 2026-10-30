@@ -166,6 +166,74 @@ COMPLEX_STATE(00190720, gpu::kRsPsTextureModes)
     assert 0x190720 in n, n  # a binding macro whose first argument is the address
 
 
+# callee anchoring: wrappers that are the same bytes except for the function they jump to
+def wrap(at, to):
+    """mov eax,[esp+4]; jmp to"""
+    return b"\x8B\x44\x24\x04" + b"\xE9" + struct.pack("<i", to - (at + 9))
+
+
+def body(k):
+    """push ebp; mov ebp,esp; inc eax * k; pop ebp; ret: a unique body per k"""
+    return b"\x55\x8B\xEC" + b"\x40" * k + b"\x5D\xC3"
+
+
+# donor: wrappers at +0x00/+0x20/+0x40 jumping to X/Y/Z at +0x100/+0x140/+0x180
+WD = {0x00: 0x100, 0x20: 0x140, 0x40: 0x180}
+CALLEES = {0x100: 1, 0x140: 2, 0x180: 3}
+CDONOR = place({**{o: wrap(TEXT + o, TEXT + t) for o, t in WD.items()}, **{o: body(k) for o, k in CALLEES.items()}})
+CDSTARTS = {TEXT + o for o in list(WD) + list(CALLEES)}
+CNAMES = {TEXT + o: "f%X" % o for o in list(WD) + list(CALLEES)}
+# target: callees moved by 0x50, wrappers reordered and spaced so no neighbour distance fits
+TCALLEES = {0x150: 1, 0x190: 2, 0x1D0: 3}
+
+
+def ctarget(wraps):
+    return image(place({**{o: wrap(TEXT + o, TEXT + t) for o, t in wraps.items()},
+                        **{o: body(k) for o, k in TCALLEES.items()}}))
+
+
+def test_callee_anchor_picks_wrapper():
+    tw = {0x08: 0x1D0, 0x30: 0x150, 0x58: 0x190}  # Z', X', Y'
+    r = match_functions(image(CDONOR), CNAMES, CDSTARTS, ctarget(tw), {TEXT + o for o in list(tw) + list(TCALLEES)})
+    assert r["matched"][TEXT + 0x00] == TEXT + 0x30, r
+    assert r["matched"][TEXT + 0x20] == TEXT + 0x58, r
+    assert r["matched"][TEXT + 0x40] == TEXT + 0x08, r
+    assert r["callee"] == {TEXT + 0x00, TEXT + 0x20, TEXT + 0x40}, r
+
+
+def test_callee_anchor_needs_a_mapped_callee():
+    tw = {0x08: 0x1D0, 0x30: 0x150, 0x58: 0x190}
+    wrappers = {TEXT + o: "w%X" % o for o in WD}  # the callees are not donor functions here: nothing to compare
+    r = match_functions(image(CDONOR), wrappers, CDSTARTS, ctarget(tw), {TEXT + o for o in list(tw) + list(TCALLEES)})
+    assert r["matched"] == {}, r
+    assert set(r["unmatched"].values()) == {"ambiguous"}, r
+
+
+def test_callee_anchor_conflict_stays_ambiguous():
+    tw = {0x08: 0x150, 0x30: 0x150, 0x58: 0x190}  # two target wrappers jump to X'
+    r = match_functions(image(CDONOR), CNAMES, CDSTARTS, ctarget(tw), {TEXT + o for o in list(tw) + list(TCALLEES)})
+    assert r["unmatched"].get(TEXT + 0x00) == "ambiguous", r
+    assert r["matched"][TEXT + 0x20] == TEXT + 0x58, r
+
+
+def test_callee_chain_settles():
+    # donor: W0 -> V0 -> X, W1 -> V1 -> Y (W and V are look-alike wrappers)
+    donor = place({0x00: wrap(TEXT, TEXT + 0x60), 0x20: wrap(TEXT + 0x20, TEXT + 0x80),
+                   0x60: wrap(TEXT + 0x60, TEXT + 0x100), 0x80: wrap(TEXT + 0x80, TEXT + 0x140),
+                   0x100: body(1), 0x140: body(2)})
+    dstarts = {TEXT + o for o in (0x00, 0x20, 0x60, 0x80, 0x100, 0x140)}
+    names = {a: "f" for a in dstarts}
+    target = place({0x08: wrap(TEXT + 0x08, TEXT + 0x98), 0x38: wrap(TEXT + 0x38, TEXT + 0x70),
+                    0x70: wrap(TEXT + 0x70, TEXT + 0x150), 0x98: wrap(TEXT + 0x98, TEXT + 0x190),
+                    0x150: body(1), 0x190: body(2)})
+    tstarts = {TEXT + o for o in (0x08, 0x38, 0x70, 0x98, 0x150, 0x190)}
+    r = match_functions(image(donor), names, dstarts, image(target), tstarts)
+    assert r["matched"][TEXT + 0x60] == TEXT + 0x70, r
+    assert r["matched"][TEXT + 0x80] == TEXT + 0x98, r
+    assert r["matched"][TEXT + 0x00] == TEXT + 0x38, r
+    assert r["matched"][TEXT + 0x20] == TEXT + 0x08, r
+
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     failed = 0

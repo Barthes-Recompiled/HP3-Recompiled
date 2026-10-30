@@ -25,6 +25,11 @@ that merely begins the same way does not count).
 - **anchored**: it matches at several, and exactly one of them is as far from a matched neighbour (the nearest
   matched donor function before or after) as in the donor, and no other donor function has it. Library code keeps
   its order and spacing within an object file. Anchored matches can anchor further ones.
+- **callee**: it still matches at several starts (look-alike wrappers that differ only in what they call), and
+  exactly one candidate's rel32 call/jump targets agree with the donor's, mapped through the matches so far (at
+  least one compared). Tried before neighbour anchoring in each round; neither rule takes a candidate whose calls
+  contradict a mapped callee. For this to work the donor names must include the callees: use a whole-library run
+  (every donor function in D3D, D3DX, XGRPH, DSOUND, XPP as `{"0xADDR": ""}`, named ones merged in).
 - unmatched: `no-match`, `ambiguous` or `not-function-start`. Nothing is guessed: a wrong address bound to an
   override silently replaces an unrelated function.
 
@@ -33,7 +38,9 @@ that merely begins the same way does not count).
 hp1's two regional XBEs (PS EUR `6014a9e9...` -> PS USA `82ecf164...`) with the names in hp1's `hle_d3d8.cpp`,
 `hle_dsound.c`, `hle_input.c`, `hle_video.c`, `hle_xapi.c`, `hle_skip.c`: 154 donor functions, 153 matched (116
 unique, 37 anchored), every one equal to hp1's verified region map (`port/region/ps-usa.json`); 1 unmatched
-(D3DDevice_Clear, no-match). 2026-10-30.
+(D3DDevice_Clear, no-match). 2026-10-30. Rerun with callee matching (hp1's sources had grown to 190 names): 184
+matched (144 unique, 39 anchored, 1 callee: D3DResource_BlockUntilNotBusy), every one equal to the region map; 6
+unmatched (Clear and five game functions).
 
 Across titles there is no such answer to compare with; matches there are evidence, and the overrides they move are
 checked by running the game.

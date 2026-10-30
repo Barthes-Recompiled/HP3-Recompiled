@@ -247,3 +247,13 @@ the HLE does not replace, at m2-boot be2dd60+:
 - D3D, 7 that reach MakeSpace / MakeRequestedSpace / BeginStateBig: 0x00266190 (9 callers), 0x00266230 (3),
   0x00266BD0 SetVertexShaderConstantNotInlineFast (2), 0x00268E10 (20), 0x00269050 (7), 0x00269640
   DrawIndexedVerticesUP (1), 0x00269AC0 (32). No address-taken library functions.
+
+**Callee matching (Task 3).** Whole-library runs (every donor function in the library sections):
+hp1 -> PoA 899 of 1094 (40 anchored, 41 by callees), hp2 (CoS USA) -> PoA 554 of 944 (32 anchored, 25 by callees);
+maps `tools/xdk_port/output/lib2_hp{1,2}_to_poa.json`. Five of the "ambiguous" DirectSound buffer wrappers are
+now callee matches, each found by both donors at the same PoA address: SetLoopRegion 0x002B761F, GetStatus
+0x002B763F, SetCurrentPosition 0x002B767B, SetFrequency 0x002B7A60, SetMixBins 0x002B7A7C. Coverage gaps they
+explain: 0x002B9760 = hp1 0x001AA384 (both donors), 0x002B765B = hp2 0x00145337. D3D gaps: 0x00269AC0 (32 callers)
+= hp2's **D3DDevice_SetVertexData4f** (unique), so PoA draws a lot in Begin/End immediate mode, which the renderer
+lacks; 0x00268E10 = hp1 0x00197BC0 / hp2 0x00132E50 (unique in both, unnamed). The IDirectSoundStream methods and
+the other unnamed DirectSound entries are still unmatched.
