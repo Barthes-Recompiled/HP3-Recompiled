@@ -145,6 +145,21 @@ Consequences until they are bound:
   SetPixelShader 0x00270D00, LoadVertexShader 0x00266D40, SetShaderConstantMode 0x00266E40). The survey below
   confirms PoA draws with a programmable vertex shader: port hp2's vertex shader path in M2.
 
+**Immediate mode (M3 Task 4).** `D3DDevice_Begin` 0x00269B20, `End` 0x00269B60, `SetVertexData2f` 0x00269A80 and
+`SetVertexData4f` 0x00269AC0 (5 args, `ret 20`) are bound (`gpu/immediate.h`, tests `port/tests/immediate`): a
+register keeps its value like the NV2A's inline attributes, D3DVSDE_VERTEX (0xFFFFFFFF) writes v0 and emits a
+vertex, End packs the list in the stream-0 layout (FVF or declaration) for one UP draw. Users (DeepCode read,
+spot-checked in recomp_0001.c): an effect object (constructor `sub_0004B190`; 32 slots of 0x2500 bytes at
+`this+0x140`; three 32x32 texture wrappers at +0x4A1C8 / +0x4A210 / +0x4A258) drawn by `sub_0004A3C0`, which returns
+early while `[0x313A6C] != 0`. `sub_00049A70` (once, guard +0x4A2A4) sets FVF 0x42 through `sub_00267090` and draws
+`Begin(6)` (6-vertex gradient strip; register 3 diffuse, then 0xFFFFFFFF) and `Begin(4)` (2-vertex transparent line)
+into the +0x4A288 target; `sub_00049F70` (each time the effect renders) sets FVF 0x144 and draws two 4-vertex
+strips (diffuse, `SetVertexData2f(9, u, v)` texcoord 0, position) into +0x4A240; the per-slot draw `sub_00043C00`
+samples all three textures. Run m3t4b: `immediate mode prim 6, 6 vertices, stride 16 (from 00049DD4)` and `prim 4,
+2 vertices, stride 16 (from 00049EF8)`, no `not supported` line, boot unchanged. `check_hle_coverage`: D3D 0 gaps,
+DSOUND 0 gaps. The start-up pass draws before the first Swap, so a timed capture can't show its target; the
+level-side pass is checked in Task 5.
+
 ## Title facts so far
 
 - Frame timing follows the video standard: hp2's toolkit fix for `XC_FACTORY_AV_REGION` notes PoA runs 25 fps on PAL
