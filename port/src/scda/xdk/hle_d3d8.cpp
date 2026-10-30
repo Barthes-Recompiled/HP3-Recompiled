@@ -598,7 +598,10 @@ void VblankHook() {
     CallGuest(cb, {g_vblank_data});
 }
 }  // namespace
-#if 0  /* PoA: hp1 00192070 has no match in PoA yet (docs/bringup.md) */
+// PoA: SetVerticalBlankCallback is not linked (nothing in PoA's D3D reads or writes device +0x1DB8); the CDevice
+// layout here matches 5659's (BlockUntilVerticalBlank 0x00267470 waits on the same +0x1DBC event), so the constant
+// stands for titles that do call it.
+#if 0  /* PoA: not linked, see above */
 HLE(00192070, 1) {
     if (!g_vblank_data) {
         g_vblank_data = mem::AllocSystem(16, 16);

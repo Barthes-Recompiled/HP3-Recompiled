@@ -35,7 +35,11 @@ static int hle_on(void)
 }
 
 /* NTSTATUS XapiAuthenticateDisc(void) (no stack arguments) */
-#if 0  /* PoA: hp1 00155251 has no match in PoA yet (docs/bringup.md) */
+/* PoA's XapiInitProcess (0x000117AB, XDK 5849) has no disc authentication: after the call whose result it stores
+ * at 0x3CB6D4 (hp1's call to 0x00155251 follows the same store) it maps \Device\Harddisk0\partition1\
+ * (sub_0001179A) and checks the cache and utility drives and the kernel version; none of hp1's auth chain
+ * (0x0015519A, 0x00155251) has a PoA match. Nothing to bind; kept for the other HP titles. */
+#if 0  /* PoA: not linked, see above */
 void sub_00155251(void)
 {
     if (!hle_on()) {

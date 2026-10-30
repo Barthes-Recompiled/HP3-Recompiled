@@ -1,25 +1,20 @@
 /**
- * Display timing the D3D8 HLE no longer gets from the XDK's vblank interrupt:
- * the device's vblank counter, which the XDK's interrupt advances and which the
- * HLE CreateDevice (scda/xdk/hle_d3d8.cpp) never connects:
+ * Display timing the D3D8 HLE no longer gets from the XDK's vblank interrupt.
  *
- *   D3DDevice_GetDisplayFieldStatus   a movie player waits on its field count
- *   D3DDevice_GetOverlayUpdateStatus  "a vblank passed since the last overlay
- *                                     update" (always, here)
+ * Philosopher's Stone (XDK 5659) read the device's vblank count (+0x1DE8)
+ * through two entry points overridden here: D3DDevice_GetDisplayFieldStatus
+ * (its XMV movie player waited on the field count) and
+ * D3DDevice_GetOverlayUpdateStatus (its loading loop). PoA (XDK 5849) links
+ * neither: the only code touching +0x1DE8 is the vblank interrupt handler
+ * 0x00269C90 (hp1 0x0019DA10) that increments it, and the HLE device never
+ * connects that interrupt. So both overrides stay disabled, kept for the
+ * other HP titles' layout (docs/bringup.md, "Display timing and XAPI").
+ * The HLE's Swap paces on the runtime's own vblank count instead.
  *
+ * PoA's movies are `.mad` files played by sub_001AC0A0 / sub_0005DCD0 and
+ * drawn as a YUY2 textured quad; its loading screens are not found yet.
  * Every entry point keeps the generated body as sub_X_gen, used when
- * RECOMP_HLE_D3D=0 (the XDK's own Direct3D on the emulated NV2A).
- * RECOMP_XMV_TRACE=1 logs the field status once a second.
- *
- * The movie player, sub_00164450(name, ., ., per-frame callback), plays the
- * main menu's moving background ("movies/frontend.thp" -> frontend.xmv) for as
- * long as the menu is up; hppoa_MenuMovie() tells d3d12.cpp's Squeeze2D so that,
- * in 16:9, it shows that picture's middle 360 lines across the full width
- * instead of the 4:3 frame between bars (RECOMP_MENU_MOVIE_CROP=0: left 4:3).
- * The loading screen (sprites/load_hognight.tga, set up by sub_00148400) is
- * drawn by its own thread, sub_00148100, looping until the level is in;
- * hppoa_LoadingScreen() gives its picture the same crop (RECOMP_LOADING_CROP=0:
- * left 4:3).
+ * RECOMP_HLE_D3D=0. RECOMP_XMV_TRACE=1 logged the field status once a second.
  *
  * Built into the recompile with --exclude-manual naming this file.
  */
@@ -64,7 +59,7 @@ static int trace_on(void)
 /* D3DDevice_GetDisplayFieldStatus(pFieldStatus): { Field, VBlankCount }. The
  * runtime's 60 Hz count, progressive (field 3, as the XDK reports when the mode
  * is not interlaced). */
-#if 0  /* PoA: hp1 001934C0 has no match in PoA yet (docs/bringup.md) */
+#if 0  /* PoA: not linked (no PoA caller; nothing reads device +0x1DE8), docs/bringup.md */
 void sub_001934C0(void)
 {
     static DWORD t0;
@@ -88,7 +83,7 @@ void sub_001934C0(void)
 
 /* D3DDevice_GetOverlayUpdateStatus(): TRUE once a vblank has passed since the
  * last UpdateOverlay. The title never shows an overlay, so always. */
-#if 0  /* PoA: hp1 0019D910 has no match in PoA yet (docs/bringup.md) */
+#if 0  /* PoA: not linked (no PoA caller), docs/bringup.md */
 void sub_0019D910(void)
 {
     if (!d3d_hle()) {

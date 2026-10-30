@@ -339,3 +339,18 @@ The recorded mix (85 s) has RMS 3297 and changes like real audio through the log
 draw, a 640x480 screen-space quad (FVF 0x144, diffuse 0xFF7F7F7F, alpha blend, no texture listed, fixed-function
 pixel stage), and the final picture is flat white (254,254,254): no movie picture and no front end, and no music on
 the front end. The deferred Task 5/6 checks (cleared frames, skinned draws) are still open with it.
+
+**Display timing and XAPI (Task 8).** The CDevice vblank fields are where 5659 has them: PoA's
+BlockUntilVerticalBlank 0x00267470 is instruction for instruction hp1's 0x00192090 (waits on the KEVENT at device
++0x1DBC after clearing its SignalState +0x1DC0), and VBlankCount +0x1DE8 is written only by the vblank interrupt
+handler 0x00269C90 (hp1 0x0019DA10, unique match; it increments the count when the interrupt's field bit says so).
+Nothing in PoA reads +0x1DE8 and nothing touches +0x1DB8: SetVerticalBlankCallback, GetDisplayFieldStatus and
+GetOverlayUpdateStatus are not linked into this XBE, so their overrides stay disabled (comments say why) and
+`kDevVBlankCallback` stays 0x1DB8. The HLE's Swap paces on the runtime's vblank count, which Task 7's run showed at
+59-60 fps on the front end. **XAPI:** PoA's XapiInitProcess 0x000117AB (XDK 5849) has no disc authentication.
+Where hp1's calls 0x00155251 right after storing a result to a global (hp1 0x374F74, PoA 0x3CB6D4), PoA maps
+`\Device\Harddisk0\partition1\` (sub_0001179A on the ANSI_STRING at 0x2F9BC8), then checks the cache drive
+(sub_000116E0), the utility drive (sub_00012BCD) and a version (sub_00012869), each failing to XapiBootToDash
+0x00011735. hp1's auth chain (0x0015519A, 0x00155251) has no PoA match, and Task 7's run never booted to the
+dashboard (no XLaunchNewImage / HalReturnToFirmware) and mapped partition1, TDATA and UDATA. hle_xapi.c's override
+stays disabled with that note.
