@@ -147,6 +147,15 @@ def match_functions(donor, donor_addrs, donor_starts, target, target_starts, lim
             ambiguous[a] = at
         else:
             unmatched[a] = "not-function-start" if hits else "no-match"
+    # byte-identical donor functions found once in the target: nothing says which donor it is
+    owners = {}
+    for a, t in matched.items():
+        owners.setdefault(t, []).append(a)
+    for t, ds in owners.items():
+        if len(ds) > 1:
+            for a in ds:
+                del matched[a]
+                unmatched[a] = "ambiguous"
     anchored, callee = set(), set()
     branches = {}  # (image, address) -> rel32 targets, for the callee test
     for a, cands in ambiguous.items():

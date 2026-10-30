@@ -98,6 +98,25 @@ def test_duplicate_rejected():
     assert r["unmatched"] == {A: "ambiguous"}, r
 
 
+TWIN = b"\x8B\x44\x24\x04\x40\xC2\x04\x00"  # mov eax,[esp+4]; inc eax; ret 4
+
+
+def test_unique_body_shared_target_is_ambiguous():
+    # two donor functions with the same bytes, one copy in the target: neither may claim it
+    donor = place({0x00: TWIN, 0x40: TWIN, 0x80: b"\xC3"})
+    target = place({0x20: TWIN})
+    r = match_functions(image(donor), {TEXT: "Foo", TEXT + 0x40: "Bar"}, DONOR_STARTS, image(target), {TEXT + 0x20})
+    assert TEXT + 0x20 not in r["matched"].values(), r
+    assert r["unmatched"] == {TEXT: "ambiguous", TEXT + 0x40: "ambiguous"}, r
+
+
+def test_unique_body_single_donor_still_binds():
+    donor = place({0x00: TWIN, 0x40: b"\x33\xC0\xC3", 0x80: b"\xC3"})
+    target = place({0x20: TWIN})
+    r = match_functions(image(donor), {TEXT: "Foo"}, DONOR_STARTS, image(target), {TEXT + 0x20})
+    assert r["matched"] == {TEXT: TEXT + 0x20}, r
+
+
 SHORT = b"\x33\xC0\xC3"  # xor eax,eax; ret: a body many functions share
 
 

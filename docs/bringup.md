@@ -422,8 +422,13 @@ title, front-end menu, menu sounds and music work. Not answered: whether the con
 and whether the `debug_menu` setting lets a title-screen button open the debug menu (both carried to M3).
 
 **M2 review follow-ups (DeepCode whole-branch review, 2026-10-30; all pre-existing on main, none hit in PoA runs).**
-- `tools/xdk_port/match.py` unique-body pass (`matched[a] = at[0]`): no check that another donor already took the
-  target, so two byte-identical donor wrappers can map to one PoA address. Demote such pairs to ambiguous.
+- **Done (M3 Task 1):** `tools/xdk_port/match.py` unique-body pass (`matched[a] = at[0]`): no check that another
+  donor already took the target, so two byte-identical donor wrappers can map to one PoA address. Such pairs are now
+  ambiguous (`test_unique_body_shared_target_is_ambiguous`). Rerun over the 1094 hp1 library functions of
+  `lib2_hp1_to_poa.json` (old vs new matcher): one real collision, hp1 0x001A5DD4 and 0x001A8D35 (two copies of a
+  DSOUND float-to-volume helper: `fcomp`, returns 0xFFFFD8F0 = -10000) both on PoA 0x002B67CB, now unbound; with
+  that contradiction gone, hp1 0x001A6FF0 (was callee-conflict) binds to PoA 0x002B777D (same prologue, calls the
+  same 0x2B6710 counterpart). No override uses any of these addresses, so no binding changed.
 - `src/kernel/kernel_bridge.c` `kernel_set_timer`: the lazy `g_timer_lock` init and timer-thread start are unguarded
   (two first callers at once would double-init). Move them to kernel init or use InitOnce.
 - `port/src/hle_dsound.c` `Play` does not clear `paused`: check what XDK Play does on a paused buffer before changing.
