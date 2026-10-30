@@ -443,3 +443,11 @@ Test folder `test\PoA_USA`, started by `poarun.ps1` (scratchpad helper: copies t
 Result: `eac_usa.mad`, `wb.mad`, `intro.mad`, title (`poa_fe_eng.big`), `attract.mad`, back to the title; 23
 `[FRAME]` lines, 0 `MakeSpace from` / `ICALL` / `[CRASH]` / unknown handle; the two `not supported` immediate-mode
 lines as before; 50 `[UNIMPL]` = the same pushfd/popfd no-op notes as conf5 (44 in a shorter run).
+
+**m3t3 (Task 3, pad injection; 150 s, Start at 65 s, A at 72 s via `poatrainer.py`).** Hypothesis: injected Start
+leaves the title and A picks the highlighted entry. Result: both `[TRAINER] input` lines; New Game was the
+highlighted entry, so the run went straight on: `system_systemgui.hpb`, the Loading screen (the train on the
+viaduct), `packages\level\hogwartsexpressizcell_pasengercar.pkg`, `ar3_ws_he_*.pkg`, speech `day5.sdt` /
+`hogwarts_express.sdt`, sfx `hogex_amb_str.sdt`; the 150 s capture shows Harry in the train corridor with the HUD.
+New in the level: **massive audio clipping** (heard by the user), `[ICALL] Failed to resolve VA 0x000CBEE0`
+(repeating), 16 x `MakeSpace from 00268E2D`. 0 `[CRASH]`. These are Task 5's first blockers.

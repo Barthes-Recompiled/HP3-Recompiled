@@ -258,6 +258,13 @@ are still Philosopher's Stone's and do nothing. **Ctrl+Shift+R** writes `reports
 memory images, logs, settings, all thread stacks and a small state file (from a separate thread, so a hung game
 still answers), plus a capture. `tools/memtool` (hppoa_mem.exe) reads/writes guest memory of a running game.
 
+Unattended runs (developer only, never during someone's play-test): `Harry Potter Xbox Decomps	ools\poatrainer.py`
+(outside the repo, beside `pstrainer.py` / `costrainer.py`) presses pad buttons through the same block, with no
+window focus: `pad <wButtons hex> [ms] [8 analog 0-255 | -] [lx,ly,rx,ry]` (Start = `0010`, A = analog 0:
+`pad 0000 200 255`) and `peek <guest addr> [n]`. `selftest <offsets.txt>` checks its struct against this
+`trainer_shm.h` (offsets printed by `poa_shm_offsets.c`, built with `-I port/src`). From a cold start, Start at
+~65 s and A at ~72 s take New Game into the Hogwarts Express (run m3t3).
+
 ### 7.3 Traces (debug.env)
 
 `RECOMP_DS3D_TRACE`,
