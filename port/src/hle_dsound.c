@@ -800,7 +800,7 @@ static void run_callbacks(uint32_t only_voice, int all)
 extern void sub_002B874A_gen(void);
 void sub_002B874A(void)
 {
-    FALLBACK(001A89A2);
+    FALLBACK(002B874A);
     EnterCriticalSection(&g_lock);
     start();
     if (!g_ds) {
@@ -815,7 +815,7 @@ void sub_002B874A(void)
 
 /* IDirectSound_Release(this) */
 extern void sub_002B6962_gen(void);
-void sub_002B6962(void) { FALLBACK(001A5FAA); ret_stdcall(0, 1); }
+void sub_002B6962(void) { FALLBACK(002B6962); ret_stdcall(0, 1); }
 
 /* DirectSoundUseFullHRTF(), DirectSoundOverrideSpeakerConfig(dwSpeakerConfig): HRTF is not reproduced */
 #if 0  /* PoA: hp1 001A5FD6 has no match in PoA yet (docs/bringup.md) */
@@ -862,7 +862,7 @@ void sub_001A6DF2(void) { FALLBACK(001A6DF2); ret_stdcall(S_OK_, 1); }
 
 /* IDirectSound_SetI3DL2Listener(this, pds3dl, dwApply): no room reverb here */
 extern void sub_002B8584_gen(void);
-void sub_002B8584(void) { FALLBACK(001A87DC); ret_stdcall(S_OK_, 3); }
+void sub_002B8584(void) { FALLBACK(002B8584); ret_stdcall(S_OK_, 3); }
 
 /* IDirectSound_DownloadEffectsImage(this, pvImageBuffer, dwImageSize,
  * pImageLoc, ppImageDesc). Effects run on the console's DSP and are not
@@ -870,7 +870,7 @@ void sub_002B8584(void) { FALLBACK(001A87DC); ret_stdcall(S_OK_, 3); }
 extern void sub_002B7508_gen(void);
 void sub_002B7508(void)
 {
-    FALLBACK(001A6DCB);
+    FALLBACK(002B7508);
     if (ARG(4)) {
         uint32_t desc = xbox_HeapAlloc(0x400, 16);
         memset((void *)XBOX_PTR(desc), 0, 0x400);
@@ -924,7 +924,7 @@ static uint32_t new_buffer(uint32_t desc, uint32_t out)
 
 /* IDirectSound_CreateSoundBuffer(this, pdsbd, ppBuffer, pUnkOuter) */
 extern void sub_002B8560_gen(void);
-void sub_002B8560(void) { FALLBACK(001A8770); ret_stdcall(new_buffer(ARG(1), ARG(2)), 4); }
+void sub_002B8560(void) { FALLBACK(002B8560); ret_stdcall(new_buffer(ARG(1), ARG(2)), 4); }
 
 /* One buffer method: look the voice up under the lock, run the body. */
 typedef uint32_t (*buf_fn)(Voice *v);
@@ -1113,7 +1113,7 @@ void sub_002B8791(void)
 {
     uint32_t desc, flags;
     Voice *v;
-    FALLBACK(001A89E9);
+    FALLBACK(002B8791);
     desc = ARG(0);
     flags = MEM32(desc);
     EnterCriticalSection(&g_lock);

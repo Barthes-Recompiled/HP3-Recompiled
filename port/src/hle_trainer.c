@@ -81,18 +81,14 @@ static void write_state(const char *path, HppoaTrainerShm *t)
     if (!f) return;
     SYSTEMTIME st;
     GetLocalTime(&st);
-    fprintf(f, "time %04u-%02u-%02u %02u:%02u:%02u, %.1f s since boot
-", st.wYear, st.wMonth, st.wDay, st.wHour,
+    fprintf(f, "time %04u-%02u-%02u %02u:%02u:%02u, %.1f s since boot\n", st.wYear, st.wMonth, st.wDay, st.wHour,
             st.wMinute, st.wSecond, GetTickCount64() / 1000.0);
-    fprintf(f, "guest -> host offset %+lld
-", (long long)g_xbox_mem_offset);
+    fprintf(f, "guest -> host offset %+lld\n", (long long)g_xbox_mem_offset);
     XBOX_GAMEPAD g = hppoa_last_pad;
     fprintf(f, "pad buttons %04X analog", g.wButtons);
     for (int i = 0; i < 8; i++) fprintf(f, " %u", g.bAnalogButtons[i]);
-    fprintf(f, " sticks %d %d %d %d
-", g.sThumbLX, g.sThumbLY, g.sThumbRX, g.sThumbRY);
-    fprintf(f, "trainer: input injections %u
-", t->inject_seq);
+    fprintf(f, " sticks %d %d %d %d\n", g.sThumbLX, g.sThumbLY, g.sThumbRX, g.sThumbRY);
+    fprintf(f, "trainer: input injections %u\n", t->inject_seq);
     fclose(f);
 }
 
@@ -121,7 +117,6 @@ void hppoa_TrainerInit(void)
 {
     HppoaTrainerShm *t = shm();
     if (!t) return;
-    fprintf(stderr, "[TRAINER] shared block %s ready
-", HPPOA_TRAINER_NAME);
+    fprintf(stderr, "[TRAINER] shared block %s ready\n", HPPOA_TRAINER_NAME);
     CloseHandle(CreateThread(NULL, 0, report_thread, t, 0, NULL));
 }

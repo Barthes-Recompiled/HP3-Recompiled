@@ -3,7 +3,7 @@
 
     python3 port/tools/check_no_foreign_addrs.py --functions tools/disasm/output/functions.json FILE...
 
-Overrides bind by name (HLE(ADDR, n), sub_ADDR). An address carried over from another title that is not a function
+Overrides bind by name (HLE(ADDR, n), FALLBACK(ADDR), sub_ADDR). An address carried over from another title that is not a function
 here would replace part of some unrelated function, silently. regen.sh runs this after disassembling, over every
 hand-written file; comments and code under `#if 0` are not looked at.
 """
@@ -12,7 +12,8 @@ import json
 import re
 import sys
 
-_NAME = re.compile(r"\bHLE\(\s*([0-9A-Fa-f]{8})\s*,|\bsub_([0-9A-Fa-f]{8})(?:_gen)?\b")
+# HLE(ADDR, n), FALLBACK(ADDR) and other macros that paste sub_ADDR / sub_ADDR_gen from an 8-digit argument; sub_ADDR
+_NAME = re.compile(r"\b[A-Z][A-Z0-9_]*\(\s*([0-9A-Fa-f]{8})\s*[,)]|\bsub_([0-9A-Fa-f]{8})(?:_gen)?\b")
 
 
 def live_lines(text):

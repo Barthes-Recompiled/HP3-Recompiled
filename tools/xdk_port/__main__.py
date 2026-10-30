@@ -6,7 +6,7 @@ Carry the library functions hand-written overrides bind to from a donor title to
         --target game/default.xbe --target-functions tools/disasm/output/functions.json \\
         -o tools/xdk_port/output/map.json
 
---donor-names takes the donor's override sources (every HLE(ADDR, n) and sub_ADDR the code defines, declares or
+--donor-names takes the donor's override sources (every binding macro such as HLE(ADDR, n) and sub_ADDR the code defines, declares or
 calls; mentions inside comments are left out, a // Name comment on the line or the line before names it) or a JSON
 {"0xADDR": "name"}. The functions.json files are tools.disasm's output for each XBE.
 
@@ -21,7 +21,9 @@ import sys
 from tools.region.xbe_align import Xbe
 from tools.xdk_port.match import match_functions
 
-_FUNC = re.compile(r"\bHLE\(\s*([0-9A-Fa-f]{8})\s*,|\bsub_([0-9A-Fa-f]{8})(?:_gen)?\s*\(")
+# HLE(ADDR, n), COMPLEX_STATE(ADDR, ...), FALLBACK(ADDR): binding macros with the address first; sub_ADDR( calls,
+# definitions and declarations
+_FUNC = re.compile(r"\b[A-Z][A-Z0-9_]*\(\s*([0-9A-Fa-f]{8})\s*[,)]|\bsub_([0-9A-Fa-f]{8})(?:_gen)?\s*\(")
 _NAME = re.compile(r"//\s*([A-Za-z_][A-Za-z0-9_:]*)")
 
 

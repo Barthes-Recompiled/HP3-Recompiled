@@ -135,3 +135,19 @@ Consequences until they are bound:
 - hppoa_trainer.exe's pages (spells, levels, checkpoints) are PS-shaped; the game side ignores them.
 - Settings with no PoA hook yet: cutscene_skip (cutscene state not found), intro_skip (movie names), Quit To Desktop
   (menus), 16:9 Hor+ (camera), the menu/loading/text-icon 2D handling.
+
+## Regeneration (M1)
+
+`regen.sh` on the USA XBE: 20,813 of 20,815 functions translated (0 failed), 102 hand-written overrides, 47 unresolved
+call targets, 908 unimplemented instructions (32 mnemonics, mostly `outsd`/`outsb`/`insb`/`arpl`/`insd`: data decoded
+as code). For scale, hp1's shipped build has 26 and 520 on its own XBE.
+
+Of the 47 unresolved targets, 40 are called only from `gap_prologue` "functions" with no callers (the disassembler's
+guesses in gaps between code: data). The other 7 to look at if they come up at run time:
+
+| Caller | Section | Targets |
+|---|---|---|
+| sub_0028768E (call_target, 2 callers) | D3DX | 0x2879F8, 0x287A08, 0x287A0C, 0x287A18, 0x287A63 |
+| sub_0028E898 (prologue, 1 caller) | D3DX | 0x28F042, 0xEA31F039 (outside the image) |
+| sub_002B48AE (call_target, no callers) | XGRPH | 0x2B5A67, 0x2B5A68, 0x2B5A6D, 0x2B5A7B, 0x2B5A83 |
+| sub_002C7768 (cc_boundary) | XPP | 0x2C77D6, 0x2C77E6 (.rdata) |

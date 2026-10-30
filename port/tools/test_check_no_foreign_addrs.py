@@ -27,6 +27,7 @@ extern void sub_00022222_gen(void);
 HLE(00077777, 0) { return 0; }
 #endif
 void sub_00011000(void);
+void f(void) { FALLBACK(00033333); }
 """
 
 
@@ -46,12 +47,13 @@ def test_flags_only_live_foreign_names():
     rc, out = run(SRC, [0x11000])
     assert rc == 1, out
     assert "x.c:6" in out and "00022222" in out, out
+    assert "x.c:11" in out and "00033333" in out, out  # a macro that pastes sub_ADDR_gen from its argument
     for quiet in ("00099999", "00088888", "00077777"):
         assert quiet not in out, out
 
 
 def test_clean_file_passes():
-    rc, out = run(SRC, [0x11000, 0x22222])
+    rc, out = run(SRC, [0x11000, 0x22222, 0x33333])
     assert rc == 0, out
 
 

@@ -78,16 +78,8 @@ set(GAME_SOURCES
     src/hle_input.c
     # XAPI's disc security-sector check (the synthetic DVD has none).
     src/hle_xapi.c
-    # Debug: file object open/close checks ([FILEOBJ]).
-    src/hle_debug.c
-    # The animation start: door opening speed (RECOMP_DOOR_SPEED), [ANIM] trace (RECOMP_ANIM_TRACE).
-    src/hle_anim.c
-    # The debug trainer's game side (hppoa_trainer.exe): noclip, spells on the buttons, health, teleport.
+    # The debug trainer's game side (hppoa_trainer.exe): input injection, debug report.
     src/hle_trainer.c
-    # "Quit To Desktop" on the main menu (RECOMP_QUIT_ITEM=0 = Xbox menu).
-    src/hle_frontend.c
-    # Characters taken out of the world, never drawn (RECOMP_HIDE_CHARACTERS=0 = drawn).
-    src/hle_world.c
     # Holding Start/Back fast-forwards a cutscene (hppoa.toml cutscene_skip; false = Xbox).
     src/hle_skip.c
     src/profiler.c
@@ -99,11 +91,7 @@ set(GAME_SOURCES
     #   --exclude-manual port/src/hle_video.c
     #   --exclude-manual port/src/hle_input.c
     #   --exclude-manual port/src/hle_xapi.c
-    #   --exclude-manual port/src/hle_debug.c
-    #   --exclude-manual port/src/hle_anim.c
     #   --exclude-manual port/src/hle_trainer.c
-    #   --exclude-manual port/src/hle_frontend.c
-    #   --exclude-manual port/src/hle_world.c
     #   --exclude-manual port/src/hle_skip.c
     #   --exclude-manual port/src/scda/xdk/hle_d3d8.cpp
     # Add game-specific sources here, e.g.:

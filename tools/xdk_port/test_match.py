@@ -156,12 +156,14 @@ HLE(00193490, 0) { return 0; }  // D3DDevice_IsBusy
 extern "C" void sub_0019D860_gen(void);
 void sub_001934C0(void)
 /* see sub_00012345 in a comment */
+COMPLEX_STATE(00190720, gpu::kRsPsTextureModes)
 """
     n = names_from_source(src)
     assert n[0x192060] == "D3DDevice_BlockOnFence", n
     assert n[0x193490] == "D3DDevice_IsBusy", n
     assert 0x19D860 in n and 0x1934C0 in n, n
     assert 0x12345 not in n, n  # only defined or declared functions, not mentions in comments
+    assert 0x190720 in n, n  # a binding macro whose first argument is the address
 
 
 if __name__ == "__main__":

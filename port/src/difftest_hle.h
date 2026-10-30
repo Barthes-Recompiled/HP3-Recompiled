@@ -1,8 +1,6 @@
 /* Guest functions replaced by host code (HLE): their generated body is sub_X_gen. Unicorn stops at these.
  * Regenerate: grep -ho '^void sub_[0-9A-F]*_gen(void)' recomp/gen/*.c */
 static const uint32_t k_hle_vas[] = {
-0x00159620u,
-0x001597E0u,
 0x00264DD0u,
 0x00264E80u,
 0x00264EB0u,

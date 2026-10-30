@@ -186,13 +186,15 @@ ships with Windows 10/11 (C/C++ runtimes are static; XInput is `xinput1_4`). **I
 
 ### 6.1 Title facts
 
-Warthog engine, XDK 5659 (XbSymbolDatabase alias 5788), entry 0x154331, `.text` 0x11000-0x190714, title id
-45410037. Guest memory is mapped at host = guest + 0x10000; the 64 MB contiguous window at 0x80000000.
-D3D: CDevice 0x1A13E0 (g_pDevice 0x1A13D8) - PsTextureModes +0x790, m_VertexShader +0x794, ZScale +0x948,
-SuperX/Y +0x95C/+0x960, transforms +0xC60, viewport +0xEE0, textures +0xF88, palettes +0xF98, RT/depth
-+0x1A04/+0x1A08, vblank count +0x1DE8, VBlankCallback +0x1DB8, swap count +0x2478; DirtyFlags 0x1A0F38,
-TextureState 0x1A0F40, RenderState 0x1A1140, g_Stream 0x1A3898. No vertex shaders: fixed function with lights,
-P8 palettes, fences, CopyRects, SetGammaRamp, a vblank callback. Movies are XMV decoded by the game into a texture.
+EA UK's own engine (build path `D:\dev\POA\builds\applications\harrypotter\xbox_release\appharrypotter.exe`; the
+same engine family as the PS2 Chamber of Secrets: `.hpb` room scripts, `.big` archives, APT menus), XDK 5849 (D3D8,
+D3DX8, DSOUND, LIBCMT, XAPILIB, XBOXKRNL, XGRAPHC), title id 4541004C ("Harry Potter: POA"). USA XBE: entry 0x111DB,
+`.text` 0x11000-0x264C64, library sections D3D 0x264C80, D3DX 0x278A20, XGRPH 0x295480, DSOUND 0x2B66E0, XPP
+0x2BF920 (no XMV: movies are EA's own `.mad` player). Guest memory is mapped at host = guest + 0x10000; the 64 MB
+contiguous window at 0x80000000.
+D3D: g_pDevice 0x2763E8, CDevice 0x2763F0, DirtyFlags 0x275F48, TextureState 0x275F50, RenderState 0x276150,
+g_Stream 0x278490, carried over from hp1 by matched code and unverified, as are the CDevice field offsets (see
+docs/bringup.md). Frame timing follows the video standard (25 fps PAL, 30 fps NTSC).
 
 ### 6.2 Overrides (hand-written code over recompiled functions)
 
