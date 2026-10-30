@@ -15,7 +15,7 @@ Xbox disc. The build regenerates the recompiled code from your `default.xbe`.
 ## Playing
 
 Download the repository, build the executables and put your disc's files or the .xiso in a `game` folder beside the executables and start
-`hpps_launcher.exe`. Requirements, controls and every option are in [port/README.txt](port/README.txt).
+`hppoa_launcher.exe`. Requirements, controls and every option are in [port/README.txt](port/README.txt).
 
 ## Building
 

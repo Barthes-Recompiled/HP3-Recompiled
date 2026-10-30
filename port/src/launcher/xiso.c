@@ -1,4 +1,4 @@
-// xiso.c - unpacking an Xbox disc image into the game folder, for hpps_launcher.exe (xiso.h)
+// xiso.c - unpacking an Xbox disc image into the game folder, for hppoa_launcher.exe (xiso.h)
 //
 // XDVDFS, as the console reads it:
 //   2048-byte sectors; the volume descriptor is sector 32 of the game partition: "MICROSOFT*XBOX*MEDIA", root

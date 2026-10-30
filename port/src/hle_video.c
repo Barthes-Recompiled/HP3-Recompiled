@@ -17,12 +17,12 @@
  *
  * The movie player, sub_00164450(name, ., ., per-frame callback), plays the
  * main menu's moving background ("movies/frontend.thp" -> frontend.xmv) for as
- * long as the menu is up; hpps_MenuMovie() tells d3d12.cpp's Squeeze2D so that,
+ * long as the menu is up; hppoa_MenuMovie() tells d3d12.cpp's Squeeze2D so that,
  * in 16:9, it shows that picture's middle 360 lines across the full width
  * instead of the 4:3 frame between bars (RECOMP_MENU_MOVIE_CROP=0: left 4:3).
  * The loading screen (sprites/load_hognight.tga, set up by sub_00148400) is
  * drawn by its own thread, sub_00148100, looping until the level is in;
- * hpps_LoadingScreen() gives its picture the same crop (RECOMP_LOADING_CROP=0:
+ * hppoa_LoadingScreen() gives its picture the same crop (RECOMP_LOADING_CROP=0:
  * left 4:3).
  *
  * Built into the recompile with --exclude-manual naming this file.
@@ -110,7 +110,7 @@ void sub_0019D910(void)
  * so in 16:9 a 4:3 pair gets xs * 3/4: the same vertical view, wider at the
  * sides (Hor+). The 640x480 frame is shown 16:9 wide and d3d12.cpp's Squeeze2D
  * keeps the 2D at its 4:3 shape. */
-extern int hpps_Widescreen(void);
+extern int hppoa_Widescreen(void);
 extern void sub_0016A4A0_gen(void);
 void sub_0016A4A0(void)
 {
@@ -127,13 +127,13 @@ void sub_0016A4A0(void)
             fprintf(stderr, "[CAM] cam %08X from %08X xs %g ys %g\n", cam, caller, xs, ys);
         }
     }
-    if (!d3d_hle() || !hpps_Widescreen() || !(xs > 0.0f) || fabsf(ys / xs - 4.0f / 3.0f) > 0.01f) {
+    if (!d3d_hle() || !hppoa_Widescreen() || !(xs > 0.0f) || fabsf(ys / xs - 4.0f / 3.0f) > 0.01f) {
         sub_0016A4A0_gen();
         return;
     }
     /* the menus' own cameras (the Remembrall inventory's, made after remember.hog loads, pointer at 0x34F998, and
      * its sibling at 0x34F944) stay 4:3: their 3D (the hourglass, the books) is laid out with the menu's 2D. Tagged
-     * for d3d12.cpp's Squeeze2D by an x scale two float steps up (hpps_MenuScale), which nothing else draws with. */
+     * for d3d12.cpp's Squeeze2D by an x scale two float steps up (hppoa_MenuScale), which nothing else draws with. */
     if (cam && (cam == MEM32(0x34F998) || cam == MEM32(0x34F944))) {
         MEMF(cam + 0xE4) = nextafterf(nextafterf(xs, INFINITY), INFINITY);
         MEMF(cam + 0xE8) = ys;
@@ -148,7 +148,7 @@ void sub_0016A4A0(void)
 /* the main menu's background movie is playing */
 static volatile int g_menu_movie;
 
-int hpps_MenuMovie(void)
+int hppoa_MenuMovie(void)
 {
     static int on = -1;
     if (on < 0) {
@@ -158,7 +158,7 @@ int hpps_MenuMovie(void)
     return on && g_menu_movie;
 }
 
-extern int app_IntroSkip(void);  /* hpps.toml intro_skip (scda/app/app.cpp) */
+extern int app_IntroSkip(void);  /* hppoa.toml intro_skip (scda/app/app.cpp) */
 
 /* the start-up logos (the EA logo ea_<language>, then Warner Bros.' splashwb), left out
  * with intro_skip; the menu's background, the trailer and the Quidditch movies play as always */
@@ -186,7 +186,7 @@ void sub_00164450(void)
 /* the loading screen's thread is drawing it */
 static volatile int g_loading;
 
-int hpps_LoadingScreen(void)
+int hppoa_LoadingScreen(void)
 {
     static int on = -1;
     if (on < 0) {
@@ -199,13 +199,13 @@ int hpps_LoadingScreen(void)
 /* loading screens so far (d3d12.cpp's RECOMP_CAP_LOADING captures the first frame of each that shows its
  * picture) */
 static volatile int g_loads;
-int hpps_LoadingCount(void) { return g_loads; }
+int hppoa_LoadingCount(void) { return g_loads; }
 
 /* the icons text puts in its lines ("[[CROSS ICON]]" ... "[[R2 ICON]]", table 0x211F28): the controller's sprites
  * (sub_00050060: "<sprite>_icon.tga"), their records at 0x331638 + 4 * i, each with its D3D texture at +0x20.
  * Some lines ("Press [B], [Y] or [X] button to test the wand.") draw them through a header of their own over the
  * same pixels (8045BC80 for the record's 8045B820, both Data 8045B880): matched by Data (D3D resource +4) too */
-int hpps_TextIcon(uint32_t tex)
+int hppoa_TextIcon(uint32_t tex)
 {
     if (!tex) return 0;
     const uint32_t data = MEM32(tex + 4);
@@ -217,7 +217,7 @@ int hpps_TextIcon(uint32_t tex)
 }
 
 /* debug: the icons' textures now, for a [WIDE] line */
-void hpps_TextIconDump(void)
+void hppoa_TextIconDump(void)
 {
     fprintf(stderr, "[WIDE]   text icons:");
     for (uint32_t i = 0; i < 12; i++) {

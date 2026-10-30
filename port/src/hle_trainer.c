@@ -1,5 +1,5 @@
 /**
- * The debug trainer's game side (the trainer itself is hpps_trainer.exe,
+ * The debug trainer's game side (the trainer itself is hppoa_trainer.exe,
  * src/trainer): a named shared block (trainer_shm.h) and Harry's per-frame
  * update, sub_00095370(entity), as the place the requests are carried out --
  * the title's own thread, between its frames.
@@ -104,40 +104,40 @@ extern void sub_00152160(void);
 extern void sub_00146110(void);
 extern void sub_00025060(void);
 extern void sub_0014D1C0(void);
-extern void hpps_StackDumpTo(const char *path);
-extern void hpps_RequestCapture(void);
+extern void hppoa_StackDumpTo(const char *path);
+extern void hppoa_RequestCapture(void);
 extern ptrdiff_t g_xbox_mem_offset;
 
 /* hle_input.c: the pad as the game last read it */
-extern XBOX_GAMEPAD hpps_last_pad;
+extern XBOX_GAMEPAD hppoa_last_pad;
 
-static HppsTrainerShm *g_shm;
+static HppoaTrainerShm *g_shm;
 
-static HppsTrainerShm *shm(void)
+static HppoaTrainerShm *shm(void)
 {
     static int tried;
     if (!g_shm && !tried) {
         tried = 1;
-        HANDLE m = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(HppsTrainerShm),
-                                      HPPS_TRAINER_NAME);
-        if (m) g_shm = (HppsTrainerShm *)MapViewOfFile(m, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(HppsTrainerShm));
+        HANDLE m = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(HppoaTrainerShm),
+                                      HPPOA_TRAINER_NAME);
+        if (m) g_shm = (HppoaTrainerShm *)MapViewOfFile(m, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(HppoaTrainerShm));
         if (g_shm) {
             memset(g_shm, 0, sizeof(*g_shm));
-            g_shm->version = HPPS_TRAINER_VERSION;
+            g_shm->version = HPPOA_TRAINER_VERSION;
             g_shm->pid = GetCurrentProcessId();
             g_shm->mem_offset = (uint64_t)g_xbox_mem_offset;
-            g_shm->magic = HPPS_TRAINER_MAGIC;
+            g_shm->magic = HPPOA_TRAINER_MAGIC;
         }
     }
     return g_shm;
 }
 
 /* hle_input.c: the trainer's injected pad state, added to port 0's while it lasts (inject_seq / inject_ms) */
-void hpps_TrainerInject(XBOX_GAMEPAD *g)
+void hppoa_TrainerInject(XBOX_GAMEPAD *g)
 {
     static uint32_t seen;
     static DWORD until;
-    HppsTrainerShm *t = shm();
+    HppoaTrainerShm *t = shm();
     if (!t) return;
     if (t->inject_seq != seen) {
         seen = t->inject_seq;
@@ -198,7 +198,7 @@ static float stick(short v)
     return f > 0 ? (f - 0.24f) / 0.76f : (f + 0.24f) / 0.76f;
 }
 
-static void fly(uint32_t obj, HppsTrainerShm *t)
+static void fly(uint32_t obj, HppoaTrainerShm *t)
 {
     uint32_t cur = current_matrix(obj);
     float p[3] = {MEMF(cur + 48), MEMF(cur + 52), MEMF(cur + 56)};
@@ -208,7 +208,7 @@ static void fly(uint32_t obj, HppsTrainerShm *t)
     float rl = sqrtf(r[0] * r[0] + r[2] * r[2]), fl = sqrtf(f[0] * f[0] + f[2] * f[2]);
     if (rl > 1e-4f) r[0] /= rl, r[2] /= rl;
     if (fl > 1e-4f) f[0] /= fl, f[2] /= fl;
-    XBOX_GAMEPAD g = hpps_last_pad;
+    XBOX_GAMEPAD g = hppoa_last_pad;
     float x = stick(g.sThumbLX), y = stick(g.sThumbLY);
     float up = (g.bAnalogButtons[7] - g.bAnalogButtons[6]) / 255.0f;
     float dt = MEMF(kFrameTime);
@@ -378,17 +378,17 @@ static int seen_changed(uint32_t ent)
  * when the archive in is not that hub's kind. */
 static uint32_t hub_of(uint32_t level)
 {
-    static const uint8_t hub[HPPS_LEVEL_LAST + 1] = {
+    static const uint8_t hub[HPPOA_LEVEL_LAST + 1] = {
         [6] = 6, [7] = 7, [8] = 8, [9] = 8, [10] = 10, [11] = 11, [12] = 11, [13] = 13, [14] = 13, [15] = 15,
         [16] = 15, [17] = 17, [18] = 17, [19] = 19, [20] = 19, [21] = 21, [22] = 21, [23] = 23, [24] = 23,
         [25] = 25, [26] = 25, [27] = 25, [28] = 25, [29] = 25, [30] = 25,
     };
-    return level <= HPPS_LEVEL_LAST ? hub[level] : 0;
+    return level <= HPPOA_LEVEL_LAST ? hub[level] : 0;
 }
 
 static int is_night(uint32_t level)
 {
-    const char *name = (const char *)XBOX_PTR(MEM32(0x21BB70 + 4 * (level - HPPS_LEVEL_FIRST)));
+    const char *name = (const char *)XBOX_PTR(MEM32(0x21BB70 + 4 * (level - HPPOA_LEVEL_FIRST)));
     return strncmp(name, "night", 5) == 0;
 }
 
@@ -440,7 +440,7 @@ static void quidditch_start(uint32_t level)
 
 static void load_level_via_hub(uint32_t level)
 {
-    if (level < HPPS_LEVEL_FIRST || level > HPPS_LEVEL_LAST) return;
+    if (level < HPPOA_LEVEL_FIRST || level > HPPOA_LEVEL_LAST) return;
     g_quidditch = level == kQuidditch;
     if (g_quidditch) {
         fprintf(stderr, "[TRAINER] level %u is day5's Quidditch match: day5, then its HPE53Script\n", level);
@@ -458,7 +458,7 @@ static void load_level_via_hub(uint32_t level)
 
 static void load_level(uint32_t level)
 {
-    if (level < HPPS_LEVEL_FIRST || level > HPPS_LEVEL_LAST) return;
+    if (level < HPPOA_LEVEL_FIRST || level > HPPOA_LEVEL_LAST) return;
     /* the level in play again: 5, as StartLevel (sub_00048FB0) asks for it; its own id loads it over itself and
      * the load crashes */
     if (level == MEM32(kLevelNow)) level = 5;
@@ -467,9 +467,9 @@ static void load_level(uint32_t level)
     fprintf(stderr, "[TRAINER] loading level %u\n", level);
 }
 
-static void snapshot(HppsTrainerShm *t, uint32_t level)
+static void snapshot(HppoaTrainerShm *t, uint32_t level)
 {
-    for (uint32_t i = 0; i < HPPS_PROGRESS_SIZE; i++) t->snap_block[i] = MEM8(HPPS_PROGRESS_VA + i);
+    for (uint32_t i = 0; i < HPPOA_PROGRESS_SIZE; i++) t->snap_block[i] = MEM8(HPPOA_PROGRESS_VA + i);
     t->snap_level = level;
     t->snap_seq++;
 }
@@ -483,17 +483,17 @@ static void snapshot(HppsTrainerShm *t, uint32_t level)
  *                                  dump <dir> (guest memory and progress, as the trainer's report), quit,
  *                                  captures <seconds> <count> (timed captures from a thread: cutscenes run no Harry),
  *                                  script <name> (start one of the level's scripts),
- *                                  diffsweep (start / end a difftest sweep, as F5: the HPPS_DIFFTEST build),
+ *                                  diffsweep (start / end a difftest sweep, as F5: the HPPOA_DIFFTEST build),
  *                                  quitafter <seconds> (from a thread)
  * Every command is logged as [AUTO]. */
-extern void hpps_RequestCapture(void);
-/* difftest.c, in the HPPS_DIFFTEST build only */
-extern void hpps_DiffSweep(void) __attribute__((weak));
+extern void hppoa_RequestCapture(void);
+/* difftest.c, in the HPPOA_DIFFTEST build only */
+extern void hppoa_DiffSweep(void) __attribute__((weak));
 
 static struct {
     int state;  /* 0 not read yet, 1 waiting for the menu, 2 done, -1 none */
     uint32_t level;
-    uint8_t block[HPPS_PROGRESS_SIZE];
+    uint8_t block[HPPOA_PROGRESS_SIZE];
 } g_boot;
 
 static void boot_read(void)
@@ -503,9 +503,9 @@ static void boot_read(void)
     if (!path || !*path) return;
     FILE *f = fopen(path, "rb");
     uint32_t hd[4];
-    if (f && fread(hd, sizeof hd, 1, f) == 1 && hd[0] == 0x4B435048u && hd[3] == HPPS_PROGRESS_SIZE &&
-        fread(g_boot.block, 1, HPPS_PROGRESS_SIZE, f) == HPPS_PROGRESS_SIZE && hd[2] >= HPPS_LEVEL_FIRST &&
-        hd[2] <= HPPS_LEVEL_LAST) {
+    if (f && fread(hd, sizeof hd, 1, f) == 1 && hd[0] == 0x4B435048u && hd[3] == HPPOA_PROGRESS_SIZE &&
+        fread(g_boot.block, 1, HPPOA_PROGRESS_SIZE, f) == HPPOA_PROGRESS_SIZE && hd[2] >= HPPOA_LEVEL_FIRST &&
+        hd[2] <= HPPOA_LEVEL_LAST) {
         g_boot.level = hd[2];
         g_boot.state = 1;
         fprintf(stderr, "[AUTO] boot checkpoint %s: level %u\n", path, g_boot.level);
@@ -559,7 +559,7 @@ static void dump_memory(const char *dir)
     static const struct { uint32_t va, size; const char *name; } parts[] = {
         {0x00000000u, 0x04000000u, "guest_00000000.bin"},
         {0x80000000u, 0x04000000u, "guest_80000000.bin"},
-        {HPPS_PROGRESS_VA, HPPS_PROGRESS_SIZE, "progress_3253B0.bin"},
+        {HPPOA_PROGRESS_VA, HPPOA_PROGRESS_SIZE, "progress_3253B0.bin"},
     };
     static uint8_t page[65536];
     for (int k = 0; k < 3; k++) {
@@ -597,7 +597,7 @@ static DWORD WINAPI timed_thread(LPVOID unused)
         if (g_cap_count > 0 && now >= next) {
             g_cap_count--;
             next += (ULONGLONG)(g_cap_every * 1000);
-            hpps_RequestCapture();
+            hppoa_RequestCapture();
             fprintf(stderr, "[AUTO] timed capture at %.2f s\n", (now - t0) / 1000.0);
         }
         if (g_quit_after > 0 && now - t0 >= (ULONGLONG)(g_quit_after * 1000)) {
@@ -608,13 +608,13 @@ static DWORD WINAPI timed_thread(LPVOID unused)
     return 0;
 }
 
-static void autoplay(HppsTrainerShm *t, uint32_t level, uint32_t obj)
+static void autoplay(HppoaTrainerShm *t, uint32_t level, uint32_t obj)
 {
     /* in a level before the menu got to it (the title went on to the last save by itself): put it back now */
     if (!g_boot.state) boot_read();
     if (g_boot.state == 1) {
         g_boot.state = 2;
-        for (uint32_t i = 0; i < HPPS_PROGRESS_SIZE; i++) MEM8(HPPS_PROGRESS_VA + i) = g_boot.block[i];
+        for (uint32_t i = 0; i < HPPOA_PROGRESS_SIZE; i++) MEM8(HPPOA_PROGRESS_VA + i) = g_boot.block[i];
         fprintf(stderr, "[AUTO] progress from the checkpoint (in level %u), loading level %u\n", level, g_boot.level);
         load_level_via_hub(g_boot.level);
         return;
@@ -637,11 +637,11 @@ static void autoplay(HppsTrainerShm *t, uint32_t level, uint32_t obj)
         if (!strcmp(a->cmd, "god")) t->god = atoi(a->arg);
         else if (!strcmp(a->cmd, "noclip")) t->noclip = atoi(a->arg);
         else if (!strcmp(a->cmd, "instakill")) t->instakill = atoi(a->arg);
-        else if (!strcmp(a->cmd, "capture")) hpps_RequestCapture();
+        else if (!strcmp(a->cmd, "capture")) hppoa_RequestCapture();
         else if (!strcmp(a->cmd, "level")) load_level_via_hub((uint32_t)atoi(a->arg));
         else if (!strcmp(a->cmd, "dump")) dump_memory(a->arg);
         else if (!strcmp(a->cmd, "script")) start_script(a->arg);
-        else if (!strcmp(a->cmd, "diffsweep") && hpps_DiffSweep) hpps_DiffSweep();
+        else if (!strcmp(a->cmd, "diffsweep") && hppoa_DiffSweep) hppoa_DiffSweep();
         else if (!strcmp(a->cmd, "captures") || !strcmp(a->cmd, "quitafter")) {
             static int started;
             if (a->cmd[0] == 'c') sscanf(a->arg, "%f %d", &g_cap_every, &g_cap_count);
@@ -661,7 +661,7 @@ static void autoplay(HppsTrainerShm *t, uint32_t level, uint32_t obj)
 extern void sub_00095370_gen(void);
 void sub_00095370(void)
 {
-    HppsTrainerShm *t = shm();
+    HppoaTrainerShm *t = shm();
     uint32_t ent = ARG(0);
     if (!t || ent != MEM32(kPlayer) || !ent) {
         sub_00095370_gen();
@@ -687,7 +687,7 @@ void sub_00095370(void)
     uint32_t level = MEM32(kLevelNow);
     if (level != level_seen || seen_changed(ent)) {
         level_seen = level;
-        if (level >= HPPS_LEVEL_FIRST && level <= HPPS_LEVEL_LAST) {
+        if (level >= HPPOA_LEVEL_FIRST && level <= HPPOA_LEVEL_LAST) {
             if (hub_of(level) == level) g_hub_in = level;
             snapshot(t, level);
             /* already in the level a hub was asked for on the way to (the title got there itself) */
@@ -707,7 +707,7 @@ void sub_00095370(void)
     }
     if (t->restore_seq != restore_done) {
         restore_done = t->restore_seq;
-        for (uint32_t i = 0; i < HPPS_PROGRESS_SIZE; i++) MEM8(HPPS_PROGRESS_VA + i) = t->restore_block[i];
+        for (uint32_t i = 0; i < HPPOA_PROGRESS_SIZE; i++) MEM8(HPPOA_PROGRESS_VA + i) = t->restore_block[i];
         fprintf(stderr, "[TRAINER] checkpoint restored\n");
         load_level_via_hub(t->restore_level);
     } else if (t->warp_seq != warp_done) {
@@ -831,7 +831,7 @@ void sub_00095370(void)
     t->frame++;
 }
 
-static void write_state(const char *path, HppsTrainerShm *t)
+static void write_state(const char *path, HppoaTrainerShm *t)
 {
     FILE *f = fopen(path, "w");
     if (!f) return;
@@ -857,7 +857,7 @@ static void write_state(const char *path, HppsTrainerShm *t)
             (int16_t)MEM16(kBeans), (int16_t)MEM16(kBeansMax), t->cards, t->cards_given);
     fprintf(f, "spell buttons %u %u %u\ninventory slots", MEM8(kSlots), MEM8(kSlots + 1), MEM8(kSlots + 2));
     for (int i = 0; i < kInventorySlots; i++) fprintf(f, " %d", (int16_t)MEM16(kInventory + 2 * i));
-    XBOX_GAMEPAD g = hpps_last_pad;
+    XBOX_GAMEPAD g = hppoa_last_pad;
     fprintf(f, "\npad buttons %04X analog", g.wButtons);
     for (int i = 0; i < 8; i++) fprintf(f, " %u", g.bAnalogButtons[i]);
     fprintf(f, " sticks %d %d %d %d\n", g.sThumbLX, g.sThumbLY, g.sThumbRX, g.sThumbRY);
@@ -868,16 +868,16 @@ static void write_state(const char *path, HppsTrainerShm *t)
 
 static DWORD WINAPI report_thread(LPVOID arg)
 {
-    HppsTrainerShm *t = (HppsTrainerShm *)arg;
+    HppoaTrainerShm *t = (HppoaTrainerShm *)arg;
     for (;; Sleep(100)) {
         uint32_t seq = t->report_seq;
         if (seq == t->report_done) continue;
         char dir[260], path[300];
         memcpy(dir, (const char *)t->report_dir, sizeof dir);
         dir[sizeof dir - 1] = 0;
-        hpps_RequestCapture();
+        hppoa_RequestCapture();
         snprintf(path, sizeof path, "%s\\stacks.txt", dir);
-        hpps_StackDumpTo(path);
+        hppoa_StackDumpTo(path);
         snprintf(path, sizeof path, "%s\\game_state.txt", dir);
         write_state(path, t);
         fprintf(stderr, "[TRAINER] debug report written to %s\n", dir);
@@ -923,13 +923,13 @@ static DWORD WINAPI __attribute__((unused)) harry_cam_thread(LPVOID unused)
 }
 
 /* at boot, so the trainer finds the block before Harry exists */
-void hpps_TrainerInit(void)
+void hppoa_TrainerInit(void)
 {
-    HppsTrainerShm *t = shm();
-#ifndef HPPS_RELEASE
+    HppoaTrainerShm *t = shm();
+#ifndef HPPOA_RELEASE
     CloseHandle(CreateThread(NULL, 0, harry_cam_thread, NULL, 0, NULL));  /* debug key, not for players */
 #endif
     if (!t) return;
-    fprintf(stderr, "[TRAINER] shared block %s ready\n", HPPS_TRAINER_NAME);
+    fprintf(stderr, "[TRAINER] shared block %s ready\n", HPPOA_TRAINER_NAME);
     CloseHandle(CreateThread(NULL, 0, report_thread, t, 0, NULL));
 }

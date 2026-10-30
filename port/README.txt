@@ -24,19 +24,19 @@ INSTALLING
 ----------
 
 1. Put the port's files in a folder of your choice:
-       hpps_launcher.exe
-       hpps.exe
+       hppoa_launcher.exe
+       hppoa.exe
        README.txt
        licenses\
        shadercache\base_shaders.bin
 2. Copy the game files from your disc or the .xiso file into a folder named "game" in the same folder with the executables.
 
 Updating from an earlier version: replace the files above and keep your
-hpps.toml, saves\ and shadercache\ (your settings, saved games and the
+hppoa.toml, saves\ and shadercache\ (your settings, saved games and the
 shaders already built on your PC stay as they are).
 
 The port creates these itself on the first run:
-    hpps.toml      your settings (the launcher and F10 change them)
+    hppoa.toml      your settings (the launcher and F10 change them)
     saves\         your saved games
     shadercache\   shaders built on your PC (the first visit to an area
                    prepares them; later visits load at once)
@@ -45,7 +45,7 @@ The port creates these itself on the first run:
 PLAYING
 -------
 
-Start the game with hpps_launcher.exe. Opening hpps.exe directly only offers
+Start the game with hppoa_launcher.exe. Opening hppoa.exe directly only offers
 to open the launcher.
 
 The launcher sets the aspect ratio (4:3 or 16:9), display, graphics and
@@ -95,7 +95,7 @@ OPTIONS (F10)
 -------------
 
 F10 opens the options over the game; most changes apply at once and are saved
-to hpps.toml. "Defaults (this page)" resets the page you are on (Graphics,
+to hppoa.toml. "Defaults (this page)" resets the page you are on (Graphics,
 Controls, ...) and leaves the others; the aspect ratio stays. "Show the
 launcher at startup" turns the launcher's page on or off.
 
@@ -170,7 +170,7 @@ Accessibility
 
 Debug
   Logs
-    Write debug logs     writes hpps_run.log and xbox_kernel.log beside the
+    Write debug logs     writes hppoa_run.log and xbox_kernel.log beside the
                          game from the next start. Off by default; turn it on
                          to report a problem, and send both files with your
                          report.
@@ -181,12 +181,12 @@ TROUBLESHOOTING
 
 "Failed to load default.xbe"
     The game files are missing: check that game\default.xbe exists beside
-    hpps.exe.
+    hppoa.exe.
 
 The game will not start / closes at once
     Update your graphics driver (DirectX 12 is required). Then turn on
-    F10 > Debug > Write debug logs (or set debug_logs = true in hpps.toml),
-    start again and keep hpps_run.log.
+    F10 > Debug > Write debug logs (or set debug_logs = true in hppoa.toml),
+    start again and keep hppoa_run.log.
 
 A short pause the first time you enter an area
     Shaders are being prepared for your graphics card; the loading picture

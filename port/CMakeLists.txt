@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 # ============================================================================
-# hpps - Static Recompilation
+# hppoa - Static Recompilation
 #
 # Copy this template to your game project root and customize:
 #   1. Change the project name below
@@ -10,7 +10,7 @@ cmake_minimum_required(VERSION 3.20)
 #   4. Add any game-specific compile definitions or link libraries
 # ============================================================================
 
-project(hpps C CXX)
+project(hppoa C CXX)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
@@ -33,22 +33,22 @@ add_compile_definitions(
 set(XBOXRECOMP_DIR "${CMAKE_CURRENT_SOURCE_DIR}/.." CACHE PATH
     "Path to the xboxrecomp toolkit root directory")
 
-# HPPS_RELEASE: the build players get (tools/package_release.sh). Hand-written code (runtime libraries, HLE, renderer,
+# HPPOA_RELEASE: the build players get (tools/package_release.sh). Hand-written code (runtime libraries, HLE, renderer,
 # launcher) gets buffer-overflow checks: _FORTIFY_SOURCE bounds checks on the C library's string/memory calls and
 # stack canaries (-fstack-protector-strong). The generated code is left without them below: its loads and stores go
 # to guest memory through XBOX_PTR, which neither check can see, and it is the hot path. ASLR, high-entropy VA and
 # NX/DEP are on in every build (binutils defaults). SSE4.1 everywhere (the renderer already required it).
-option(HPPS_RELEASE "Release build for players: hardening, no debug keys" OFF)
-# HPPS_FORTIFY: the release's _FORTIFY_SOURCE (bounds-checked C library calls, through the headers). A player's
+option(HPPOA_RELEASE "Release build for players: hardening, no debug keys" OFF)
+# HPPOA_FORTIFY: the release's _FORTIFY_SOURCE (bounds-checked C library calls, through the headers). A player's
 # main-menu keyboard hitch on Windows went away in a development build, which has none of the release's hardening
 # (2026-10-25): OFF builds the release without it, the stack canaries kept, to tell which part it is
-option(HPPS_FORTIFY "With HPPS_RELEASE: _FORTIFY_SOURCE=2" ON)
-if(HPPS_RELEASE AND WIN32)
+option(HPPOA_FORTIFY "With HPPOA_RELEASE: _FORTIFY_SOURCE=2" ON)
+if(HPPOA_RELEASE AND WIN32)
     add_compile_options(-msse4.1 -fstack-protector-strong)
-    if(HPPS_FORTIFY)
+    if(HPPOA_FORTIFY)
         add_compile_options(-D_FORTIFY_SOURCE=2)
     endif()
-    add_compile_definitions(HPPS_RELEASE)
+    add_compile_definitions(HPPOA_RELEASE)
 endif()
 
 # Add xboxrecomp as a subdirectory -- this builds all 6 runtime libraries
@@ -82,19 +82,19 @@ set(GAME_SOURCES
     src/hle_debug.c
     # The animation start: door opening speed (RECOMP_DOOR_SPEED), [ANIM] trace (RECOMP_ANIM_TRACE).
     src/hle_anim.c
-    # The debug trainer's game side (hpps_trainer.exe): noclip, spells on the buttons, health, teleport.
+    # The debug trainer's game side (hppoa_trainer.exe): noclip, spells on the buttons, health, teleport.
     src/hle_trainer.c
     # "Quit To Desktop" on the main menu (RECOMP_QUIT_ITEM=0 = Xbox menu).
     src/hle_frontend.c
     # Characters taken out of the world, never drawn (RECOMP_HIDE_CHARACTERS=0 = drawn).
     src/hle_world.c
-    # Holding Start/Back fast-forwards a cutscene (hpps.toml cutscene_skip; false = Xbox).
+    # Holding Start/Back fast-forwards a cutscene (hppoa.toml cutscene_skip; false = Xbox).
     src/hle_skip.c
     src/profiler.c
     # Direct3D 8 on a host D3D12 renderer, ported from SCDA-XBERecomp
     # (src/scda, MIT): the XDK's D3D entry points instead of the NV2A.
     src/scda/xdk/hle_d3d8.cpp
-    # All are hand-written over generated bodies: the recompile (run from hpps/) must pass
+    # All are hand-written over generated bodies: the recompile (run from hppoa/) must pass
     #   --exclude-manual port/src/hle_dsound.c
     #   --exclude-manual port/src/hle_video.c
     #   --exclude-manual port/src/hle_input.c
@@ -121,62 +121,62 @@ set(GAME_SOURCES
 # image, section $$XTIMAGE) by tools/xbx_to_ico.py; the launcher's background is src/launcher/launcher_bg.png when
 # someone has made one (DEVELOPING.md). Without either the build goes on: default icon, plain launcher page.
 find_package(Python3 COMPONENTS Interpreter)
-# HPPS_NO_ART: neither, whatever is on this PC: the builds that are given to others (tools/package_release.sh), so
+# HPPOA_NO_ART: neither, whatever is on this PC: the builds that are given to others (tools/package_release.sh), so
 # no Warner Bros. artwork travels inside the exes; the launcher then shows the title as text
-option(HPPS_NO_ART "Leave the game's artwork (icon, launcher picture) out of the exes" OFF)
-set(HPPS_GAME_XBE "${XBOXRECOMP_DIR}/game/default.xbe" CACHE FILEPATH "the game's default.xbe, for the exe icon")
-set(HPPS_ICON "${CMAKE_CURRENT_BINARY_DIR}/hpps.ico")
-if(HPPS_NO_ART)
-    file(REMOVE "${HPPS_ICON}")
-elseif(WIN32 AND Python3_FOUND AND EXISTS "${HPPS_GAME_XBE}" AND NOT EXISTS "${HPPS_ICON}")
+option(HPPOA_NO_ART "Leave the game's artwork (icon, launcher picture) out of the exes" OFF)
+set(HPPOA_GAME_XBE "${XBOXRECOMP_DIR}/game/default.xbe" CACHE FILEPATH "the game's default.xbe, for the exe icon")
+set(HPPOA_ICON "${CMAKE_CURRENT_BINARY_DIR}/hppoa.ico")
+if(HPPOA_NO_ART)
+    file(REMOVE "${HPPOA_ICON}")
+elseif(WIN32 AND Python3_FOUND AND EXISTS "${HPPOA_GAME_XBE}" AND NOT EXISTS "${HPPOA_ICON}")
     execute_process(COMMAND ${Python3_EXECUTABLE} -I ${CMAKE_CURRENT_SOURCE_DIR}/tools/xbx_to_ico.py
-                            "${HPPS_GAME_XBE}" "${HPPS_ICON}"
+                            "${HPPOA_GAME_XBE}" "${HPPOA_ICON}"
                     RESULT_VARIABLE ico_result OUTPUT_QUIET)
 endif()
-set(HPPS_RC_ICON "")
-if(EXISTS "${HPPS_ICON}")
-    set(HPPS_RC_ICON "1 ICON \"${HPPS_ICON}\"\n")
+set(HPPOA_RC_ICON "")
+if(EXISTS "${HPPOA_ICON}")
+    set(HPPOA_RC_ICON "1 ICON \"${HPPOA_ICON}\"\n")
 elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/res/app.ico")
     # the port's own icon (tools/make_icon.py: drawn from shapes, no game art): releases, and builds without the XBE
-    set(HPPS_RC_ICON "1 ICON \"${CMAKE_CURRENT_SOURCE_DIR}/res/app.ico\"\n")
+    set(HPPOA_RC_ICON "1 ICON \"${CMAKE_CURRENT_SOURCE_DIR}/res/app.ico\"\n")
 endif()
-set(HPPS_RC_BG "")
-if(NOT HPPS_NO_ART AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/launcher/launcher_bg.png")
-    set(HPPS_RC_BG "1 RCDATA \"${CMAKE_CURRENT_SOURCE_DIR}/src/launcher/launcher_bg.png\"\n")
+set(HPPOA_RC_BG "")
+if(NOT HPPOA_NO_ART AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/launcher/launcher_bg.png")
+    set(HPPOA_RC_BG "1 RCDATA \"${CMAKE_CURRENT_SOURCE_DIR}/src/launcher/launcher_bg.png\"\n")
 endif()
 # resource 1: the icon (fb_present.c and the launcher load it for their windows); the launcher's RCDATA 1 its picture.
 # Each also carries its version information (Explorer's Properties > Details), which keeps the file from being
 # empty without art: windres refuses a resource script with no resources
-# HPPS_VERSION: the release's version (tools/package_release.sh passes VERSION), in Properties > Details as the file
+# HPPOA_VERSION: the release's version (tools/package_release.sh passes VERSION), in Properties > Details as the file
 # and product version; the description is the product's name, the copyright the port's author
-set(HPPS_VERSION "0.2.1" CACHE STRING "the release version, major.minor.patch")
-string(REGEX MATCHALL "[0-9]+" hpps_ver_parts "${HPPS_VERSION}.0.0.0")
-list(GET hpps_ver_parts 0 hpps_v0)
-list(GET hpps_ver_parts 1 hpps_v1)
-list(GET hpps_ver_parts 2 hpps_v2)
-set(HPPS_PRODUCT "Harry Potter and the Philosopher's Stone - unofficial PC port")
-function(hpps_version_rc out file)
-    set(v "${hpps_v0},${hpps_v1},${hpps_v2},0")
-    set(${out} "1 VERSIONINFO\nFILEVERSION ${v}\nPRODUCTVERSION ${v}\nFILEOS 0x40004\nFILETYPE 1\nBEGIN\n  BLOCK \"StringFileInfo\"\n  BEGIN\n    BLOCK \"040904B0\"\n    BEGIN\n      VALUE \"CompanyName\", \"MiddleDucky\"\n      VALUE \"FileDescription\", \"${HPPS_PRODUCT}\"\n      VALUE \"ProductName\", \"${HPPS_PRODUCT}\"\n      VALUE \"FileVersion\", \"${HPPS_VERSION}\"\n      VALUE \"ProductVersion\", \"${HPPS_VERSION}\"\n      VALUE \"LegalCopyright\", \"Copyright (C) 2026 MiddleDucky\"\n      VALUE \"OriginalFilename\", \"${file}\"\n      VALUE \"InternalName\", \"${file}\"\n    END\n  END\n  BLOCK \"VarFileInfo\"\n  BEGIN\n    VALUE \"Translation\", 0x409, 1200\n  END\nEND\n" PARENT_SCOPE)
+set(HPPOA_VERSION "0.0.1" CACHE STRING "the release version, major.minor.patch")
+string(REGEX MATCHALL "[0-9]+" hppoa_ver_parts "${HPPOA_VERSION}.0.0.0")
+list(GET hppoa_ver_parts 0 hppoa_v0)
+list(GET hppoa_ver_parts 1 hppoa_v1)
+list(GET hppoa_ver_parts 2 hppoa_v2)
+set(HPPOA_PRODUCT "Harry Potter and the Prisoner of Azkaban - unofficial PC port")
+function(hppoa_version_rc out file)
+    set(v "${hppoa_v0},${hppoa_v1},${hppoa_v2},0")
+    set(${out} "1 VERSIONINFO\nFILEVERSION ${v}\nPRODUCTVERSION ${v}\nFILEOS 0x40004\nFILETYPE 1\nBEGIN\n  BLOCK \"StringFileInfo\"\n  BEGIN\n    BLOCK \"040904B0\"\n    BEGIN\n      VALUE \"CompanyName\", \"barthes_recompiled\"\n      VALUE \"FileDescription\", \"${HPPOA_PRODUCT}\"\n      VALUE \"ProductName\", \"${HPPOA_PRODUCT}\"\n      VALUE \"FileVersion\", \"${HPPOA_VERSION}\"\n      VALUE \"ProductVersion\", \"${HPPOA_VERSION}\"\n      VALUE \"LegalCopyright\", \"Copyright (C) 2026 MiddleDucky, barthes_recompiled contributors\"\n      VALUE \"OriginalFilename\", \"${file}\"\n      VALUE \"InternalName\", \"${file}\"\n    END\n  END\n  BLOCK \"VarFileInfo\"\n  BEGIN\n    VALUE \"Translation\", 0x409, 1200\n  END\nEND\n" PARENT_SCOPE)
 endfunction()
-hpps_version_rc(HPPS_RC_VERSION_GAME "hpps.exe")
-hpps_version_rc(HPPS_RC_VERSION_LAUNCHER "hpps_launcher.exe")
-file(CONFIGURE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/hpps_res.rc"
-     CONTENT "// generated by CMakeLists.txt\n${HPPS_RC_ICON}${HPPS_RC_VERSION_GAME}")
+hppoa_version_rc(HPPOA_RC_VERSION_GAME "hppoa.exe")
+hppoa_version_rc(HPPOA_RC_VERSION_LAUNCHER "hppoa_launcher.exe")
+file(CONFIGURE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/hppoa_res.rc"
+     CONTENT "// generated by CMakeLists.txt\n${HPPOA_RC_ICON}${HPPOA_RC_VERSION_GAME}")
 file(CONFIGURE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/launcher_res.rc"
-     CONTENT "// generated by CMakeLists.txt\n${HPPS_RC_ICON}${HPPS_RC_BG}${HPPS_RC_VERSION_LAUNCHER}")
+     CONTENT "// generated by CMakeLists.txt\n${HPPOA_RC_ICON}${HPPOA_RC_BG}${HPPOA_RC_VERSION_LAUNCHER}")
 
 add_executable(${PROJECT_NAME} WIN32
     ${GAME_SOURCES}
     ${RECOMP_GEN_SOURCES}
-    ${CMAKE_CURRENT_BINARY_DIR}/hpps_res.rc
+    ${CMAKE_CURRENT_BINARY_DIR}/hppoa_res.rc
 )
 
 # MinGW GCC 16 at -O3 sometimes hoists the address of a thread local array out of a loop as a plain global: the
 # lifted code then reads the TLS template instead of the thread's copy (g_fp_stack in sub_00036EC0, which turned the
 # Whomping Willow's right hand to angle 0). -O2 keeps it out; the post build check below fails on any such access.
 if(WIN32)
-    if(HPPS_RELEASE)
+    if(HPPOA_RELEASE)
         set_source_files_properties(${RECOMP_GEN_SOURCES} PROPERTIES COMPILE_OPTIONS
             "-O2;-fno-stack-protector;-U_FORTIFY_SOURCE")
     else()
@@ -237,10 +237,10 @@ endif()
 
 if(WIN32)
     # the C++ renderer must not need MinGW's libstdc++/libgcc/winpthread DLLs at run time
-    target_link_options(hpps PRIVATE -static -static-libgcc -static-libstdc++)
-    target_link_libraries(hpps PRIVATE d3d11 d3d12 d3dcompiler dxgi dxguid xinput1_4 winmm dbghelp xaudio2_8 ole32 imm32 dwmapi gdi32)
+    target_link_options(hppoa PRIVATE -static -static-libgcc -static-libstdc++)
+    target_link_libraries(hppoa PRIVATE d3d11 d3d12 d3dcompiler dxgi dxguid xinput1_4 winmm dbghelp xaudio2_8 ole32 imm32 dwmapi gdi32)
 else()
-    target_link_options(hpps PRIVATE -rdynamic)
+    target_link_options(hppoa PRIVATE -rdynamic)
 endif()
 
 # MSVC-specific: large address aware, increase section limit for big generated files
@@ -269,44 +269,44 @@ endif()
 #     VERBOSE_KERNEL_LOG=1
 # )
 
-# HPPS_CALL_PROFILE: count every direct call by target (F7 dumps calls_N.txt, see profiler.c)
-option(HPPS_CALL_PROFILE "Count direct calls per target, F7 dumps" OFF)
-if(HPPS_CALL_PROFILE)
+# HPPOA_CALL_PROFILE: count every direct call by target (F7 dumps calls_N.txt, see profiler.c)
+option(HPPOA_CALL_PROFILE "Count direct calls per target, F7 dumps" OFF)
+if(HPPOA_CALL_PROFILE)
     target_compile_definitions(${PROJECT_NAME} PRIVATE RECOMP_CALL_PROFILE)
 endif()
 
-# HPPS_DIFFTEST: compare every called function with its original x86 in Unicorn (F5 sweep, difftest.txt; see
+# HPPOA_DIFFTEST: compare every called function with its original x86 in Unicorn (F5 sweep, difftest.txt; see
 # src/difftest.c). Needs unicorn.dll next to the executable.
-option(HPPS_DIFFTEST "Differential test against the original x86 (Unicorn)" OFF)
-if(HPPS_DIFFTEST)
+option(HPPOA_DIFFTEST "Differential test against the original x86 (Unicorn)" OFF)
+if(HPPOA_DIFFTEST)
     target_sources(${PROJECT_NAME} PRIVATE src/difftest.c)
     target_include_directories(${PROJECT_NAME} PRIVATE third_party/unicorn)
     target_compile_definitions(${PROJECT_NAME} PRIVATE RECOMP_DIFFTEST)
 endif()
 
-# hpps_launcher.exe: 4:3 or 16:9 and the graphics settings, then hpps.exe (src/launcher/launcher.cpp)
+# hppoa_launcher.exe: 4:3 or 16:9 and the graphics settings, then hppoa.exe (src/launcher/launcher.cpp)
 if(WIN32)
-    add_executable(hpps_launcher WIN32
+    add_executable(hppoa_launcher WIN32
         src/launcher/launcher.cpp
         src/launcher/xiso.c  # unpacks a disc image in game\ before the first start
         ${CMAKE_CURRENT_BINARY_DIR}/launcher_res.rc
         ${IMGUI_DIR}/imgui.cpp ${IMGUI_DIR}/imgui_draw.cpp ${IMGUI_DIR}/imgui_tables.cpp
         ${IMGUI_DIR}/imgui_widgets.cpp ${IMGUI_DIR}/backends/imgui_impl_win32.cpp
         ${IMGUI_DIR}/backends/imgui_impl_dx11.cpp)
-    target_include_directories(hpps_launcher PRIVATE ${IMGUI_DIR})
-    set_target_properties(hpps_launcher PROPERTIES CXX_STANDARD 20 CXX_STANDARD_REQUIRED ON)
-    target_compile_options(hpps_launcher PRIVATE -O2)
-    target_link_options(hpps_launcher PRIVATE -static -static-libgcc -static-libstdc++ -mwindows)
-    target_link_libraries(hpps_launcher PRIVATE d3d11 dxgi d3dcompiler windowscodecs ole32 imm32 dwmapi gdi32 xinput1_4)
+    target_include_directories(hppoa_launcher PRIVATE ${IMGUI_DIR})
+    set_target_properties(hppoa_launcher PROPERTIES CXX_STANDARD 20 CXX_STANDARD_REQUIRED ON)
+    target_compile_options(hppoa_launcher PRIVATE -O2)
+    target_link_options(hppoa_launcher PRIVATE -static -static-libgcc -static-libstdc++ -mwindows)
+    target_link_libraries(hppoa_launcher PRIVATE d3d11 dxgi d3dcompiler windowscodecs ole32 imm32 dwmapi gdi32 xinput1_4)
 endif()
 
-# hpps_trainer.exe: the debug trainer beside the game (noclip, spells, health, saved spots); src/trainer/trainer.c,
+# hppoa_trainer.exe: the debug trainer beside the game (noclip, spells, health, saved spots); src/trainer/trainer.c,
 # the game side is src/hle_trainer.c
 if(WIN32)
-    add_executable(hpps_trainer WIN32 src/trainer/trainer.c)
-    target_compile_options(hpps_trainer PRIVATE -O2)
-    target_link_options(hpps_trainer PRIVATE -static -static-libgcc -mwindows)
-    target_link_libraries(hpps_trainer PRIVATE comctl32 gdi32 user32)
+    add_executable(hppoa_trainer WIN32 src/trainer/trainer.c)
+    target_compile_options(hppoa_trainer PRIVATE -O2)
+    target_link_options(hppoa_trainer PRIVATE -static -static-libgcc -mwindows)
+    target_link_libraries(hppoa_trainer PRIVATE comctl32 gdi32 user32)
 endif()
 
 # Region retargeting: compile src/recomp/region/ copies when regen.sh made them for a non-canonical XBE

@@ -23,7 +23,7 @@ artwork. You need your own copy of the Xbox disc; the pipeline regenerates every
                           and the Python pipeline (xbe_parser, disasm, func_id, abi_analysis, recomp)
   cmake/ include/ docs/ tests/ LICENSES/   toolkit
   port/
-    CMakeLists.txt        the game: hpps.exe, hpps_launcher.exe, hpps_trainer.exe
+    CMakeLists.txt        the game: hppoa.exe, hppoa_launcher.exe, hppoa_trainer.exe
     regen.sh              XBE -> port/src/recomp/gen/*.c (generated, ignored by git)
     icall_seeds.json      indirect-call targets the disassembler can't find by itself (regen.sh input)
     src/                  hand-written code
@@ -31,10 +31,10 @@ artwork. You need your own copy of the Xbox disc; the pipeline regenerates every
       hle_*.c             overrides of recompiled game/XDK functions (see 6.2)
       scda/               renderer (gpu/d3d12.cpp, shaders.cpp, pipeline_cache.cpp), XDK D3D8 HLE
                           (xdk/hle_d3d8.cpp), settings + F10 panel + input (app/)
-      launcher/           hpps_launcher.exe (Dear ImGui over D3D11)
-      trainer/            hpps_trainer.exe, the debug trainer
+      launcher/           hppoa_launcher.exe (Dear ImGui over D3D11)
+      trainer/            hppoa_trainer.exe, the debug trainer
       recomp/             recomp_types.h etc.; gen/ is generated
-      difftest.c          Unicorn-based original-vs-lifted comparison (HPPS_DIFFTEST builds)
+      difftest.c          Unicorn-based original-vs-lifted comparison (HPPOA_DIFFTEST builds)
     res/base_shaders.bin  shader bytecode shipped with releases (see 5)
     tools/                package_release.sh, xbx_to_ico.py, check_tls_refs.py, memtool, warp
     third_party/imgui/    Dear ImGui (MIT)
@@ -124,22 +124,22 @@ cmake -S . -B build-win -G Ninja -DCMAKE_BUILD_TYPE=Release
 cmake --build build-win -j$(nproc)
 ```
 
-Outputs in `port/build-win/`: `hpps.exe`, `hpps_launcher.exe`, `hpps_trainer.exe`.
+Outputs in `port/build-win/`: `hppoa.exe`, `hppoa_launcher.exe`, `hppoa_trainer.exe`.
 
 * The exe icon is made at configure time from `game/default.xbe`'s title image (`$$XTIMAGE`) by
-  `tools/xbx_to_ico.py`. Without the XBE, and always in release builds (`HPPS_NO_ART`), the port's own icon
+  `tools/xbx_to_ico.py`. Without the XBE, and always in release builds (`HPPOA_NO_ART`), the port's own icon
   `res/app.ico` is used instead: a wand and sparkle drawn from shapes by `tools/make_icon.py`, original artwork.
-  `-DHPPS_GAME_XBE=<path>` points at another XBE.
+  `-DHPPOA_GAME_XBE=<path>` points at another XBE.
 * The launcher shows `src/launcher/launcher_bg.png` behind its page when that file exists (not in the repo: game
   art). One can be made from an F12 capture of the main menu (logo texture over the menu background).
 * Generated code is compiled at **-O2** on purpose: GCC 16 at -O3 hoisted the address of a thread-local array
   out of a loop, reading the TLS template instead of the thread's copy. The post-build step
   `tools/check_tls_refs.py` fails the build on any such access ("58 thread local variables, no global address
   reads" is the good result).
-* CMake options: `HPPS_RELEASE` (players' build: hardening, SSE4.1, no debug keys), `HPPS_NO_ART` (no game
+* CMake options: `HPPOA_RELEASE` (players' build: hardening, SSE4.1, no debug keys), `HPPOA_NO_ART` (no game
   artwork inside the exes: no icon, no launcher picture, the launcher shows the title as text in Windows' Georgia;
-  package_release.sh always sets it, so nothing of Warner Bros.' is in a release), `HPPS_DIFFTEST` (see 7.4),
-  `HPPS_CALL_PROFILE` (per-target call counts, F7 dumps).
+  package_release.sh always sets it, so nothing of Warner Bros.' is in a release), `HPPOA_DIFFTEST` (see 7.4),
+  `HPPOA_CALL_PROFILE` (per-target call counts, F7 dumps).
 
 
 ## 5. Run, test, release
@@ -151,23 +151,23 @@ mkdir port\run
 mklink /J port\run\game game          (cmd, from the repo root; no admin needed)
 copy port\build-win\*.exe port\run\
 ```
-It creates `hpps.toml` (settings), `saves\` (Xbox UDATA/TDATA, one folder per game, beside the exe) and
+It creates `hppoa.toml` (settings), `saves\` (Xbox UDATA/TDATA, one folder per game, beside the exe) and
 `shadercache\` there.
 
-**Starting.** `hpps.exe` only runs when started by `hpps_launcher.exe` (which sets `HPPS_LAUNCHER=1` and the
+**Starting.** `hppoa.exe` only runs when started by `hppoa_launcher.exe` (which sets `HPPOA_LAUNCHER=1` and the
 `RECOMP_*` defaults the game expects, see `StartGame` in launcher.cpp). For scripted test runs set
-`HPPS_LAUNCHER=1` yourself. Only one copy runs at a time (named mutex, `src/single_instance.h`); a second start
+`HPPOA_LAUNCHER=1` yourself. Only one copy runs at a time (named mutex, `src/single_instance.h`); a second start
 brings the running one forward. Alt+F4 ends the process at once (`fb_present.c`).
 
 **debug.env** beside the exe: `KEY=VALUE` lines set as environment variables however the game is started (an
 existing variable wins, `#` comments). This is how trace switches are turned on.
 
-**Logs.** Only with F10 > Debug > "Write debug logs" (`debug_logs = true` in hpps.toml, from the next start):
-`hpps_run.log` (the game's console output, written by the launcher) and `xbox_kernel.log` (kernel layer).
-Crash reports (`[CRASH]` with symbolised guest functions; hpps.exe keeps its symbol table) land in hpps_run.log.
+**Logs.** Only with F10 > Debug > "Write debug logs" (`debug_logs = true` in hppoa.toml, from the next start):
+`hppoa_run.log` (the game's console output, written by the launcher) and `xbox_kernel.log` (kernel layer).
+Crash reports (`[CRASH]` with symbolised guest functions; hppoa.exe keeps its symbol table) land in hppoa_run.log.
 
 **Shader cache.** Shaders are generated HLSL keyed by a hash of their source, compiled with D3DCompile and kept in
-`shadercache\shaders.bin`; pipelines in `shadercache\hpps_pipelines.bin` (per driver). A release ships
+`shadercache\shaders.bin`; pipelines in `shadercache\hppoa_pipelines.bin` (per driver). A release ships
 `res/base_shaders.bin` as `shadercache\base_shaders.bin` (read only, after the player's own) so a new PC compiles
 almost nothing; bytecode a driver refuses is recompiled locally (`DropBaseCode`). Draws whose pipeline is still
 building are skipped (`async_shaders`), and such a frame is not shown: the last whole frame stays up for up to 3 s
@@ -175,8 +175,8 @@ building are skipped (`async_shaders`), and such a frame is not shown: the last 
 `res/base_shaders.bin`** (copy a well-played `shadercache\shaders.bin` over it) whenever shader generation changes;
 stale entries are harmless but useless.
 
-**Release.** `bash port/tools/package_release.sh` (MSYS2) configures `build-release` with `HPPS_RELEASE=ON`,
-builds, and fills `port/dist/hpps-<date>/` with hpps_launcher.exe, hpps.exe, README.txt and
+**Release.** `bash port/tools/package_release.sh` (MSYS2) configures `build-release` with `HPPOA_RELEASE=ON`,
+builds, and fills `port/dist/hppoa-<date>/` with hppoa_launcher.exe, hppoa.exe, README.txt and
 `shadercache/base_shaders.bin`. It checks ASLR/NX/high-entropy, the stack protector, and that every imported DLL
 ships with Windows 10/11 (C/C++ runtimes are static; XInput is `xinput1_4`). **It never deletes the folder**
 (testers drop game files into it): only its own files are overwritten. Keep it that way.
@@ -245,13 +245,13 @@ bytes) over the block after the 24-byte header.
 
 ### 7.2 Trainer and reports
 
-`hpps_trainer.exe` (beside hpps.exe, either started first) talks to the game through the shared mapping
-`Local\hpps_trainer` (`trainer_shm.h`): noclip (left stick flies, triggers up/down), health, spells, cards, beans,
+`hppoa_trainer.exe` (beside hppoa.exe, either started first) talks to the game through the shared mapping
+`Local\hppoa_trainer` (`trainer_shm.h`): noclip (left stick flies, triggers up/down), health, spells, cards, beans,
 bag size, level warp (via the hub when needed), checkpoints (`checkpoints\*.bin`, the 0x4AE4-byte progress block),
 insta-kill (Ctrl+Shift+K), Undo. **Ctrl+Shift+R** writes `reports\<date_time>\`: report.txt, guest memory images,
 the progress block, logs, settings, all thread stacks and game state (from a separate thread, so a hung game still
-answers), plus a capture. `tools/memtool` (hpps_mem.exe) reads/writes guest memory of a running game;
-`tools/warp` (hpps_warp.exe <level>) warps.
+answers), plus a capture. `tools/memtool` (hppoa_mem.exe) reads/writes guest memory of a running game;
+`tools/warp` (hppoa_warp.exe <level>) warps.
 
 `RECOMP_BOOT_CHECKPOINT=<file>` restores a checkpoint on Harry's first frame; `RECOMP_AUTOPLAY=<file>` runs
 `<seconds> <command> [args]` lines (captures, quitafter, dump, diffsweep, ...; see the comment in hle_trainer.c).
@@ -264,11 +264,11 @@ WaitForSpeech with the cutscene flag and speech state, and each change of them (
 `RECOMP_DSOUND_TRACE` (`RECOMP_DSOUND_WAV` records the mix), `RECOMP_XMV_TRACE`, `RECOMP_D3D_TRACE`,
 `RECOMP_PAD_TRACE`, `RECOMP_RUMBLE_TRACE`, `RECOMP_VSC_TRACE`, `RECOMP_WATCH`, `RECOMP_PROFILE` (sampling
 profiler). F11 writes every thread's native stack plus held guest locks and I/O queues to `stacks.txt`
-(symbolise with `nm -n hpps.exe`).
+(symbolise with `nm -n hppoa.exe`).
 
 ### 7.4 Difftest
 
-`-DHPPS_DIFFTEST=ON` (own build folder) builds a hpps.exe that runs each called function's **original x86** in
+`-DHPPOA_DIFFTEST=ON` (own build folder) builds a hppoa.exe that runs each called function's **original x86** in
 Unicorn from the live state, then the lifted C, and compares registers, x87 and memory; needs `unicorn.dll`
 (Unicorn Engine 2.x, x64) beside it. F5 starts/stops a sweep, `RECOMP_DIFF_AUTO=start_s,len_s` runs one,
 `RECOMP_DIFF_ONLY=<addr,...>` restricts it, `RECOMP_DIFF_SAMPLES` / `RECOMP_DIFF_STRIDE` thin it; results in

@@ -16,7 +16,7 @@
  *
  * RECOMP_SCRIPT_TRACE=1 logs [SCRIPT] for every level-script command the title runs (sub_0014DD30 calls each
  * command's handler, entry + 0x20, from its table [0x356F90], 0x48 bytes an entry: the name inline at +0, the
- * argument count at +0x24; hpps_ScriptCommand is put into the generated code just before by port/tools/patch_gen.py,
+ * argument count at +0x24; hppoa_ScriptCommand is put into the generated code just before by port/tools/patch_gen.py,
  * which regen.sh runs): the time, the
  * script context, the command, each argument (argv + 8 * i: the object it names, or its value [+4] -> a string or a
  * number) and Harry's position.
@@ -205,7 +205,7 @@ static const char *guest_str(uint32_t p)
     return n > 0 && (n == 40 || c[n] == 0) ? c : 0;
 }
 
-extern void hpps_DiffCutscene(void) __attribute__((weak));
+extern void hppoa_DiffCutscene(void) __attribute__((weak));
 
 /* a command's arguments as text: "a, "b", 3" (the object each one names, its string, or its number) */
 static int format_args(uint32_t entry, uint32_t argv, char *buf, int size)
@@ -368,16 +368,16 @@ static void speech_command(const char *name, uint32_t entry, uint32_t ctx, uint3
     fprintf(stderr, "[SPEECH] %9.2f s %s\n", GetTickCount() / 1000.0, line);
 }
 
-void hpps_ScriptCommand(uint32_t entry, uint32_t ctx, uint32_t argv)
+void hppoa_ScriptCommand(uint32_t entry, uint32_t ctx, uint32_t argv)
 {
     static int lines;
     if (!crab_ptr(entry)) return;
     const char *name = (const char *)XBOX_PTR(entry);
     /* the difftest build sweeps each cutscene by itself (StartCutScene repeats for a few frames: once a minute) */
-    if (hpps_DiffCutscene && !strcmp(name, "StartCutScene")) {
+    if (hppoa_DiffCutscene && !strcmp(name, "StartCutScene")) {
         static DWORD last;
         DWORD now = GetTickCount();
-        if (!last || now - last > 60000) { last = now; hpps_DiffCutscene(); }
+        if (!last || now - last > 60000) { last = now; hppoa_DiffCutscene(); }
     }
     if (speech_trace_on()) speech_command(name, entry, ctx, argv);
     if (!script_trace_on() || lines > 400000) return;

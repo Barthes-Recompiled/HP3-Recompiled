@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Xbox title/save image (XPR0 .xbx, DXT1 or linear A8R8G8B8) -> Windows .ico (PNG entries) and a preview .png.
 
-    python tools/xbx_to_ico.py TitleImage.xbx res/hpps.ico [preview.png]
-    python tools/xbx_to_ico.py game/default.xbe hpps.ico     (the title image in the XBE's $$XTIMAGE section)
+    python tools/xbx_to_ico.py TitleImage.xbx res/hppoa.ico [preview.png]
+    python tools/xbx_to_ico.py game/default.xbe hppoa.ico     (the title image in the XBE's $$XTIMAGE section)
 
 The build runs the second form (CMakeLists.txt), so the icon comes from the player's own game files and no game
 art is kept in the repository.

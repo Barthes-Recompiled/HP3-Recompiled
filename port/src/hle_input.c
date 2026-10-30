@@ -51,12 +51,12 @@ static int trace_on(void)
 
 extern int app_KbmOn(void);  /* scda/app/input.cpp: keyboard and mouse play as controller 1 */
 extern void app_InputPad0Present(int present);
-void hpps_TrainerInject(XBOX_GAMEPAD *g);  /* hle_trainer.c: input a tool asks for, added to port 0 */
-void hpps_SkipPad(const XBOX_GAMEPAD *g);  /* hle_skip.c: holding Start/Back fast-forwards a cutscene */
+void hppoa_TrainerInject(XBOX_GAMEPAD *g);  /* hle_trainer.c: input a tool asks for, added to port 0 */
+void hppoa_SkipPad(const XBOX_GAMEPAD *g);  /* hle_skip.c: holding Start/Back fast-forwards a cutscene */
 
 /* scda/app/input.cpp's sneak toggle: Harry's pace as the game last picked it, [[0x3565B0] + 0xDC] + 0x2574 (0 stand,
  * 1 sneak, 2 walk, 3 run, set by the movement code at 0x8567A from the stick's push); -1 when there is no Harry */
-int hpps_HarryPace(void)
+int hppoa_HarryPace(void)
 {
     uint32_t player = MEM32(0x3565B0), ctrl;
     if (player < 0x80000000u || player >= 0x84000000u) return -1;
@@ -245,7 +245,7 @@ void sub_001F5044(void)
     g_esp += 4 + 8;
 }
 
-extern int hpps_MenuOpen(void);  /* scda/app/menu.cpp */
+extern int hppoa_MenuOpen(void);  /* scda/app/menu.cpp */
 extern void app_InputPad(int port, XBOX_GAMEPAD *g);  /* scda/app/input.cpp */
 
 /* Stick range compensation (RECOMP_STICK_RANGE, default 0.65; 1 = off).
@@ -284,7 +284,7 @@ static void stick_compensate(SHORT *x, SHORT *y)
 }
 
 /* the pad as the game last read it: the debug trainer's noclip flies Harry with it (hle_trainer.c) */
-XBOX_GAMEPAD hpps_last_pad;
+XBOX_GAMEPAD hppoa_last_pad;
 
 static void get_state_direct(void)
 {
@@ -297,16 +297,16 @@ static void get_state_direct(void)
         g_eax = 1167;
     } else {
         /* the F10 options panel has the pad while it is open: the game sees it at rest */
-        if (hpps_MenuOpen()) memset(&s.Gamepad, 0, sizeof(s.Gamepad));
+        if (hppoa_MenuOpen()) memset(&s.Gamepad, 0, sizeof(s.Gamepad));
         /* the controls settings: remapping, deadzones, camera inversion, keyboard and mouse on port 0 */
         app_InputPad((int)g_h[h].port, &s.Gamepad);
         stick_compensate(&s.Gamepad.sThumbLX, &s.Gamepad.sThumbLY);
         stick_compensate(&s.Gamepad.sThumbRX, &s.Gamepad.sThumbRY);
         if (g_h[h].port == 0) {
-            hpps_TrainerInject(&s.Gamepad);
-            hpps_SkipPad(&s.Gamepad);
+            hppoa_TrainerInject(&s.Gamepad);
+            hppoa_SkipPad(&s.Gamepad);
         }
-        hpps_last_pad = s.Gamepad;
+        hppoa_last_pad = s.Gamepad;
         /* the packet number moves only when something changed, as XAPI's does */
         if (memcmp(&s.Gamepad, &g_h[h].last, sizeof(s.Gamepad))) g_h[h].packet++;
         g_h[h].last = s.Gamepad;

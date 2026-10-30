@@ -14,7 +14,7 @@ python3 -m tools.disasm game/default.xbe --text-only --extra-sections D3D,D3DX,X
     --seed-functions "$(src icall_seeds.json)"
 python3 -m tools.func_id game/default.xbe
 python3 -m tools.abi_analysis game/default.xbe
-python3 -m tools.recomp game/default.xbe --all --split 1000 --gen-dir port/src/recomp/gen --game-name hpps \
+python3 -m tools.recomp game/default.xbe --all --split 1000 --gen-dir port/src/recomp/gen --game-name hppoa \
     --exclude-manual "$(src src/hle_dsound.c)" \
     --exclude-manual "$(src src/hle_video.c)" \
     --exclude-manual "$(src src/hle_input.c)" \

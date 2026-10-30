@@ -45,7 +45,7 @@ typedef void (*recomp_func_t)(void);
 recomp_func_t recomp_lookup(uint32_t xbox_va);
 void xbox_SetVblankHook(void (*fn)(void));  // kernel_bridge.c
 uint32_t xbox_Nv2aVblankCount(void);
-int hpps_FastForward(void);  // hle_skip.c: a cutscene fast-forwarding (1 when not)
+int hppoa_FastForward(void);  // hle_skip.c: a cutscene fast-forwarding (1 when not)
 }
 
 using namespace kernel;
@@ -232,7 +232,7 @@ void PaceAbove(uint32_t fps) {
 }
 void Pace() {
     if (app::Get().fps_limit == app::kFpsUnlocked) return;  // xboxrecomp: unlocked (experimental), vsync paces
-    if (hpps_FastForward() > 1) return;  // xboxrecomp: a cutscene fast-forwarding (hle_skip.c) runs flat out
+    if (hppoa_FastForward() > 1) return;  // xboxrecomp: a cutscene fast-forwarding (hle_skip.c) runs flat out
     if (app::Get().fps_limit > 60) return PaceAbove(app::Get().fps_limit);
     static uint32_t last;
     // xboxrecomp: the 30 fps limit (fps_limit) shows each frame for two vblanks at least, as a title asking for
@@ -545,7 +545,7 @@ HLE(00196050, 1) {
 // D3DDevice_BlockUntilVerticalBlank
 HLE(00192090, 0) {
     // xboxrecomp: unlocked and caps above 60 (Pace) do not wait for the 59.94 Hz grid, nor a cutscene fast-forwarding
-    if (app::Get().fps_limit > 60 || hpps_FastForward() > 1) return 0;
+    if (app::Get().fps_limit > 60 || hppoa_FastForward() > 1) return 0;
     WaitVblank(xbox_Nv2aVblankCount(), 1);  // the next vblank
     return 0;
 }
@@ -674,10 +674,10 @@ static std::atomic<int> g_hud_trace{0};  // xboxrecomp debug: HudTrace, F12
 static uint32_t g_hud_n = 0;
 
 // xboxrecomp: the debug trainer's report asks for an F12 capture of the next frame (hle_trainer.c)
-extern "C" void hpps_RequestCapture(void) { gpu::g_capture = true; }
+extern "C" void hppoa_RequestCapture(void) { gpu::g_capture = true; }
 
 // xboxrecomp: the run is 16:9 (hle_video.c widens the 4:3 cameras)
-extern "C" int hpps_Widescreen(void) { return app::BootAspect() == app::AspectMode::Wide; }
+extern "C" int hppoa_Widescreen(void) { return app::BootAspect() == app::AspectMode::Wide; }
 
 // A movie frame went up (hle_video.c's UpdateOverlay). The NV2A scans the overlay out by itself, so a title playing
 // an XMV need not Swap; when it has not swapped lately, present the last frame for the overlay to be drawn over.

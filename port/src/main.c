@@ -1,5 +1,5 @@
 /**
- * hpps (Harry Potter and the Philosopher's Stone) - Recompiled Game Entry Point
+ * hppoa (Harry Potter and the Prisoner of Azkaban) - Recompiled Game Entry Point
  *
  * This is the Windows executable that hosts the recompiled game code.
  * It performs the following initialization sequence:
@@ -433,17 +433,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     (void)nCmdShow;
 
     /* xboxrecomp (single_instance.h), before anything touches the log, saves or shader cache: one copy at a time,
-     * and only from the launcher. A running game is reported first, so opening hpps.exe again just shows it. */
-    if (hpps_GameRunning()) {
-        hpps_ReportAlreadyRunning();
+     * and only from the launcher. A running game is reported first, so opening hppoa.exe again just shows it. */
+    if (hppoa_GameRunning()) {
+        hppoa_ReportAlreadyRunning();
         return 0;
     }
-    if (!hpps_StartedByLauncher()) {
-        hpps_OfferLauncher();
+    if (!hppoa_StartedByLauncher()) {
+        hppoa_OfferLauncher();
         return 0;
     }
-    if (!hpps_ClaimSingleInstance()) {  /* another started in between */
-        hpps_ReportAlreadyRunning();
+    if (!hppoa_ClaimSingleInstance()) {  /* another started in between */
+        hppoa_ReportAlreadyRunning();
         return 0;
     }
 
@@ -475,11 +475,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
         }
     }
 
-    /* hpps.toml: display, resolution, anti-aliasing... (scda/app/app.cpp),
+    /* hppoa.toml: display, resolution, anti-aliasing... (scda/app/app.cpp),
      * handed on as RECOMP_* variables before any thread reads them */
     {
-        extern void hpps_SettingsInit(void);
-        hpps_SettingsInit();
+        extern void hppoa_SettingsInit(void);
+        hppoa_SettingsInit();
     }
 
     printf("=== YOUR_GAME_NAME - Static Recompilation ===\n");
@@ -546,10 +546,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
      * on the PC, read through XInput, appears to the title as a Controller S. */
     xbox_OhciInit();
     recomp_profiler_start();
-    {   /* the debug trainer's shared block and report thread (hle_trainer.c), for hpps_trainer.exe: after the
+    {   /* the debug trainer's shared block and report thread (hle_trainer.c), for hppoa_trainer.exe: after the
          * memory layout, whose guest -> host offset it hands on */
-        extern void hpps_TrainerInit(void);
-        hpps_TrainerInit();
+        extern void hppoa_TrainerInit(void);
+        hppoa_TrainerInit();
     }
 
     /* GPU fence. D3D's push-buffer wait (guest 0x00195D90, D3D_BlockOnTime) spins until the

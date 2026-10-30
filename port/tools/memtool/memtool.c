@@ -1,9 +1,9 @@
-/* hpps_mem.exe - read/write/scan the running hpps.exe guest memory (RE helper).
- *   hpps_mem r  <guest> <len>            hex dump
- *   hpps_mem d  <guest> <len> <file>     dump to file
- *   hpps_mem w  <guest> <hexbytes>       write bytes
- *   hpps_mem f32 <guest> <len> <value> <tol>   find floats
- * Guest address -> host: + offset (HPPS_MEM_OFFSET, default 0x10000). */
+/* hppoa_mem.exe - read/write/scan the running hppoa.exe guest memory (RE helper).
+ *   hppoa_mem r  <guest> <len>            hex dump
+ *   hppoa_mem d  <guest> <len> <file>     dump to file
+ *   hppoa_mem w  <guest> <hexbytes>       write bytes
+ *   hppoa_mem f32 <guest> <len> <value> <tol>   find floats
+ * Guest address -> host: + offset (HPPOA_MEM_OFFSET, default 0x10000). */
 #include <windows.h>
 #include <tlhelp32.h>
 #include <stdio.h>
@@ -16,7 +16,7 @@ static HANDLE open_game(void)
     PROCESSENTRY32 pe = { sizeof pe };
     HANDLE snap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     HANDLE h = NULL;
-    const char *name = getenv("HPPS_EXE") ? getenv("HPPS_EXE") : "hpps.exe";
+    const char *name = getenv("HPPOA_EXE") ? getenv("HPPOA_EXE") : "hppoa.exe";
     if (Process32First(snap, &pe)) do {
         if (!_stricmp(pe.szExeFile, name)) {
             h = OpenProcess(PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION |
@@ -30,7 +30,7 @@ static HANDLE open_game(void)
 
 static unsigned long long off(void)
 {
-    const char *e = getenv("HPPS_MEM_OFFSET");
+    const char *e = getenv("HPPOA_MEM_OFFSET");
     return e ? strtoull(e, NULL, 0) : 0x10000;
 }
 
@@ -38,7 +38,7 @@ int main(int argc, char **argv)
 {
     if (argc < 3) { fprintf(stderr, "usage: see source\n"); return 2; }
     HANDLE h = open_game();
-    if (!h) { fprintf(stderr, "hpps.exe not found / no access (%lu)\n", GetLastError()); return 1; }
+    if (!h) { fprintf(stderr, "hppoa.exe not found / no access (%lu)\n", GetLastError()); return 1; }
     unsigned guest = (unsigned)strtoul(argv[2], NULL, 0);
     void *host = (void *)(uintptr_t)(guest + off());
     if (!strcmp(argv[1], "r") || !strcmp(argv[1], "d") || !strcmp(argv[1], "f32")) {

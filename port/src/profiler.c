@@ -190,10 +190,10 @@ static void stack_dump_to(const char *path)
 static void stack_dump(void) { stack_dump_to("stacks.txt"); }
 
 /* the debug trainer's report (hle_trainer.c): the same stacks into its folder */
-void hpps_StackDumpTo(const char *path) { stack_dump_to(path); }
+void hppoa_StackDumpTo(const char *path) { stack_dump_to(path); }
 
 #ifdef RECOMP_CALL_PROFILE
-/* HPPS_CALL_PROFILE build: every direct call counts its target. F7 writes the counts since the last F7 to
+/* HPPOA_CALL_PROFILE build: every direct call counts its target. F7 writes the counts since the last F7 to
  * calls_N.txt (address and count, most called first) and starts over, so two dumps taken in two situations diff
  * into the functions one of them runs and the other does not. Guest code is below 4 MB: a flat table. */
 #define CALL_SLOTS 0x400000u

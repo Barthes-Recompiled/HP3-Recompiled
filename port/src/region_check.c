@@ -45,7 +45,7 @@ static void check(void)
     while (!xbox_GetMappedSize()) SLEEP_MS(500);
     for (int t = 0; t < 2 * 600; t++, SLEEP_MS(500)) {
         uint32_t level = MEM32(kLevelNow), pl = MEM32(kPlayer);
-        if (level < HPPS_LEVEL_FIRST || level > HPPS_LEVEL_LAST || !guest_ptr(pl)) continue;
+        if (level < HPPOA_LEVEL_FIRST || level > HPPOA_LEVEL_LAST || !guest_ptr(pl)) continue;
         int entity = MEM32(pl + 8) == pl;
         float h = MEMF(kHealth), hmax = MEMF(kHealthMax);
         uint8_t s0 = MEM8(kSlots), s1 = MEM8(kSlots + 1), s2 = MEM8(kSlots + 2);

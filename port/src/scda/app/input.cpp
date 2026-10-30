@@ -295,7 +295,7 @@ static void SneakToggle(const Settings& s, const uint8_t in[kPadInputs], bool ke
     pad_was = pad;
 }
 
-// The keys' push for sneaking and walking, a share of the stick's full push (F10 > Controls; hpps.toml pace_sneak /
+// The keys' push for sneaking and walking, a share of the stick's full push (F10 > Controls; hppoa.toml pace_sneak /
 // pace_walk, %). Fixed: learnt from the pace the game picked (2026-10-25) it went wrong, the game easing Harry from one
 // gait to the next gave answers no threshold fits. From play: 44% is a quick sneak, 64% already runs
 static void PaceStick(int16_t* x, int16_t* y, uint32_t percent) {

@@ -1,5 +1,5 @@
 // The options panel on F10, after SCDA-XBERecomp's (src/app/menu.cpp): its graphics settings on one ImGui page,
-// applied at once and saved to hpps.toml. Alt+Enter flips windowed and borderless. The fps counter draws here too.
+// applied at once and saved to hppoa.toml. Alt+Enter flips windowed and borderless. The fps counter draws here too.
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
@@ -95,7 +95,7 @@ std::vector<std::pair<uint32_t, uint32_t>> ModesFor(AspectMode a) {
     return m;
 }
 
-// a setting changed: applied by the renderer next frame, kept in hpps.toml
+// a setting changed: applied by the renderer next frame, kept in hppoa.toml
 void Changed(bool display = false) {
     Save();
     if (display) ApplyDisplay();
@@ -281,7 +281,7 @@ void DrawPanel(bool start) {
                             ImVec2(0.5f, 0.5f));
     ImGui::SetNextWindowSize(ImVec2(520 * io.FontGlobalScale, 0), ImGuiCond_Appearing);
     bool open = true;
-    const char* title = start ? "Harry Potter and the Philosopher's Stone - Settings###start" : "Options (F10)";
+    const char* title = start ? "Harry Potter and the Prisoner of Azkaban - Settings###start" : "Options (F10)";
     if (!ImGui::Begin(title, start ? nullptr : &open, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize)) {
         ImGui::End();
         if (!open) g_open = false;
@@ -431,12 +431,12 @@ void DrawPanel(bool start) {
         ImGui::TextDisabled("Shifts the colours a colour-blind player confuses toward ones they can tell apart.");
         ImGui::EndTabItem();
     }
-    // xboxrecomp: the logs are opened as the game starts (the launcher's hpps_run.log, the kernel's xbox_kernel.log)
+    // xboxrecomp: the logs are opened as the game starts (the launcher's hppoa_run.log, the kernel's xbox_kernel.log)
     if (tabs && ImGui::BeginTabItem("Debug")) {
         page = "Debug";
         Row("Logs");
         if (ImGui::Checkbox("Write debug logs", &s.debug_logs)) Changed();
-        ImGui::TextDisabled("hpps_run.log and xbox_kernel.log beside the game, for reporting a problem.");
+        ImGui::TextDisabled("hppoa_run.log and xbox_kernel.log beside the game, for reporting a problem.");
         ImGui::TextDisabled("Takes effect the next time the game starts.");
         ImGui::EndTabItem();
     }
@@ -459,13 +459,13 @@ void DrawPanel(bool start) {
         }
         ImGui::SetItemDefaultFocus();
         ImGui::SameLine();
-        ImGui::TextDisabled("Saved to hpps.toml; F10 in game changes them too");
+        ImGui::TextDisabled("Saved to hppoa.toml; F10 in game changes them too");
     } else {
         if (ImGui::Button("Close")) open = false;
         ImGui::SameLine();
         if (ImGui::Checkbox("Show the launcher at startup", &s.show_launcher)) Changed();
         ImGui::SameLine();
-        ImGui::TextDisabled("Saved to hpps.toml");
+        ImGui::TextDisabled("Saved to hppoa.toml");
     }
     ImGui::PopItemWidth();
     ImGui::End();
@@ -576,4 +576,4 @@ void DrawUi() {
 }  // namespace app
 
 // hle_input.c: the panel has the controller while it is open
-extern "C" int hpps_MenuOpen(void) { return app::MenuOpen(); }
+extern "C" int hppoa_MenuOpen(void) { return app::MenuOpen(); }

@@ -1,5 +1,5 @@
 /**
- * Differential test of the recompiled code against the original x86 (HPPS_DIFFTEST build).
+ * Differential test of the recompiled code against the original x86 (HPPOA_DIFFTEST build).
  *
  * Every direct and indirect call goes through RECOMP_ABI_CALL, which in this build asks recomp_difftest_pre whether
  * to test the target. A test runs the guest function's original bytes in Unicorn first, from the live guest state
@@ -357,7 +357,7 @@ static int auto_toggle(DWORD now)
 
 /* hle_trainer.c's autoplay "diffsweep": starts or ends a sweep as F5 does */
 static volatile LONG g_toggle_asked;
-void hpps_DiffSweep(void)
+void hppoa_DiffSweep(void)
 {
     InterlockedExchange(&g_toggle_asked, 1);
 }
@@ -365,7 +365,7 @@ void hpps_DiffSweep(void)
 /* hle_debug.c, as a cutscene starts (StartCutScene): a 40 s sweep on its own, so nobody has to catch it with F5 */
 static volatile LONG g_cutscene_asked;
 static DWORD g_auto_end;
-void hpps_DiffCutscene(void)
+void hppoa_DiffCutscene(void)
 {
     InterlockedExchange(&g_cutscene_asked, 1);
 }

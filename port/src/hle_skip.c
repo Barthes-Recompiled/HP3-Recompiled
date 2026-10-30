@@ -1,5 +1,5 @@
 /**
- * Cutscene fast-forward (hpps.toml cutscene_skip, on by default): holding Start or Back for half a second while a
+ * Cutscene fast-forward (hppoa.toml cutscene_skip, on by default): holding Start or Back for half a second while a
  * cutscene plays runs it through to its own end at SKIP_SCALE times the speed, with the sound muted and the picture
  * held (a frame every quarter of a second shows how far it got). Nothing in the cutscene is left out: its scripts,
  * speech and camera all run as they would, only faster, so whatever the cutscene sets up is set up.
@@ -27,7 +27,7 @@
 #include "recomp/gen/recomp_types.h"
 #include "input/xinput_xbox.h"
 
-extern int app_CutsceneSkip(void);           /* hpps.toml cutscene_skip (scda/app/app.cpp) */
+extern int app_CutsceneSkip(void);           /* hppoa.toml cutscene_skip (scda/app/app.cpp) */
 
 #define LETTERBOX_STATE 0x0032E1FCu
 #define LETTERBOX_DOWN  1u
@@ -41,7 +41,7 @@ extern int app_CutsceneSkip(void);           /* hpps.toml cutscene_skip (scda/ap
 
 static volatile LONG g_scale = 1;
 
-int hpps_FastForward(void) { return (int)g_scale; }
+int hppoa_FastForward(void) { return (int)g_scale; }
 
 static int cutscene(void)
 {
@@ -50,7 +50,7 @@ static int cutscene(void)
 }
 
 /* hle_input.c, port 0's pad as the game reads it: the hold that starts the fast-forward, and its end */
-void hpps_SkipPad(const XBOX_GAMEPAD *g)
+void hppoa_SkipPad(const XBOX_GAMEPAD *g)
 {
     static DWORD held_since, ff_since, ended;
     static int held;

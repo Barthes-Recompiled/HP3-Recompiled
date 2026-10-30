@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# The build players get: configures build-release (HPPS_RELEASE=ON: buffer-overflow hardening on the hand-written
-# code, SSE4.1, no debug keys), builds the game and the launcher, and puts in dist/hpps-<date>/:
-#   hpps_launcher.exe             setup: 4:3 / 16:9, graphics, controls; starts the game
-#   hpps.exe                      the game
+# The build players get: configures build-release (HPPOA_RELEASE=ON: buffer-overflow hardening on the hand-written
+# code, SSE4.1, no debug keys), builds the game and the launcher, and puts in dist/hppoa-<date>/:
+#   hppoa_launcher.exe             setup: 4:3 / 16:9, graphics, controls; starts the game
+#   hppoa.exe                      the game
 #   shadercache\base_shaders.bin  shaders compiled ahead (read only; the player's own go in shaders.bin)
 #   README.txt                    requirements, installing, controls, the F10 options
-# Players put the folder beside (or the exes inside) their game/ folder (default.xbe, data); hpps.toml, saves\
-# and the rest of shadercache\ are created on first run. Symbols stay in hpps.exe so crash reports name guest functions.
+# Players put the folder beside (or the exes inside) their game/ folder (default.xbe, data); hppoa.toml, saves\
+# and the rest of shadercache\ are created on first run. Symbols stay in hppoa.exe so crash reports name guest functions.
 set -euo pipefail
 port="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$port"
@@ -20,24 +20,24 @@ else
     objdump=objdump
     nm=nm
 fi
-# HPPS_NO_ART: no game artwork inside the exes given to others (no icon from the XBE, no launcher picture)
-# HPPS_FORTIFY=OFF: no _FORTIFY_SOURCE (a player's main-menu keyboard hitch on Windows, gone in a build without the
+# HPPOA_NO_ART: no game artwork inside the exes given to others (no icon from the XBE, no launcher picture)
+# HPPOA_FORTIFY=OFF: no _FORTIFY_SOURCE (a player's main-menu keyboard hitch on Windows, gone in a build without the
 # release hardening, 2026-10-25); the stack canaries stay
-cmake -S . -B build-release "${cross[@]}" -DCMAKE_BUILD_TYPE=Release -DHPPS_RELEASE=ON -DHPPS_NO_ART=ON -DHPPS_FORTIFY=OFF -DHPPS_VERSION="${VERSION:-0.2.1}" \
+cmake -S . -B build-release "${cross[@]}" -DCMAKE_BUILD_TYPE=Release -DHPPOA_RELEASE=ON -DHPPOA_NO_ART=ON -DHPPOA_FORTIFY=OFF -DHPPOA_VERSION="${VERSION:-0.2.1}" \
       > logs/build-release-config.log
-nice -n 10 cmake --build build-release -j"$(nproc)" --target hpps hpps_launcher > logs/build-release.log 2>&1 ||
+nice -n 10 cmake --build build-release -j"$(nproc)" --target hppoa hppoa_launcher > logs/build-release.log 2>&1 ||
     { tail -30 logs/build-release.log; exit 1; }
 
-dist="$port/dist/hpps-$(date +%Y%m%d)"
+dist="$port/dist/hppoa-$(date +%Y%m%d)"
 # Never delete the folder: players (and testers) drop game/, settings and saves into it. Only the two executables
 # are replaced; anything else found there is left alone. (2026-10-20 an rm -rf of this folder destroyed a game/
 # folder that had been moved into it for a test.)
 mkdir -p "$dist"
-cp -f build-release/hpps.exe build-release/hpps_launcher.exe "$dist/"
+cp -f build-release/hppoa.exe build-release/hppoa_launcher.exe "$dist/"
 # players' readme: requirements, installing, controls, the F10 options; and what changed since the last release
 cp -f README.txt "$dist/"
 cp -f "$port/../CHANGES.md" "$dist/CHANGES.txt"
-# licence texts: the LGPL code from xemu (src/apu, src/nv2a/nv2a_regs.h) is linked into hpps.exe, and the LGPL
+# licence texts: the LGPL code from xemu (src/apu, src/nv2a/nv2a_regs.h) is linked into hppoa.exe, and the LGPL
 # requires a copy of the licence with every binary; README.txt points to the source
 mkdir -p "$dist/licenses"
 cp -f "$port/../LICENSE" "$dist/licenses/LICENSE.txt"
@@ -67,7 +67,7 @@ for exe in "$dist"/*.exe; do
         grep -q "$want" <<< "$bits" || { echo "$exe: $want missing" >&2; exit 1; }
     done
 done
-[ "$("$nm" "$dist/hpps.exe" | grep -c __stack_chk_fail)" -gt 0 ] || { echo "hpps.exe: no stack protector" >&2; exit 1; }
+[ "$("$nm" "$dist/hppoa.exe" | grep -c __stack_chk_fail)" -gt 0 ] || { echo "hppoa.exe: no stack protector" >&2; exit 1; }
 
 # every DLL either exe imports must come with Windows 10/11 itself (the C/C++ runtimes are linked in statically);
 # anything else would have to be shipped in the folder
@@ -82,7 +82,7 @@ ls -la "$dist"
 
 # the zip players download: the folder's contents at its top, as v0.1.0's (VERSION=0.2.0 tools/package_release.sh)
 if [ -n "${VERSION:-}" ]; then
-    zip="$port/dist/hpps_v${VERSION}_windows.zip"
+    zip="$port/dist/hppoa_v${VERSION}_windows.zip"
     rm -f "$zip"
     python3 - "$dist" "$zip" <<'PY'
 import os, sys, zipfile

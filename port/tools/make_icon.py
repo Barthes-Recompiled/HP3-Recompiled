@@ -4,7 +4,7 @@
     python tools/make_icon.py res/app.ico [preview.png]
 
 Original artwork made for this repository, used where the game's own title image may not be (release builds,
-HPPS_NO_ART; builds without the XBE). Standard library only: shapes are rasterised 4x supersampled, then box
+HPPOA_NO_ART; builds without the XBE). Standard library only: shapes are rasterised 4x supersampled, then box
 filtered to 16, 24, 32, 48, 64, 128 and 256 px PNG entries.
 """
 import math

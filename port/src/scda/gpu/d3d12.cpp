@@ -675,7 +675,7 @@ struct DrawShaders {
 // xboxrecomp: which draws write depth from w. HP:CoS draws most of the world W buffered (D3DZB_USEW) and other
 // passes (the spell book's light beams, effects) with plain Z in the same frame and depth buffer. Our W draws store
 // log2(1 + w) / 20 and Z draws z / w, two scales that do not compare: a Z pass passed against W depth only close to
-// the camera. RECOMP_LOGDEPTH_ALL=1 (hpps default off) puts every 3D draw with depth on the log2(1 + w) scale;
+// the camera. RECOMP_LOGDEPTH_ALL=1 (hppoa default off) puts every 3D draw with depth on the log2(1 + w) scale;
 // otherwise only ZEnable == 2 draws use it. Pretransformed (screen space) draws keep their z.
 // xboxrecomp debug keys, read once a frame in Present: F8 flips RECOMP_LOGDEPTH_ALL, F9 turns the alpha test off,
 // F10 passes every depth test
@@ -686,7 +686,7 @@ bool g_dbg_zalways = false;
 bool UseLogDepth(const State& s, const Assembled& a) {
     int& all = g_dbg_logall;
     if (all < 0) {
-        // xboxrecomp (hpps): off unless asked. HP:CoS mixed W- and z-buffered draws in one buffer and needed every
+        // xboxrecomp (hppoa): off unless asked. HP:CoS mixed W- and z-buffered draws in one buffer and needed every
         // 3D draw on the log scale; HP:PS z-buffers, and its pretransformed quads write plain z that log depth draws
         // were compared against (the spellbook and inventory book failed the depth test behind such a quad)
         const char* e = std::getenv("RECOMP_LOGDEPTH_ALL");
@@ -2629,11 +2629,11 @@ void D3D12Backend::UploadTextureLevel(Tex& tx, uint32_t f, uint32_t l, const std
 // Shown 16:9 its middle 360 lines fill the screen (Squeeze2D) and the painted track no longer sits under the drawn
 // bar; it is painted over from the rows just above and below. Only while the loading screen is up, only a 512x512
 // palette texture, and only when the track is there: a bright line on a dark picture.
-extern "C" int hpps_LoadingScreen(void);
+extern "C" int hppoa_LoadingScreen(void);
 static void RemoveLoadingBarTrack(const TextureDesc& d, std::vector<uint8_t>& px, uint32_t pitch) {
     if (d.format != 0x0B || d.width != 512 || d.height != 512 || pitch < 512 * 4 || px.size() < size_t(pitch) * 512)
         return;
-    if (!hpps_LoadingScreen()) return;
+    if (!hppoa_LoadingScreen()) return;
     auto lum = [&](uint32_t x, uint32_t y) {
         const uint8_t* q = &px[size_t(y) * pitch + x * 4];
         return (q[0] + q[1] + q[2]) / 3;
@@ -3085,7 +3085,7 @@ constexpr size_t kTsProjection = 3;
 constexpr size_t kTsTexture0 = 16;
 constexpr size_t kTsWorld = 256;
 
-// xboxrecomp (hpps): true 16:9 widens the camera (hle_video.c: x scale * 3/4), and with it the near plane: close to
+// xboxrecomp (hppoa): true 16:9 widens the camera (hle_video.c: x scale * 3/4), and with it the near plane: close to
 // a wall its sides reached through where the 4:3 view's did not, showing outside the level. The widened camera's
 // near distance (10 for the world camera) is cut to RECOMP_WIDE_NEAR times itself (default 0.75, 1 = the title's),
 // so its near plane is no wider than the console's. The far plane stays the title's.
@@ -3616,12 +3616,12 @@ bool RegisterFirst(const Assembled& a, int r, float out[2]) {
 // at the size it has on screen otherwise, and its HUD is left out (returns true: the draw is skipped). Elsewhere Present shows the title's viewport, leaving out the rows of TV
 // overscan above and below it (black lines on a PC), and as much off the sides to keep the shape.
 static std::unordered_set<uint32_t> spun;  // textures seen as turned quads (the aiming circle)
-extern "C" int hpps_MenuMovie(void);  // hle_video.c: the main menu's background movie is playing
-extern "C" int hpps_FastForward(void);  // hle_skip.c: a cutscene fast-forwarding (1 when not)
-extern "C" int hpps_LoadingScreen(void);  // hle_video.c: the loading screen's thread is drawing
-extern "C" int hpps_LoadingCount(void);   // hle_video.c: loading screens so far
-extern "C" int hpps_TextIcon(uint32_t tex);
-extern "C" void hpps_TextIconDump(void);  // hle_video.c: a button icon text puts in its lines
+extern "C" int hppoa_MenuMovie(void);  // hle_video.c: the main menu's background movie is playing
+extern "C" int hppoa_FastForward(void);  // hle_skip.c: a cutscene fast-forwarding (1 when not)
+extern "C" int hppoa_LoadingScreen(void);  // hle_video.c: the loading screen's thread is drawing
+extern "C" int hppoa_LoadingCount(void);   // hle_video.c: loading screens so far
+extern "C" int hppoa_TextIcon(uint32_t tex);
+extern "C" void hppoa_TextIconDump(void);  // hle_video.c: a button icon text puts in its lines
 bool Squeeze2D(const State& s, const Assembled& a, const DrawShaders& sh, uint32_t frame_w, uint32_t frame_h,
                WideFrame& wf, DrawConstants& c) {
     if (app::BootAspect() != app::AspectMode::Wide) return false;
@@ -3750,13 +3750,13 @@ bool Squeeze2D(const State& s, const Assembled& a, const DrawShaders& sh, uint32
         TextureDesc d;
         // the loading screen's picture too (over most of the frame's height: not its bar or icon)
         const bool movie =
-            hpps_MenuMovie() && Describe(s.textures[0], d) && d.format == 0x24 && d.width == 640 && d.height == 480;
-        if (movie || (hpps_LoadingScreen() && r[3] - r[1] >= fh * 0.9f)) {
+            hppoa_MenuMovie() && Describe(s.textures[0], d) && d.format == 0x24 && d.width == 640 && d.height == 480;
+        if (movie || (hppoa_LoadingScreen() && r[3] - r[1] >= fh * 0.9f)) {
             // RECOMP_CAP_LOADING=1: the frame after the picture first goes up in each load is captured
             static const bool cap_loading = GetEnvironmentVariableW(L"RECOMP_CAP_LOADING", nullptr, 0) != 0;
             static int loads_seen = -1;
-            if (cap_loading && !movie && loads_seen != hpps_LoadingCount()) {
-                loads_seen = hpps_LoadingCount();
+            if (cap_loading && !movie && loads_seen != hppoa_LoadingCount()) {
+                loads_seen = hppoa_LoadingCount();
                 g_capture = true;
             }
             c.squeeze[0] = 1.0f;
@@ -3806,7 +3806,7 @@ bool Squeeze2D(const State& s, const Assembled& a, const DrawShaders& sh, uint32
     // is centred, so the icon squeezes about the middle with it (an A at the line's start fell in the left third and
     // was left out as HUD). Gameplay's lines too ("Press [B], [Y] or [X] button to test the wand.": B and Y went
     // to the left HUD's edge, X about its own middle, apart from the words)
-    const bool icon = s.textures[0] && hpps_TextIcon(s.textures[0]);
+    const bool icon = s.textures[0] && hppoa_TextIcon(s.textures[0]);
     // a mark on a centred bar (Harry's face on the Quidditch distance track: the title places it at its 4:3 distance
     // along the bar) goes about the middle with the bar, else it runs off the bar's ends
     const bool on_track = wf.track[2] > wf.track[0] && r[1] >= wf.track[1] - 2 && r[3] <= wf.track[3] + 2 &&
@@ -3828,7 +3828,7 @@ bool Squeeze2D(const State& s, const Assembled& a, const DrawShaders& sh, uint32
         static std::set<uint32_t> told;  // each texture once: what a cutscene left out (an icon not known as one?)
         if (told.insert(s.textures[0]).second)
             fprintf(stderr, "[WIDE] cutscene HUD left out: t0 %08X rect %.0f %.0f %.0f %.0f verts %u\n", s.textures[0], r[0],
-                    r[1], r[2], r[3], a.vertex_count), hpps_TextIconDump();
+                    r[1], r[2], r[3], a.vertex_count), hppoa_TextIconDump();
         return true;
     }
     float sx = 0.75f, bx = anchor * (1 - sx), sy = 1, by = 0;
@@ -4562,7 +4562,7 @@ void D3D12Backend::Present(const Surface& front, bool pillarbox) {
     auto now_t = std::chrono::steady_clock::now();
     bool hold = skipped_frame_ && shown_ && now_t - shown_t_ < kHoldMax;
     // xboxrecomp: a cutscene fast-forwarding (hle_skip.c) shows a frame every quarter of a second, no more
-    const bool ff_hold = hpps_FastForward() > 1 && shown_ && now_t - shown_t_ < std::chrono::milliseconds(250);
+    const bool ff_hold = hppoa_FastForward() > 1 && shown_ && now_t - shown_t_ < std::chrono::milliseconds(250);
     skipped_frame_ = false;
     {   // xboxrecomp: each hold in the log as it ends (the title animates on meanwhile: a long one looks like a jump)
         static uint32_t held;

@@ -1,5 +1,5 @@
 /*
- * hpps_trainer.exe: the debug trainer. Runs beside hpps.exe (start either
+ * hppoa_trainer.exe: the debug trainer. Runs beside hppoa.exe (start either
  * first) and talks to it through the shared
  * block in trainer_shm.h; the game carries the requests out on its own thread
  * (hle_trainer.c).
@@ -67,11 +67,11 @@ static const char *const kLevelNotes[] = {
 
 static const char *level_file(uint32_t id)
 {
-    return id >= HPPS_LEVEL_FIRST && id - HPPS_LEVEL_FIRST < (uint32_t)NLEVELS ? kLevelFiles[id - HPPS_LEVEL_FIRST]
+    return id >= HPPOA_LEVEL_FIRST && id - HPPOA_LEVEL_FIRST < (uint32_t)NLEVELS ? kLevelFiles[id - HPPOA_LEVEL_FIRST]
                                                                               : "?";
 }
 
-static HppsTrainerShm *g_t;
+static HppoaTrainerShm *g_t;
 static HWND g_wnd, g_noclip, g_speed, g_god, g_slot[3], g_status, g_pos, g_spells, g_spot[3], g_collect, g_undo;
 static HWND g_beans_value, g_report_mem, g_report_status, g_report_btn;
 static HWND g_instakill, g_level_now, g_levels, g_checkpoints, g_cp_status;
@@ -93,16 +93,16 @@ static int attach(void)
 {
     if (g_t) {
         /* the game restarted with a new block: let go of the old one */
-        if (g_t->magic == HPPS_TRAINER_MAGIC) return 1;
+        if (g_t->magic == HPPOA_TRAINER_MAGIC) return 1;
         UnmapViewOfFile(g_t);
         g_t = NULL;
     }
-    HANDLE m = OpenFileMappingA(FILE_MAP_ALL_ACCESS, FALSE, HPPS_TRAINER_NAME);
+    HANDLE m = OpenFileMappingA(FILE_MAP_ALL_ACCESS, FALSE, HPPOA_TRAINER_NAME);
     if (!m) return 0;
-    HppsTrainerShm *t = (HppsTrainerShm *)MapViewOfFile(m, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(HppsTrainerShm));
+    HppoaTrainerShm *t = (HppoaTrainerShm *)MapViewOfFile(m, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(HppoaTrainerShm));
     CloseHandle(m);
     if (!t) return 0;
-    if (t->magic != HPPS_TRAINER_MAGIC || t->version != HPPS_TRAINER_VERSION) {
+    if (t->magic != HPPOA_TRAINER_MAGIC || t->version != HPPOA_TRAINER_VERSION) {
         UnmapViewOfFile(t);
         return 0;
     }
@@ -175,7 +175,7 @@ typedef struct {
 } CheckpointHeader;
 #define CHECKPOINT_MAGIC 0x4B435048u  /* "HPCK" */
 
-static uint8_t g_last_block[HPPS_PROGRESS_SIZE];
+static uint8_t g_last_block[HPPOA_PROGRESS_SIZE];
 static int g_have_last;
 static uint32_t g_snap_seen;
 
@@ -184,7 +184,7 @@ static void load_level(void)
     if (!attach()) return;
     int sel = (int)SendMessageA(g_levels, CB_GETCURSEL, 0, 0);
     if (sel < 0) return;
-    g_t->warp_level = HPPS_LEVEL_FIRST + (uint32_t)sel;
+    g_t->warp_level = HPPOA_LEVEL_FIRST + (uint32_t)sel;
     g_t->warp_seq++;
 }
 
@@ -214,8 +214,8 @@ static void take_snapshot(void)
     if (!g_t || g_t->snap_seq == g_snap_seen) return;
     g_snap_seen = g_t->snap_seq;
     uint32_t level = g_t->snap_level;
-    static uint8_t block[HPPS_PROGRESS_SIZE];
-    for (uint32_t i = 0; i < HPPS_PROGRESS_SIZE; i++) block[i] = g_t->snap_block[i];
+    static uint8_t block[HPPOA_PROGRESS_SIZE];
+    for (uint32_t i = 0; i < HPPOA_PROGRESS_SIZE; i++) block[i] = g_t->snap_block[i];
     if (g_have_last && !memcmp(block, g_last_block, sizeof block)) return;
     memcpy(g_last_block, block, sizeof block);
     g_have_last = 1;
@@ -228,7 +228,7 @@ static void take_snapshot(void)
              st.wDay, st.wHour, st.wMinute, st.wSecond, level_file(level));
     FILE *f = fopen(path, "wb");
     if (!f) return;
-    CheckpointHeader hd = {CHECKPOINT_MAGIC, 1, level, HPPS_PROGRESS_SIZE};
+    CheckpointHeader hd = {CHECKPOINT_MAGIC, 1, level, HPPOA_PROGRESS_SIZE};
     fwrite(&hd, sizeof hd, 1, f);
     fwrite(block, 1, sizeof block, f);
     fclose(f);
@@ -248,16 +248,16 @@ static void restore_checkpoint(void)
     snprintf(path, sizeof path, "%s\\checkpoints\\%s.bin", g_dir, name);
     FILE *f = fopen(path, "rb");
     CheckpointHeader hd;
-    static uint8_t block[HPPS_PROGRESS_SIZE];
-    int ok = f && fread(&hd, sizeof hd, 1, f) == 1 && hd.magic == CHECKPOINT_MAGIC && hd.size == HPPS_PROGRESS_SIZE &&
-             fread(block, 1, sizeof block, f) == sizeof block && hd.level >= HPPS_LEVEL_FIRST &&
-             hd.level <= HPPS_LEVEL_LAST;
+    static uint8_t block[HPPOA_PROGRESS_SIZE];
+    int ok = f && fread(&hd, sizeof hd, 1, f) == 1 && hd.magic == CHECKPOINT_MAGIC && hd.size == HPPOA_PROGRESS_SIZE &&
+             fread(block, 1, sizeof block, f) == sizeof block && hd.level >= HPPOA_LEVEL_FIRST &&
+             hd.level <= HPPOA_LEVEL_LAST;
     if (f) fclose(f);
     if (!ok) {
         SetWindowTextA(g_cp_status, "That file is not a checkpoint");
         return;
     }
-    for (uint32_t i = 0; i < HPPS_PROGRESS_SIZE; i++) g_t->restore_block[i] = block[i];
+    for (uint32_t i = 0; i < HPPOA_PROGRESS_SIZE; i++) g_t->restore_block[i] = block[i];
     g_t->restore_level = hd.level;
     g_t->restore_seq++;
     char b[MAX_PATH + 32];
@@ -364,11 +364,11 @@ static DWORD WINAPI report_worker(LPVOID arg)
         PostMessageA(g_wnd, WM_REPORT_DONE, 0, 0);
         return 0;
     }
-    report_line(f, "hpps debug report %s", stamp);
+    report_line(f, "hppoa debug report %s", stamp);
     int game = attach();
     uint32_t asked = 0;
     if (game) {
-        HppsTrainerShm *t = g_t;
+        HppoaTrainerShm *t = g_t;
         report_line(f, "game pid %u, guest -> host offset %+lld", t->pid, (long long)t->mem_offset);
         report_line(f, "Harry's updates %u, player %08X, position %.2f %.2f %.2f%s", t->frame, t->player, t->pos[0],
                     t->pos[1], t->pos[2], t->noclip_on ? ", noclip" : "");
@@ -381,7 +381,7 @@ static DWORD WINAPI report_worker(LPVOID arg)
         snprintf((char *)t->report_dir, sizeof t->report_dir, "%s", dir);
         asked = ++t->report_seq;
     } else {
-        report_line(f, "game: no shared block (hpps.exe not running, or an older build)");
+        report_line(f, "game: no shared block (hppoa.exe not running, or an older build)");
     }
 
     if (game && with_memory) {
@@ -389,7 +389,7 @@ static DWORD WINAPI report_worker(LPVOID arg)
         if (h) {
             uint64_t off = g_t->mem_offset;
             snprintf(path, sizeof path, "%s\\progress_3253B0.bin", dir);
-            size_t a = dump_guest(h, off, HPPS_PROGRESS_VA, HPPS_PROGRESS_SIZE, path);
+            size_t a = dump_guest(h, off, HPPOA_PROGRESS_VA, HPPOA_PROGRESS_SIZE, path);
             snprintf(path, sizeof path, "%s\\guest_00000000.bin", dir);
             size_t b = dump_guest(h, off, 0x00000000u, 0x04000000u, path);
             snprintf(path, sizeof path, "%s\\guest_80000000.bin", dir);
@@ -402,11 +402,11 @@ static DWORD WINAPI report_worker(LPVOID arg)
         }
     }
 
-    report_line(f, "logs: last_run.log %s, hpps_run.log %s, xbox_kernel.log %s, hpps.toml %s",
+    report_line(f, "logs: last_run.log %s, hppoa_run.log %s, xbox_kernel.log %s, hppoa.toml %s",
                 copy_in("..\\logs\\last_run.log", dir, "last_run.log") ? "copied" : "missing",
-                copy_in("hpps_run.log", dir, "hpps_run.log") ? "copied" : "missing",
+                copy_in("hppoa_run.log", dir, "hppoa_run.log") ? "copied" : "missing",
                 copy_in("xbox_kernel.log", dir, "xbox_kernel.log") ? "copied" : "missing",
-                copy_in("hpps.toml", dir, "hpps.toml") ? "copied" : "missing");
+                copy_in("hppoa.toml", dir, "hppoa.toml") ? "copied" : "missing");
 
     if (game) {
         int answered = 0;
@@ -449,7 +449,7 @@ static void refresh(void)
 {
     char b[256];
     if (!attach()) {
-        SetWindowTextA(g_status, "Waiting for hpps.exe...");
+        SetWindowTextA(g_status, "Waiting for hppoa.exe...");
         return;
     }
     if (g_t->frame != g_last_frame) g_last_frame = g_t->frame, g_stale = 0;
@@ -569,7 +569,7 @@ static int build(void)
     g_levels = add("COMBOBOX", "", CBS_DROPDOWNLIST | WS_VSCROLL, x + 10, ry + 46, 300, 400, ID_LEVELS);
     for (int i = 0; i < NLEVELS; i++) {
         char l[96];
-        snprintf(l, sizeof l, "%2d  %s%s%s", (int)HPPS_LEVEL_FIRST + i, kLevelFiles[i], kLevelNotes[i][0] ? " - " : "",
+        snprintf(l, sizeof l, "%2d  %s%s%s", (int)HPPOA_LEVEL_FIRST + i, kLevelFiles[i], kLevelNotes[i][0] ? " - " : "",
                  kLevelNotes[i]);
         SendMessageA(g_levels, CB_ADDSTRING, 0, (LPARAM)l);
     }
@@ -670,12 +670,12 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev, LPSTR cmd, int show)
     wc.hInstance = inst;
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
     wc.hbrBackground = (HBRUSH)(COLOR_BTNFACE + 1);
-    wc.lpszClassName = "hpps_trainer";
+    wc.lpszClassName = "hppoa_trainer";
     RegisterClassA(&wc);
     RECT r = {0, 0, 885, 892};
     DWORD style = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
     AdjustWindowRect(&r, style, FALSE);
-    HWND w = CreateWindowExA(WS_EX_TOPMOST, "hpps_trainer", "HP:PS debug trainer", style, CW_USEDEFAULT,
+    HWND w = CreateWindowExA(WS_EX_TOPMOST, "hppoa_trainer", "HP:PS debug trainer", style, CW_USEDEFAULT,
                              CW_USEDEFAULT, r.right - r.left, r.bottom - r.top, NULL, NULL, inst, NULL);
     ShowWindow(w, show);
     MSG m;

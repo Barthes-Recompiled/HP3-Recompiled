@@ -1,4 +1,4 @@
-// xiso.h - unpacking an Xbox disc image into the game folder (xiso.c), for hpps_launcher.exe
+// xiso.h - unpacking an Xbox disc image into the game folder (xiso.c), for hppoa_launcher.exe
 #pragma once
 #include <windows.h>
 

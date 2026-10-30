@@ -1,5 +1,5 @@
-// hpps_launcher.exe: picks 4:3 or 16:9 and the graphics settings, writes them to hpps.toml beside it and starts
-// hpps.exe with the environment it needs (StartGame). A main menu picture made from the title's textures
+// hppoa_launcher.exe: picks 4:3 or 16:9 and the graphics settings, writes them to hppoa.toml beside it and starts
+// hppoa.exe with the environment it needs (StartGame). A main menu picture made from the title's textures
 // (launcher_bg.png beside the exe, or built in from src/launcher/launcher_bg.png; not in the repository) is drawn
 // behind the page when there is one. Dear ImGui over Direct3D 11. A disc image in game\ (game\*.iso / *.xiso, no
 // game\default.xbe) is unpacked there first, with a progress page (xiso.c).
@@ -35,7 +35,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND, UINT, WPARAM,
 
 namespace {
 
-// ── settings: hpps.toml, the keys the game reads (scda/app/app.cpp) ─────────────────────────────────────────────
+// ── settings: hppoa.toml, the keys the game reads (scda/app/app.cpp) ─────────────────────────────────────────────
 
 // fps_limit's choices, as the game's F10 panel offers them (scda/app/app.h kFpsChoices): 0 the game's rate,
 // 30, caps above 60, 'unlocked'
@@ -95,7 +95,7 @@ std::string Trim(std::string s) {
     return s;
 }
 
-// hpps.toml as its lines, so a save keeps the comments and every key this page does not touch
+// hppoa.toml as its lines, so a save keeps the comments and every key this page does not touch
 std::vector<std::string> g_lines;
 
 std::string Value(const std::string& key) {
@@ -124,7 +124,7 @@ void SetValue(const std::string& key, const std::string& v) {
     g_lines.push_back(key + " = " + v);
 }
 
-std::string TomlPath() { return Narrow(ExeDir()) + "hpps.toml"; }
+std::string TomlPath() { return Narrow(ExeDir()) + "hppoa.toml"; }
 
 Settings Load() {
     Settings s;
@@ -227,11 +227,11 @@ void FitSize(Settings& s) {
     s.height = m.front().second;
 }
 
-// hpps.exe beside this one, with the environment the game expects (debug.env beside it can add to it)
+// hppoa.exe beside this one, with the environment the game expects (debug.env beside it can add to it)
 bool StartGame() {
     // one started from elsewhere while this page was open: the log below would be truncated under it
-    if (hpps_GameRunning()) {
-        hpps_ReportAlreadyRunning();
+    if (hppoa_GameRunning()) {
+        hppoa_ReportAlreadyRunning();
         return true;
     }
     const std::pair<const wchar_t*, const wchar_t*> kEnv[] = {
@@ -242,16 +242,16 @@ bool StartGame() {
     };
     for (auto [k, v] : kEnv)
         if (!GetEnvironmentVariableW(k, nullptr, 0)) SetEnvironmentVariableW(k, v);
-    // hpps.exe refuses to start without it (single_instance.h)
-    SetEnvironmentVariableW(HPPS_LAUNCHER_ENV, L"1");
-    std::wstring dir = ExeDir(), exe = dir + L"hpps.exe";
+    // hppoa.exe refuses to start without it (single_instance.h)
+    SetEnvironmentVariableW(HPPOA_LAUNCHER_ENV, L"1");
+    std::wstring dir = ExeDir(), exe = dir + L"hppoa.exe";
     std::wstring cmd = L"\"" + exe + L"\"";
-    // the game's console output (its [CRASH] reports among it) to hpps_run.log beside it: a windowed launcher has no
+    // the game's console output (its [CRASH] reports among it) to hppoa_run.log beside it: a windowed launcher has no
     // console to hand down. Only with debug_logs (F10 > Debug) on; off, the output goes nowhere and no file is made
     Load();
     bool logs = Value("debug_logs") == "true";
     SECURITY_ATTRIBUTES sa{sizeof(sa), nullptr, TRUE};
-    HANDLE log = logs ? CreateFileW((dir + L"hpps_run.log").c_str(), GENERIC_WRITE, FILE_SHARE_READ, &sa,
+    HANDLE log = logs ? CreateFileW((dir + L"hppoa_run.log").c_str(), GENERIC_WRITE, FILE_SHARE_READ, &sa,
                                     CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr)
                       : INVALID_HANDLE_VALUE;
     STARTUPINFOW si{};
@@ -449,7 +449,7 @@ void DrawTitle() {
     dl->AddRectFilledMultiColor(ImVec2(0, 0), ImVec2(ww, wh), IM_COL32(28, 22, 40, 255), IM_COL32(28, 22, 40, 255),
                                 IM_COL32(8, 6, 12, 255), IM_COL32(8, 6, 12, 255));
     ImFont* f = g_title_font ? g_title_font : ImGui::GetFont();
-    const char* lines[2] = {"Harry Potter and the", "Philosopher's Stone"};
+    const char* lines[2] = {"Harry Potter and the", "Prisoner of Azkaban"};
     float size = std::min(wh * 0.085f, ww * 0.075f);
     float y = wh * 0.08f;
     for (const char* line : lines) {
@@ -571,7 +571,7 @@ bool DrawPage(Settings& s, std::string& error) {
     ImGui::SameLine();
     if (ImGui::Button("Quit", ImVec2(bw, 40 * sc))) PostQuitMessage(0);
     if (!error.empty()) ImGui::TextColored(ImVec4(1, 0.4f, 0.4f, 1), "%s", error.c_str());
-    ImGui::TextDisabled("Saved to hpps.toml. F10 in the game changes the picture settings too.");
+    ImGui::TextDisabled("Saved to hppoa.toml. F10 in the game changes the picture settings too.");
     ImGui::End();
 
     if (play) Save(s);
@@ -582,8 +582,8 @@ bool DrawPage(Settings& s, std::string& error) {
 
 int WINAPI WinMain(HINSTANCE inst, HINSTANCE, LPSTR, int show) {
     // xboxrecomp: a game already running: say so and show it, no settings page (its changes would not apply)
-    if (hpps_GameRunning()) {
-        hpps_ReportAlreadyRunning();
+    if (hppoa_GameRunning()) {
+        hppoa_ReportAlreadyRunning();
         return 0;
     }
     CoInitializeEx(nullptr, COINIT_MULTITHREADED);
@@ -598,7 +598,7 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE, LPSTR, int show) {
     SetProcessDPIAware();
     // xboxrecomp: the title image icon (launcher.rc) on the window and taskbar
     WNDCLASSEXW wc{sizeof(wc), CS_CLASSDC, WndProc, 0, 0, inst, LoadIconW(inst, MAKEINTRESOURCEW(1)), LoadCursorW(nullptr, MAKEINTRESOURCEW(32512)),
-                   nullptr, nullptr, L"hpps_launcher", nullptr};
+                   nullptr, nullptr, L"hppoa_launcher", nullptr};
     RegisterClassExW(&wc);
     // 4:3 like the art, a good part of the screen
     int sh = GetSystemMetrics(SM_CYSCREEN);
@@ -606,7 +606,7 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE, LPSTR, int show) {
     RECT rc{0, 0, cw, ch};
     DWORD style = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
     AdjustWindowRect(&rc, style, FALSE);
-    HWND hwnd = CreateWindowW(wc.lpszClassName, L"Harry Potter and the Philosopher's Stone", style, CW_USEDEFAULT,
+    HWND hwnd = CreateWindowW(wc.lpszClassName, L"Harry Potter and the Prisoner of Azkaban", style, CW_USEDEFAULT,
                               CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, inst, nullptr);
     if (!InitD3D(hwnd)) {
         MessageBoxW(hwnd, L"Direct3D 11 could not start.", L"Launcher", MB_ICONERROR);
@@ -670,7 +670,7 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE, LPSTR, int show) {
             if (xiso_Find((ExeDir() + L"game").c_str(), image))  // stopped part-way: not playable yet
                 error = "The game files are not unpacked yet. Open the launcher again to carry on.";
             else if (StartGame()) started = true;
-            else error = "hpps.exe could not be started (it must sit beside the launcher).";
+            else error = "hppoa.exe could not be started (it must sit beside the launcher).";
         }
         ImGui::Render();
         const float black[4] = {0, 0, 0, 1};

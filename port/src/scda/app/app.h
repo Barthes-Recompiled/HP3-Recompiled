@@ -1,6 +1,6 @@
 // The part of SCDA-XBERecomp's app layer (src/app/app.h) its renderer reads:
 // settings, the window, the output shape, the F10 options panel. Settings live
-// in hpps.toml beside the exe as SCDA's scda.toml does (app.cpp); a RECOMP_*
+// in hppoa.toml beside the exe as SCDA's scda.toml does (app.cpp); a RECOMP_*
 // environment variable set at launch wins over its line. The window is
 // xboxrecomp's framebuffer window.
 #pragma once
@@ -61,7 +61,7 @@ struct Settings {
     bool intro_skip = true;            // xboxrecomp: the start-up logo movies are left out (hle_video.c)
     bool cutscene_skip = true;         // xboxrecomp: holding Start/Back fast-forwards a cutscene to its end (hle_skip.c)
     bool cutscene_bars = true;         // xboxrecomp: 16:9's zoomed cutscenes keep the console's black bars over the picture
-    bool debug_logs = false;           // RECOMP_DEBUG_LOGS: hpps_run.log (launcher) and xbox_kernel.log, from the next start
+    bool debug_logs = false;           // RECOMP_DEBUG_LOGS: hppoa_run.log (launcher) and xbox_kernel.log, from the next start
     uint32_t aniso = 0;                // RECOMP_ANISO, 0 as the game asks
     uint32_t msaa = 0;                 // RECOMP_MSAA samples, 0 off
     bool smaa = false;                 // RECOMP_SMAA, over the finished frame; combines with msaa
@@ -73,8 +73,8 @@ struct Settings {
     uint32_t ambient_occlusion = 0;    // SCDA's needs a hook into the game's translucent pass; none here yet
     bool controller = true;            // xboxrecomp: false: the PC's controller is read as at rest (keyboard and mouse stay)
     bool async_shaders = true;         // RECOMP_ASYNC_SHADERS=0: wait for every pipeline
-    bool show_launcher = true;         // xboxrecomp: hpps_launcher.exe shows its page; false starts the game straight away (Shift shows it)
-    bool start_menu = false;           // xboxrecomp: the settings page before the game starts (RECOMP_START_MENU); hpps_launcher.exe is the usual way
+    bool show_launcher = true;         // xboxrecomp: hppoa_launcher.exe shows its page; false starts the game straight away (Shift shows it)
+    bool start_menu = false;           // xboxrecomp: the settings page before the game starts (RECOMP_START_MENU); hppoa_launcher.exe is the usual way
     // xboxrecomp: frame rate, accessibility and controls (input.cpp, the final pass)
     uint32_t fps_limit = 0;            // kFpsChoices: 0 the game's own rate, 30: two vblanks a frame at least, 120..240 a cap, kFpsUnlocked none
     uint32_t colorblind = 0;           // ColorBlind: correction filter over the finished frame
@@ -102,7 +102,7 @@ void Save();
 enum MoveMode : uint32_t { kMoveSneak, kMoveWalk, kMoveRun, kMoveModes };
 extern std::atomic<unsigned long long> g_pace_note;  // GetTickCount64 when the wheel last stepped it (menu.cpp shows it)
 inline const char* const kMoveModeNames[kMoveModes] = {"Sneak", "Walk", "Run"};
-// re-reads hpps.toml when it changed on disk; the renderer calls it once a frame
+// re-reads hppoa.toml when it changed on disk; the renderer calls it once a frame
 void Poll();
 // the window to the display settings, any thread
 void ApplyDisplay();
@@ -125,7 +125,7 @@ void OpenStartMenu();
 bool StartMenuOpen();
 void InitUi();  // ImGui's context and Win32 side, once the window is up
 void DrawUi();
-// xboxrecomp: controls (input.cpp): key names as hpps.toml spells them, the window's keys and mouse, the pointer held
+// xboxrecomp: controls (input.cpp): key names as hppoa.toml spells them, the window's keys and mouse, the pointer held
 // in the window, and the menu's "press a key" for a binding (Escape clears it)
 const char* KeyName(uint32_t vk);
 int KeyFromName(const char* name);  // -1 not a key name

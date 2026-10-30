@@ -1,35 +1,35 @@
 /*
- * The debug trainer's shared block: hpps.exe creates the named mapping
- * "Local\hpps_trainer" at boot; hpps_trainer.exe (src/trainer) opens it, shows
+ * The debug trainer's shared block: hppoa.exe creates the named mapping
+ * "Local\hppoa_trainer" at boot; hppoa_trainer.exe (src/trainer) opens it, shows
  * the status the game writes and leaves requests the game carries out on its
  * own thread (hle_trainer.c). Nothing here changes the game unless the trainer
  * asks for it.
  */
-#ifndef HPPS_TRAINER_SHM_H
-#define HPPS_TRAINER_SHM_H
+#ifndef HPPOA_TRAINER_SHM_H
+#define HPPOA_TRAINER_SHM_H
 
 #include <stdint.h>
 
-#define HPPS_TRAINER_NAME    "Local\\hpps_trainer"
-#define HPPS_TRAINER_MAGIC   0x52545048u  /* "HPTR" */
-#define HPPS_TRAINER_VERSION 5u
+#define HPPOA_TRAINER_NAME    "Local\\hppoa_trainer"
+#define HPPOA_TRAINER_MAGIC   0x52545048u  /* "HPTR" */
+#define HPPOA_TRAINER_VERSION 5u
 
 /* the title's spell numbers (button slots at 0x329DD5..7; 0 = none) */
 enum { kSpellNone = 0, kSpellFlipendo = 1, kSpellLumos = 2, kSpellDiffindo = 5, kSpellSpongify = 8,
        kSpellIncendio = 10, kSpellAlohomora = 12 };
 
 /* guest memory the report copies: the progress block (= the save file after its 24 byte header) */
-#define HPPS_PROGRESS_VA   0x3253B0u
-#define HPPS_PROGRESS_SIZE 0x4AE4u
+#define HPPOA_PROGRESS_VA   0x3253B0u
+#define HPPOA_PROGRESS_SIZE 0x4AE4u
 
 /* levels: [0x356CC4] is the one in play, an id = 6 + its index in the title's name table at 0x21BB70
  * (6 day0.lvl .. 30 day6.lvl are the story) */
-#define HPPS_LEVEL_FIRST 6u
-#define HPPS_LEVEL_LAST  30u
+#define HPPOA_LEVEL_FIRST 6u
+#define HPPOA_LEVEL_LAST  30u
 
-typedef struct HppsTrainerShm {
+typedef struct HppoaTrainerShm {
     uint32_t magic, version;
-    uint32_t pid;                  /* hpps.exe */
+    uint32_t pid;                  /* hppoa.exe */
     uint32_t pad1;
     uint64_t mem_offset;           /* host address = guest address + mem_offset */
 
@@ -83,9 +83,9 @@ typedef struct HppsTrainerShm {
     /* checkpoints: the progress block (everything a save keeps) as a level starts, or when asked (snap_now_seq);
      * the trainer files them in run\checkpoints. Restore puts restore_block back and loads restore_level. */
     volatile uint32_t snap_seq, snap_level, snap_now_seq;
-    volatile uint8_t snap_block[HPPS_PROGRESS_SIZE];
+    volatile uint8_t snap_block[HPPOA_PROGRESS_SIZE];
     volatile uint32_t restore_seq, restore_level;
-    volatile uint8_t restore_block[HPPS_PROGRESS_SIZE];
+    volatile uint8_t restore_block[HPPOA_PROGRESS_SIZE];
 
     /* version 5: trainer / tools -> game: pad input added to port 0 (hle_input.c), for driving the game without a
      * person and without OS key presses (tests): buttons (XINPUT wButtons), the 8 analog buttons (A B X Y Black
@@ -94,6 +94,6 @@ typedef struct HppsTrainerShm {
     volatile uint16_t inject_buttons, pad5;
     volatile uint8_t inject_analog[8];
     volatile int16_t inject_stick[4];
-} HppsTrainerShm;
+} HppoaTrainerShm;
 
 #endif

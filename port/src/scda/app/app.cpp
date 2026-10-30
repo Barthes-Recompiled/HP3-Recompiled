@@ -1,6 +1,6 @@
 // Host settings and window for the ported SCDA renderer. See app.h.
 //
-// hpps.toml beside the exe holds the settings, one `key = value` line each, as
+// hppoa.toml beside the exe holds the settings, one `key = value` line each, as
 // SCDA's scda.toml; it is written with every key on first run and by the F10
 // panel, and re-read while the game runs when it changes on disk. A RECOMP_*
 // variable in the environment at launch overrides its line for that run
@@ -32,7 +32,7 @@ namespace {
 enum class Kind { U32, Bool, Display, Aspect, Key, Pad, PadOpt, ColorBlind, Fps };  // PadOpt: a pad input or 'none'
 
 struct Entry {
-    const char* key;  // in hpps.toml
+    const char* key;  // in hppoa.toml
     const char* env;  // RECOMP_* that overrides it, or null
     Kind kind;
     size_t off;       // into Settings
@@ -70,13 +70,13 @@ const Entry kEntries[] = {
     {"cutscene_bars", nullptr, Kind::Bool, FIELD(cutscene_bars), 0, 0,
      "16:9: cutscenes fill the screen and keep the console's black bars over the picture (subtitles in the bottom one)"},
     {"debug_logs", "RECOMP_DEBUG_LOGS", Kind::Bool, FIELD(debug_logs), 0, 0,
-     "hpps_run.log and xbox_kernel.log beside the exe, for reporting a problem; from the next start (F10 > Debug)"},
+     "hppoa_run.log and xbox_kernel.log beside the exe, for reporting a problem; from the next start (F10 > Debug)"},
     {"controller", nullptr, Kind::Bool, FIELD(controller), 0, 0,
      "false: the game ignores the PC's controller (keyboard and mouse still play)"},
     {"async_shaders", "RECOMP_ASYNC_SHADERS", Kind::Bool, FIELD(async_shaders), 0, 0,
      "a draw whose pipeline is still compiling is skipped instead of waited for"},
     {"show_launcher", nullptr, Kind::Bool, FIELD(show_launcher), 0, 0,
-     "hpps_launcher.exe shows its settings page; false starts the game at once (hold Shift to see it)"},
+     "hppoa_launcher.exe shows its settings page; false starts the game at once (hold Shift to see it)"},
     {"start_menu", "RECOMP_START_MENU", Kind::Bool, FIELD(start_menu), 0, 0,
      "the settings page before the game starts (aspect ratio, resolution, quality)"},
     {"fps_limit", "RECOMP_FPS_LIMIT", Kind::Fps, FIELD(fps_limit), 0, 0,
@@ -237,7 +237,7 @@ std::string Format(Settings& s, const Entry& e) {
 struct State {
     std::mutex lock;
     Settings cur;          // what the game uses
-    Settings file;         // what hpps.toml holds
+    Settings file;         // what hppoa.toml holds
     bool locked[std::size(kEntries)] = {};  // the environment set it at launch
     bool size_locked = false;               // RECOMP_WINDOW_SIZE
     AspectMode boot_aspect = AspectMode::Standard;
@@ -251,7 +251,7 @@ State& St() {
     return st;
 }
 
-std::filesystem::path FilePath() { return ExeDir() / "hpps.toml"; }
+std::filesystem::path FilePath() { return ExeDir() / "hppoa.toml"; }
 
 // false when there is no file
 bool ReadFile(Settings& s) {
@@ -265,7 +265,7 @@ bool ReadFile(Settings& s) {
         std::string key = Trim(line.substr(0, eq));
         for (const Entry& e : kEntries) {
             if (key == e.key && !Parse(s, e, line.substr(eq + 1)))
-                LOGW("hpps.toml: %s = %s not understood, kept %s", e.key, Trim(line.substr(eq + 1)).c_str(),
+                LOGW("hppoa.toml: %s = %s not understood, kept %s", e.key, Trim(line.substr(eq + 1)).c_str(),
                      Format(s, e).c_str());
         }
     }
@@ -274,7 +274,7 @@ bool ReadFile(Settings& s) {
 
 void WriteFile(Settings& s) {
     std::ostringstream o;
-    o << "# Harry Potter and the Philosopher's Stone (xboxrecomp) settings, as SCDA's scda.toml.\n"
+    o << "# Harry Potter and the Prisoner of Azkaban (xboxrecomp) settings, as SCDA's scda.toml.\n"
          "# F10 in game changes them too. Saved while the game runs, this file applies at once,\n"
          "# except aspect. A RECOMP_* environment variable of the same setting wins over its line.\n";
     for (const Entry& e : kEntries) {
@@ -288,12 +288,12 @@ void WriteFile(Settings& s) {
         std::ofstream f(tmp, std::ios::trunc);
         f << o.str();
         if (!f) {
-            LOGW("hpps.toml: can't write %s", p.string().c_str());
+            LOGW("hppoa.toml: can't write %s", p.string().c_str());
             return;
         }
     }
     std::filesystem::rename(tmp, p, ec);
-    if (ec) LOGW("hpps.toml: can't write %s: %s", p.string().c_str(), ec.message().c_str());
+    if (ec) LOGW("hppoa.toml: can't write %s: %s", p.string().c_str(), ec.message().c_str());
 }
 
 // file values into cur, but not over what the environment set
@@ -395,7 +395,7 @@ void Poll() {
         display = before.display_mode != st.cur.display_mode || before.width != st.cur.width ||
                   before.height != st.cur.height;
     }
-    LOGI("settings: hpps.toml changed, applied");
+    LOGI("settings: hppoa.toml changed, applied");
     if (display) ApplyDisplay();
 }
 
@@ -478,7 +478,7 @@ extern "C" int app_IntroSkip(void) { return app::Get().intro_skip; }
 
 // main.c, first thing: the settings read, and handed to the C side (the window, the title's widescreen camera, the
 // pushbuffer path) as the RECOMP_* variables it reads, before any thread starts
-extern "C" void hpps_SettingsInit(void) {
+extern "C" void hppoa_SettingsInit(void) {
     const app::Settings& s = app::Get();
     uint32_t w, h;
     app::WindowSize(s, w, h);

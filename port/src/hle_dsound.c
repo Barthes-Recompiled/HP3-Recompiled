@@ -584,7 +584,7 @@ static void wav_write(const int16_t *pcm, uint32_t frames)
 static unsigned g_dry, g_clipped, g_mixed;
 static DWORD g_report_ms;
 
-extern int hpps_FastForward(void);  /* hle_skip.c: 1, or how many times as fast a cutscene runs */
+extern int hppoa_FastForward(void);  /* hle_skip.c: 1, or how many times as fast a cutscene runs */
 
 static DWORD WINAPI mixer_thread(LPVOID unused)
 {
@@ -637,8 +637,8 @@ static DWORD WINAPI mixer_thread(LPVOID unused)
     for (;;) {
         render(mix, MIX_FRAMES);
         /* a cutscene fast-forwarding: the voices move on as many blocks as its clock, and nothing is heard */
-        for (int k = hpps_FastForward(); k > 1; k--) render(mix, MIX_FRAMES);
-        if (hpps_FastForward() > 1) memset(mix, 0, sizeof(float) * MIX_FRAMES * g_oc);
+        for (int k = hppoa_FastForward(); k > 1; k--) render(mix, MIX_FRAMES);
+        if (hppoa_FastForward() > 1) memset(mix, 0, sizeof(float) * MIX_FRAMES * g_oc);
         for (int i = 0; i < MIX_FRAMES * g_oc; i++) {
             float s = mix[i] < -1.0f ? -1.0f : mix[i] > 1.0f ? 1.0f : mix[i];
             if (s != mix[i]) g_clipped++;
