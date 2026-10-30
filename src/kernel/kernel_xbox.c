@@ -273,7 +273,7 @@ NTSTATUS __stdcall xbox_ExQueryNonVolatileSetting(
          * NTSC-M 60 Hz, to match AvSendTVEncoderOption. XGetVideoStandard
          * reads this; unhandled, it returned 0 and a title timing its frames
          * by the standard (HP: Prisoner of Azkaban, 25 fps PAL vs 30 fps NTSC)
-         * fell back to its PAL rate on an NTSC disc. (from hp2_recomp) */
+         * fell back to its PAL rate on an NTSC disc. (MiddleDucky, from their PoA work; via hp2_recomp) */
         if (ValueLength >= sizeof(ULONG)) {
             *(PULONG)Value = (AV_STANDARD_NTSC_M << AV_STANDARD_SHIFT) | AV_REFRESH_60Hz;
             if (Type) *Type = 4;

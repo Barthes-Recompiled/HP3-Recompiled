@@ -25,6 +25,12 @@ and XMV tooling, and the recompilation pipeline that ties them together.
 
 ## Contributors
 
+### MiddleDucky — [@MiddleDucky](https://github.com/MiddleDucky)
+The Harry Potter Xbox ports this one is forked from (Philosopher's Stone, Chamber of Secrets): the port layer over
+the toolkit, the SCDA renderer's adaptation, DirectSound on XAudio2, input, the launcher and trainer, region
+retargeting, and toolkit fixes (clock, time zone, region, heap reclaim, cache partition). Two of the fixes hp3 relies
+on came from MiddleDucky's own Prisoner of Azkaban work: the factory AV region answer and NV2A-style line drawing.
+
 ### barthes_recompiled
 The Harry Potter ports' QoL and fixes (cutscene skip, frame-rate caps, regions) and the Prisoner of Azkaban port
 (hp3_recomp): the cross-title XDK matcher (`tools/xdk_port`) and the PoA bring-up. Made with Claude Code.

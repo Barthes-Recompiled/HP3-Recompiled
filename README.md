@@ -20,8 +20,16 @@ debugging tools and how the port works. The design and plans are in [docs/superp
 
 ## Credits and licences
 
-The port's own code is MIT licensed, © 2026 MiddleDucky and barthes_recompiled contributors ([LICENSE](LICENSE)); it starts from MiddleDucky's Philosopher's Stone port. The parts below keep their own
-licences and copyright.
+The port's own code is MIT licensed, © 2026 MiddleDucky and barthes_recompiled contributors ([LICENSE](LICENSE)). The parts
+below keep their own licences and copyright.
+
+**MiddleDucky** made the Philosopher's Stone and Chamber of Secrets Xbox ports this one is built from
+([HP-PS-Xbox-Recomp](https://github.com/MiddleDucky/HP-PS-Xbox-Recomp),
+[HP-COS-Xbox-Recomp](https://github.com/MiddleDucky/HP-COS-Xbox-Recomp)): the port layer, renderer adaptation, audio,
+input, launcher, trainer, region retargeting and much of the toolkit work. MiddleDucky has also started a Prisoner of
+Azkaban port of their own ([HP-POA-Xbox-Recomp](https://github.com/MiddleDucky/HP-POA-Xbox-Recomp)), and two fixes in
+this toolkit come from their work on PoA: the factory AV region answer (PoA times its frames by the video standard)
+and NV2A-style line drawing (PoA's shadow fade mask relies on it).
 
 * **xboxrecomp** — the static recompilation toolkit this port is built on (runtime, kernel layer, pipeline),
   MIT, by sp00nz. Its own readme: [README.xboxrecomp.md](README.xboxrecomp.md); licence [LICENSES/xboxrecomp-MIT.txt](LICENSES/xboxrecomp-MIT.txt);

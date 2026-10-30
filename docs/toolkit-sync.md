@@ -6,7 +6,7 @@ records, per difference, what hp3 took and why. Triage: Codex (read-only), 2026-
 
 | Area | hp2 change | hp3 decision |
 |---|---|---|
-| `kernel.h`, `kernel_xbox.c` | `XC_FACTORY_AV_REGION` (0x103) answered NTSC-M 60 Hz | **taken**. hp2's comment names PoA: it times frames by the video standard (25 PAL / 30 NTSC) |
+| `kernel.h`, `kernel_xbox.c` | `XC_FACTORY_AV_REGION` (0x103) answered NTSC-M 60 Hz | **taken**. MiddleDucky's fix from their PoA work (hp2 v0.1.0): PoA times frames by the video standard (25 PAL / 30 NTSC) |
 | `video/fb_present.c` | bare Alt/F10 (`SC_KEYMENU`, l=0) no longer enters the modal menu loop | **taken** |
 | `kernel/nv2a_pb_exec.c` | framebuffer pick prefers the display-mode pitch, then size | **taken** |
 | `kernel/kernel_rtl.c` | per-thread cache of the last critical section looked up | **taken**; hp2's poll-yield before `RtlEnterCriticalSection` is CoS scheduling policy, **not taken** |
