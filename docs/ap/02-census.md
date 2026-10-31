@@ -229,3 +229,16 @@ The scripts carry spell **ids**, not names (`intro_initialisechapter.hpb`'s `Add
 `Petrificus` (13) is a duelling-club incantation used by NPCs; Alohomora, Incendio, Diffindo, Spongify and
 Wingardium do **not** appear — PoA's spell set is the ten above. Mapping each name to the numeric id used by
 `AddSpells`/the capability sets is still open; that mapping is what lets a spell item actually be granted.
+
+## 16. Reward classes (for suppression)
+
+Every check's vanilla grant falls into one of two classes, and the catalog records it (design §12):
+
+| Class | Checks | Suppressed when AP owns it? |
+|---|---|---|
+| **Reward** | cards, beans, house points, endurance, folio pages, L&F items, statue rewards, minigame grades, Fred & George rewards | **yes** — the AP item is the same reward |
+| **Progression** | spellbooks/lessons, story tasks, chapter ends, area passes | **no** — suppressing can soft-lock the mission that expects it |
+
+The **reward-swap table** (check key → suppressed grant → AP item) is part of the catalog. Cards are the awkward
+case: the world entity is the check, so it must still spawn, but its ownership grant is suppressed until the AP
+item arrives (HP2's "world cards AP-only" problem, in scope here).

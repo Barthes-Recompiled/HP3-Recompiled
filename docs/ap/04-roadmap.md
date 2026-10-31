@@ -12,6 +12,8 @@ unknown seams (item grant, script VM) are attacked only after the cheap wins are
 | Challenge Shields | count + award points | category size known |
 | F&G milestones | per-track checkpoint list | dungbomb 5/10/15/20, snot targets, confiscation 4 |
 | Enemy/creature list | per-room spawn table | Max-tier `enemies` can be sized |
+| Reward class per check | catalog field (`reward`/`progression`) | every check has a class and a swap target |
+| Intro event scan | optional `intro:*` list | flashback content known (or "none") |
 | `InitialiseChapter` side effects | note per chapter: what it resets | AP state plan per chapter |
 | Save layout first look | progress block offset map | save lineage possible |
 
@@ -43,22 +45,28 @@ Tools: the `.hpb` reader (`Harry Potter Xbox Decomps/tools/hpbfn.py`), the censu
 | Travel | `sub_00115390` + globals | medium (only from safe states) |
 
 - Whitelist variables → checks; debounce duplicate writes; persist sent-checks in the sidecar.
-- Add the pause-menu "Archipelago" page: passes list + travel.
-- **Exit**: a live run sends card/task/statue checks and travels between two chapters.
+- Add the pause "Archipelago" page (Marauder's Map): Travel / Checks / Items / Status; native parchment toasts for
+  sent checks and received items; optional Remembrall HUD.
+- **Exit**: a live run sends card/task/statue checks, travels between two chapters, the tracker shows the right
+  counts, and a toast fires for one check and one item.
 
 ## Phase 4 — delivery (the expensive hooks)
 
 - Find the **item grant / inventory add**; wire AP item → spell/upgrade/consumable.
 - Find the **progress/save block**; wire lineage and "apply after chapter ready".
-- Story tokens and mission-pass flags: per-mission flag table, seeded on grant.
-- Vanilla reward suppression (optional; decide in Phase 3 review).
-- **Exit**: a fresh seed can be started, one item of each class delivered, one mission completed and its token
-  used to open another mission.
+- Story tokens and area-pass flags: per-mission flag table, seeded on grant.
+- **Reward suppression** (decision 6): grant-site test, the reward-swap table, and re-evaluating card-set
+  completion when a card arrives from AP.
+- **Intro flashback**: snapshot/restore around the Intro load, no `EndChapter_StartNextChapter`.
+- **Exit**: a fresh seed starts, one item of each class is delivered, one mission completes and its token opens
+  another, one suppressed card/statue arrives exactly once, and the Intro leaves the Day 1 state untouched.
 
 ## Phase 5 — options, goal, polish
 
-- `check_slop` presets and all groups; goal `dark_tower` (9/12), `house_cup`, `cards`.
-- Start-chapter option; mission-pass shuffle/chain; open-castle off.
+- `check_slop` presets and all groups; goal `dark_tower` (8/11), `house_cup`, `cards`.
+- Start-chapter option; area-pass mode `areas`/`tasks`/`chain`; open-castle off.
+- Travel theming: `travel_requires_floo` fireplaces, the Map/Floo transition, the page's parchment pass.
+- Notifications: native toasts ship; the game-text channel if the display function is found.
 - Launcher Archipelago tab (shared Barthes launcher).
 - EUR retarget through `tools/xdk_port` (addresses move, never by hand).
 - **Exit**: two-slot test with different presets; a minimal seed and a maximum seed both complete.
@@ -70,10 +78,14 @@ Tools: the `.hpb` reader (`Harry Potter Xbox Decomps/tools/hpbfn.py`), the censu
 2. **InitialiseChapter resets AP state.** Mitigation: apply after the chapter-ready signal; if it also resets the
    *slot* counters, keep AP counters in the sidecar and re-apply at every chapter load.
 3. **Item grant never found cheaply.** Fallback: script-variable writes (the UI names are known) may be enough to
-   make spells/cards "owned" for gating, with the vanilla grant left in place (double-reward model).
+   make spells/cards "owned" for gating; that forces the double-reward model and `suppress_rewards=off` for the
+   affected groups, which is a visible regression, so the grant search is a real gate.
 4. **52-card ambiguity.** If the two extra slots are not cards, the album checks are 50; catalogue version bump.
 5. **Pickup census stalls.** Ship Standard without `pickups`; add later as a group (the HP2 precedent).
 6. **Save corruption.** Never write the native save from AP; the sidecar is separate, lineage is read-only.
+7. **Suppression edge cases** — a card that never reaches the album, a set that never completes, a grant that fires
+   twice. Mitigation: exactly-once test in the live matrix, set re-evaluation on card add, the reward-swap table in
+   the catalog, and a group-level `suppress_rewards` switch to fall back.
 
 ## Branch and review model
 

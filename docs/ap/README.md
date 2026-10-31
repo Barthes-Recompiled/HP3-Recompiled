@@ -12,9 +12,10 @@ The game is the USA disc (`default.xbe` SHA-1 `51b09e01…`), played through `hp
 |---|---|
 | [01-audit.md](01-audit.md) | What the disc, the scripts, the engine and the recompilation actually give us: formats, counts, code seams, and what a hook can and cannot see. |
 | [02-census.md](02-census.md) | Every plausible check, grouped by the game's own systems, with counts, evidence and a detection method. |
-| [03-design.md](03-design.md) | The proposed world: start state, chapter/mission passes, the open castle, story and gamestate handling, options ("-sanity"/check slop), goal. |
+| [03-design.md](03-design.md) | The world: decisions, Day 1 start, chapter/area passes, the open castle, Intro flashback, story and gamestate handling, tracker, reward suppression, options and check slop, goal. |
 | [04-roadmap.md](04-roadmap.md) | Phases from census to playable seed, the open questions that gate each phase, and the risks. |
 | [05-handoff.md](05-handoff.md) | State at the end of the 2026-10-31 night session. |
+| [06-handoff-2026-10-31.md](06-handoff-2026-10-31.md) | Post-decision handoff: the eight answers, the area-pass call, and the next workstreams (check/pickup audit, check slop, tracker, suppression, Intro). |
 
 ## Method
 

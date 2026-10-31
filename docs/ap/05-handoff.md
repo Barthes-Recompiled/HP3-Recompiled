@@ -3,6 +3,9 @@
 You asked for the audit + design headwork, docs only, on a branch, without touching `main`. This is what is on
 `ap/headwork` in `hp3_recomp` (worktree `hp3_ap`).
 
+> Superseded for next steps by [06-handoff-2026-10-31.md](06-handoff-2026-10-31.md), which records Austin's answers
+> and the workstreams that follow from them.
+
 ## Where things are
 
 - Branch **`ap/headwork`**, worktree `C:\Users\unowi\DecompProject\hp3_ap`, based on `github/main` **753e456**
@@ -45,7 +48,8 @@ Start at **Day 1** with the earlier chapters seeded complete. Chapter passes ope
 mission passes open the 12–18 missions with real doors (FF12 story events); spells open traversal and are mission
 prerequisites. Completing a mission is an **Event location** that yields a **Story Token**, and the finale
 (the Dark Tower, Night 5) needs **9 of 12 tokens + the Night 5 pass + Expecto Patronum** — the OoT medallion
-shape. `open_castle` on means all rooms of a held chapter are free; only mission doors and spell doors are gated.
+shape. (Corrected in [06](06-handoff-2026-10-31.md) to 8 of 11: the Intro has no tasks and two tokens are
+pre-collected.) `open_castle` on means all rooms of a held chapter are free; only mission doors and spell doors are gated.
 Check slop is one preset (`minimal` / `standard` / `maximum`) over granular `include_*` groups; talk and pursuit
 checks are **maximum only**.
 
