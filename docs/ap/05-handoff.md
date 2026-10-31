@@ -5,8 +5,9 @@ You asked for the audit + design headwork, docs only, on a branch, without touch
 
 ## Where things are
 
-- Branch **`ap/headwork`**, worktree `C:\Users\unowi\DecompProject\hp3_ap`, based on `github/main` **09d89af**
-  (which is three commits ahead of the local `main` — settings-parity was merged on GitHub).
+- Branch **`ap/headwork`**, worktree `C:\Users\unowi\DecompProject\hp3_ap`, based on `github/main` **753e456**
+  (settings-parity and the EUR merge #4 landed while this branch was being written; it was rebased onto that tip).
+- Draft PR: **https://github.com/Barthes-Recompiled/HP3-Recompiled/pull/5** — base `main`, not merged.
 - Deliverables: `docs/ap/README.md`, `01-audit.md`, `02-census.md`, `03-design.md`, `04-roadmap.md`, this file.
 - Also edited: `docs/INDEX.md` (Archipelago section), `docs/re-notes.md` (randomizer-relevant finds).
 - Nothing else changed; no game data, no generated code, no build.
