@@ -1,5 +1,9 @@
 # 07 — Prompt for the next session
 
+> The audit pass this prompt asks for is done (see [08-catalog-spec.md](08-catalog-spec.md) and the 2026-10-31
+> research section in [02-census.md](02-census.md)). For the implementation step use
+> [09-handoff-to-claude.md](09-handoff-to-claude.md) instead.
+
 Copy the block below into a fresh agent session. It is self-contained; the agent reads the docs for detail.
 
 ```text

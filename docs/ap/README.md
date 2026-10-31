@@ -17,6 +17,8 @@ The game is the USA disc (`default.xbe` SHA-1 `51b09e01…`), played through `hp
 | [05-handoff.md](05-handoff.md) | State at the end of the 2026-10-31 night session. |
 | [06-handoff-2026-10-31.md](06-handoff-2026-10-31.md) | Post-decision handoff: the eight answers, the area-pass call, and the next workstreams (check/pickup audit, check slop, tracker, suppression, Intro). |
 | [07-prompt-next-session.md](07-prompt-next-session.md) | Copy-paste prompt for the next agent session, scoped to the audit and the catalog spec. |
+| [08-catalog-spec.md](08-catalog-spec.md) | The catalog contract: schema, IDs, keys, groups and presets, reward classes and swap table, regions, tests, spell-id evidence. |
+| [09-handoff-to-claude.md](09-handoff-to-claude.md) | Implementation handoff: what is solid/open, the phase order, rules, first tasks, and a prompt for Claude. |
 
 ## Method
 
