@@ -1,6 +1,6 @@
 """Catalog contract tests (docs/ap/08-catalog-spec.md §11), standard library only.
 
-    python test_catalog.py
+    python test_catalog.py          (HPPOA_GAME_DIR=<hp3_recomp>/game for the two tests that rebuild)
 """
 import copy
 import json
@@ -11,10 +11,12 @@ import unittest
 import make_catalog as mc
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+GAME_DIR = os.environ.get("HPPOA_GAME_DIR", mc.DEFAULT_GAME_DIR)
+CENSUS = mc.read_census(mc.Text(GAME_DIR)) if os.path.isdir(GAME_DIR) else None
 KEY = re.compile(r"^[a-z_]+:[a-z0-9_]+(:[a-z0-9_]+)?$")
 # census counts (02-census.md, docs/ap/08 §5)
-COUNTS = {"tasks": 28, "chapters": 8, "spellbooks": 4, "cards": 50, "card_sets": 10, "folio": 16,
-          "lost_and_found": 10, "statues": 12, "potions": 11, "minigames": 8, "marauders_challenge": 10,
+COUNTS = {"tasks": 28, "chapters": 12, "spellbooks": 4, "cards": 50, "card_sets": 10, "folio": 16,
+          "lost_and_found": 10, "statues": 9, "potions": 11, "minigames": 8, "marauders_challenge": 10,
           "fred_and_george": 12, "shop": 13, "secrets": 7, "house_points": 10, "bean_milestones": 11}
 
 
@@ -28,15 +30,20 @@ class TestCatalog(unittest.TestCase):
         self.catalog = load("catalog.json")
         self.lock = load("ids.lock.json")
 
+    @unittest.skipUnless(os.path.isdir(GAME_DIR), "needs --game-dir / HPPOA_GAME_DIR")
     def test_committed_catalog_is_current(self):
-        catalog, lock = mc.build(self.lock)
+        catalog, lock = mc.build(mc.read_census(mc.Text(GAME_DIR)), self.lock)
         self.assertEqual(catalog, self.catalog, "catalog.json is stale: run make_catalog.py")
         self.assertEqual(lock, self.lock)
 
+    def test_apworld_copy_is_verbatim(self):
+        with open(mc.OUTPUTS[0], "rb") as a, open(mc.OUTPUTS[1], "rb") as b:
+            self.assertEqual(a.read(), b.read())
+
     def test_version_is_canonical_hash(self):
-        body = {k: v for k, v in self.catalog.items() if k != "version"}
-        canonical = json.dumps(body, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
-        self.assertEqual(self.catalog["version"], mc.hashlib.sha256(canonical.encode()).hexdigest()[:12])
+        self.assertEqual(self.catalog["version"], mc.version_of(self.catalog))
+        bumped = dict(self.catalog, version="000000000000")
+        self.assertNotEqual(bumped["version"], mc.version_of(bumped))
 
     def test_ids_unique_and_in_range(self):
         loc_ids = [loc["id"] for loc in self.catalog["locations"]]
@@ -74,12 +81,13 @@ class TestCatalog(unittest.TestCase):
             for key in acc["prereq"]:
                 self.assertIn(key, keys)
 
+    @unittest.skipUnless(CENSUS, "needs HPPOA_GAME_DIR")
     def test_ids_are_stable(self):
         """A key keeps its ID when keys are added before it, and a removed key leaves a hole."""
         lock = copy.deepcopy(self.lock)
         removed = next(iter(lock["locations"]))
         lock["locations"]["zzz:new"] = max(lock["locations"].values()) + 7
-        catalog, new_lock = mc.build(lock)
+        catalog, new_lock = mc.build(CENSUS, lock)
         for loc in catalog["locations"]:
             self.assertEqual(loc["id"], self.lock["locations"][loc["key"]])
         self.assertIn(removed, new_lock["locations"])

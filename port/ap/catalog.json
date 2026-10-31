@@ -1,5 +1,5 @@
 {
- "version": "94d5b65540b6",
+ "version": "6f022b02f338",
  "schema": 1,
  "game": "Harry Potter and the Prisoner of Azkaban Recomp",
  "ids": {
@@ -332,608 +332,684 @@
    "id": 74310043
   },
   "Gunhilda of Gorsemoor Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310044
   },
   "Morgan le Fay Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310045
   },
   "Queen Maeve Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310046
   },
   "Ignatia Wildsmith Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310047
   },
   "Beatrix Bloxam Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310048
   },
   "Albus Dumbledore Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310049
   },
   "Merlin Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310050
   },
   "Glanmore Peakes Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310051
   },
   "Herpo the Foul Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310052
   },
   "Edgar Stroulger Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310053
   },
   "Count Vlad Drakul Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310054
   },
   "Lady Carmilla Sanguina Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310055
   },
   "Amarillo Lestoat Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310056
   },
   "Sir Herbert Varney Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310057
   },
   "Blodwyn Bludd Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310058
   },
   "Gringott Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310059
   },
   "Eargit the Ugly Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310060
   },
   "Alguff the Awful Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310061
   },
   "Ug the Unreliable Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310062
   },
   "Urg the Unclean Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310063
   },
   "Cordelia Misericordia Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310064
   },
   "Babayaga Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310065
   },
   "Malodora Grymm Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310066
   },
   "Leticia Somnolens Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310067
   },
   "Old Mother Hubbard Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310068
   },
   "Hengist of Upper Barnton Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310069
   },
   "Bran the Bloodthirsty Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310070
   },
   "Cyclops Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310071
   },
   "Goliath Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310072
   },
   "Morholt Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310073
   },
   "Norwegian Ridgeback Dragon Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310074
   },
   "Common Welsh Green Dragon Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310075
   },
   "Hebridean Black Dragon Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310076
   },
   "Hungarian Horntail Dragon Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310077
   },
   "Romanian Longhorn Dragon Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310078
   },
   "Gnome Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310079
   },
   "Imp Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310080
   },
   "Doxy Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310081
   },
   "Bowtruckle Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310082
   },
   "Billywig Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310083
   },
   "Phoenix Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310084
   },
   "Giant Squid Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310085
   },
   "Manticore Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310086
   },
   "Unicorn Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310087
   },
   "Mountain Troll Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310088
   },
   "Barberus Bragge Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310089
   },
   "Cyprian Youdle Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310090
   },
   "Joscelind Wadcock Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310091
   },
   "Leopoldina Smethwyck Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310092
   },
   "Roderick Plumpton Card": {
-   "kind": "card",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "card",
    "pool": [
     "cards"
    ],
    "id": 74310093
   },
   "Folio Bruti Page: Dementor": {
-   "kind": "collectible",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "folio",
    "pool": [
     "folio"
    ],
    "id": 74310094
   },
   "Folio Bruti Page: Billywig": {
-   "kind": "collectible",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "folio",
    "pool": [
     "folio"
    ],
    "id": 74310095
   },
   "Folio Bruti Page: Chizpurfle": {
-   "kind": "collectible",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "folio",
    "pool": [
     "folio"
    ],
    "id": 74310096
   },
   "Folio Bruti Page: Doxy": {
-   "kind": "collectible",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "folio",
    "pool": [
     "folio"
    ],
    "id": 74310097
   },
   "Folio Bruti Page: Dragonfly": {
-   "kind": "collectible",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "folio",
    "pool": [
     "folio"
    ],
    "id": 74310098
   },
   "Folio Bruti Page: Fairy": {
-   "kind": "collectible",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "folio",
    "pool": [
     "folio"
    ],
    "id": 74310099
   },
   "Folio Bruti Page: Fire Seed Bush": {
-   "kind": "collectible",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "folio",
    "pool": [
     "folio"
    ],
    "id": 74310100
   },
   "Folio Bruti Page: Flying Seahorse": {
-   "kind": "collectible",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "folio",
    "pool": [
     "folio"
    ],
    "id": 74310101
   },
   "Folio Bruti Page: Ghoul": {
-   "kind": "collectible",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "folio",
    "pool": [
     "folio"
    ],
    "id": 74310102
   },
   "Folio Bruti Page: Hinkypunk": {
-   "kind": "collectible",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "folio",
    "pool": [
     "folio"
    ],
    "id": 74310103
   },
   "Folio Bruti Page: Hippogriff": {
-   "kind": "collectible",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "folio",
    "pool": [
     "folio"
    ],
    "id": 74310104
   },
   "Folio Bruti Page: Pixie": {
-   "kind": "collectible",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "folio",
    "pool": [
     "folio"
    ],
    "id": 74310105
   },
   "Folio Bruti Page: Red Cap": {
-   "kind": "collectible",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "folio",
    "pool": [
     "folio"
    ],
    "id": 74310106
   },
   "Folio Bruti Page: Salamander": {
-   "kind": "collectible",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "folio",
    "pool": [
     "folio"
    ],
    "id": 74310107
   },
   "Folio Bruti Page: Troll": {
-   "kind": "collectible",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "folio",
    "pool": [
     "folio"
    ],
    "id": 74310108
   },
   "Folio Bruti Page: Venemous Tentacula": {
-   "kind": "collectible",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "folio",
    "pool": [
     "folio"
    ],
    "id": 74310109
   },
   "Prefect Badge": {
-   "kind": "collectible",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "lost_and_found",
    "pool": [
     "lost_and_found"
    ],
    "id": 74310110
   },
   "Remembrall": {
-   "kind": "collectible",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "lost_and_found",
    "pool": [
     "lost_and_found"
    ],
    "id": 74310111
   },
   "Potion Vial Case": {
-   "kind": "collectible",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "lost_and_found",
    "pool": [
     "lost_and_found"
    ],
    "id": 74310112
   },
   "Dragon-hide Gloves": {
-   "kind": "collectible",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "lost_and_found",
    "pool": [
     "lost_and_found"
    ],
    "id": 74310113
   },
   "Owl Post Parcel": {
-   "kind": "collectible",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "lost_and_found",
    "pool": [
     "lost_and_found"
    ],
    "id": 74310114
   },
   "Key": {
-   "kind": "collectible",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "lost_and_found",
    "pool": [
     "lost_and_found"
    ],
    "id": 74310115
   },
   "Telescope": {
-   "kind": "collectible",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "lost_and_found",
    "pool": [
     "lost_and_found"
    ],
    "id": 74310116
   },
   "Daily Prophet": {
-   "kind": "collectible",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "lost_and_found",
    "pool": [
     "lost_and_found"
    ],
    "id": 74310117
   },
   "Brass Scales": {
-   "kind": "collectible",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "lost_and_found",
    "pool": [
     "lost_and_found"
    ],
    "id": 74310118
   },
   "Potion Jar": {
-   "kind": "collectible",
+   "kind": "upgrade",
    "class": "useful",
+   "collect": "lost_and_found",
    "pool": [
     "lost_and_found"
    ],
@@ -953,7 +1029,6 @@
    "class": "useful",
    "count": 3,
    "pool": [
-    "statues",
     "shop"
    ],
    "id": 74310121
@@ -1060,7 +1135,7 @@
  "locations": [
   {
    "key": "task:day1:dada",
-   "name": "Day1: DADA Class",
+   "name": "Day1: Go to the Defense Against the Dark Arts classroom on the third floor",
    "region": "Day1",
    "group": "tasks",
    "reward_class": "progression-story",
@@ -1075,7 +1150,7 @@
   },
   {
    "key": "task:day1:glacius",
-   "name": "Day1: Glacius Spellbook",
+   "name": "Day1: Collect the Glacius spellbook",
    "region": "GlaciusChallenge",
    "group": "tasks",
    "reward_class": "progression-spell",
@@ -1098,7 +1173,7 @@
   },
   {
    "key": "task:day1:potions",
-   "name": "Day1: Potions Class (Wiggenweld)",
+   "name": "Day1: Attend Potions class in the Dungeons to learn about the Wiggenweld Potion",
    "region": "Day1",
    "group": "tasks",
    "reward_class": "progression-story",
@@ -1113,7 +1188,7 @@
   },
   {
    "key": "task:day1:broom",
-   "name": "Day1: Broom Flying Class",
+   "name": "Day1: Go to the Broom Flying class in the grounds",
    "region": "Day1",
    "group": "tasks",
    "reward_class": "progression-story",
@@ -1128,7 +1203,7 @@
   },
   {
    "key": "task:night1:neville",
-   "name": "Night1: Rescue Neville",
+   "name": "Night1: Rescue Neville from the ghoul on the fifth floor",
    "region": "Night1",
    "group": "tasks",
    "reward_class": "progression-story",
@@ -1143,7 +1218,7 @@
   },
   {
    "key": "task:night1:common_room",
-   "name": "Night1: Return to the Common Room",
+   "name": "Night1: Return to the Gryffindor common room",
    "region": "Night1",
    "group": "tasks",
    "reward_class": "progression-story",
@@ -1160,7 +1235,7 @@
   },
   {
    "key": "task:day2:comc",
-   "name": "Day2: Care of Magical Creatures",
+   "name": "Day2: Attend Care of Magical Creatures class in the grounds",
    "region": "Day2",
    "group": "tasks",
    "reward_class": "progression-story",
@@ -1190,7 +1265,7 @@
   },
   {
    "key": "task:night2:escape",
-   "name": "Night2: Escape the Dungeons",
+   "name": "Night2: Escape from the Dungeons to the Entrance Hall",
    "region": "Night2",
    "group": "tasks",
    "reward_class": "progression-story",
@@ -1207,7 +1282,7 @@
   },
   {
    "key": "task:day3:antidote_ingredients",
-   "name": "Day3: Antidote Ingredients",
+   "name": "Day3: Collect ingredients for the Antidote to Uncommon Poisons",
    "region": "Day3",
    "group": "tasks",
    "reward_class": "progression-story",
@@ -1222,7 +1297,7 @@
   },
   {
    "key": "task:day3:mix_antidote",
-   "name": "Day3: Mix the Antidote",
+   "name": "Day3: Go to Potions class to mix the Antidote to Uncommon Poisons",
    "region": "Day3",
    "group": "tasks",
    "reward_class": "progression-story",
@@ -1239,7 +1314,7 @@
   },
   {
    "key": "task:day3:charms",
-   "name": "Day3: Charms Class",
+   "name": "Day3: Attend the Charms class on the second floor",
    "region": "Day3",
    "group": "tasks",
    "reward_class": "progression-story",
@@ -1254,7 +1329,7 @@
   },
   {
    "key": "task:day3:carpe",
-   "name": "Day3: Carpe Retractum Spellbook",
+   "name": "Day3: Collect the Carpe Retractum spellbook",
    "region": "CarpeRetractumChallenge",
    "group": "tasks",
    "reward_class": "progression-spell",
@@ -1277,7 +1352,7 @@
   },
   {
    "key": "task:night3:lupin",
-   "name": "Night3: Meet Lupin (History of Magic)",
+   "name": "Night3: Meet Professor Lupin in the History of Magic classroom on the fourth floor",
    "region": "Night3",
    "group": "tasks",
    "reward_class": "progression-story",
@@ -1292,7 +1367,7 @@
   },
   {
    "key": "task:night3:patronus",
-   "name": "Night3: Expecto Patronum Spellbook",
+   "name": "Night3: Get the Expecto Patronum spellbook",
    "region": "PatronusChallenge",
    "group": "tasks",
    "reward_class": "progression-spell",
@@ -1315,7 +1390,7 @@
   },
   {
    "key": "task:night3:gunhilda",
-   "name": "Night3: Enter the Gunhilda Statue",
+   "name": "Night3: Open and enter the Gunhilda of Gorsemoor statue on the third floor",
    "region": "Night3",
    "group": "tasks",
    "reward_class": "progression-story",
@@ -1330,7 +1405,7 @@
   },
   {
    "key": "task:night3:common_room",
-   "name": "Night3: Return to the Common Room",
+   "name": "Night3: Return to the Gryffindor common room",
    "region": "Night3",
    "group": "tasks",
    "reward_class": "progression-story",
@@ -1347,7 +1422,7 @@
   },
   {
    "key": "task:day5:girding_ingredients",
-   "name": "Day5: Girding Ingredients",
+   "name": "Day5: Collect ingredients for the Girding Potion",
    "region": "Day5",
    "group": "tasks",
    "reward_class": "progression-story",
@@ -1364,7 +1439,7 @@
   },
   {
    "key": "task:day5:mix_girding",
-   "name": "Day5: Mix the Girding Potion",
+   "name": "Day5: Go to Potions class to mix the Girding Potion",
    "region": "Day5",
    "group": "tasks",
    "reward_class": "progression-story",
@@ -1381,7 +1456,7 @@
   },
   {
    "key": "task:day5:crate",
-   "name": "Day5: Quidditch Ball Crate",
+   "name": "Day5: Collect the Quidditch ball crate from the courtyard in front of the Clock Tower",
    "region": "Day5",
    "group": "tasks",
    "reward_class": "progression-story",
@@ -1396,7 +1471,7 @@
   },
   {
    "key": "task:day5:stadium",
-   "name": "Day5: Crate to the Stadium",
+   "name": "Day5: Take the Quidditch ball crate to the Quidditch stadium",
    "region": "QuidditchMatch",
    "group": "tasks",
    "reward_class": "progression-story",
@@ -1415,7 +1490,7 @@
   },
   {
    "key": "task:night5:hagrid",
-   "name": "Night5: Visit Hagrid",
+   "name": "Night5: Visit Hagrid at his hut in the grounds",
    "region": "Night5",
    "group": "tasks",
    "reward_class": "progression-story",
@@ -1430,7 +1505,7 @@
   },
   {
    "key": "task:night5:protect_sirius",
-   "name": "Night5: Protect Sirius",
+   "name": "Night5: Protect Sirius from the Dementors",
    "region": "DementorBattle",
    "group": "tasks",
    "reward_class": "progression-story",
@@ -1472,7 +1547,7 @@
   },
   {
    "key": "task:night5:buckbeak",
-   "name": "Night5: Fly Buckbeak to the Dark Tower",
+   "name": "Night5: Fly Buckbeak to the Dark Tower and rescue Sirius",
    "region": "DarkTower",
    "group": "tasks",
    "reward_class": "progression-story",
@@ -1491,7 +1566,7 @@
   },
   {
    "key": "task:day6:cards",
-   "name": "Day6: Collector's Cards",
+   "name": "Day6: Complete your collection of collector's cards",
    "region": "Day6",
    "group": "tasks",
    "reward_class": "progression-story",
@@ -1506,7 +1581,7 @@
   },
   {
    "key": "task:day6:house_points",
-   "name": "Day6: House Points",
+   "name": "Day6: Earn as many house points as you can",
    "region": "Day6",
    "group": "tasks",
    "reward_class": "progression-story",
@@ -1521,7 +1596,7 @@
   },
   {
    "key": "task:day6:house_cup",
-   "name": "Day6: House Cup Ceremony",
+   "name": "Day6: Attend the House Cup ceremony in the Great Hall",
    "region": "HouseCup",
    "group": "tasks",
    "reward_class": "progression-story",
@@ -1535,6 +1610,51 @@
     "prereq": []
    },
    "id": 74300028
+  },
+  {
+   "key": "chapter:intro",
+   "name": "Intro: Chapter Complete",
+   "region": "Intro",
+   "group": "chapters",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Intro Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300029
+  },
+  {
+   "key": "chapter:hogwartsexpress",
+   "name": "HogwartsExpress: Chapter Complete",
+   "region": "HogwartsExpress",
+   "group": "chapters",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Hogwarts Express Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300030
+  },
+  {
+   "key": "chapter:night0",
+   "name": "Night0: Chapter Complete",
+   "region": "Night0",
+   "group": "chapters",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Night 0 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300031
   },
   {
    "key": "chapter:day1",
@@ -1554,7 +1674,7 @@
      "task:day1:broom"
     ]
    },
-   "id": 74300029
+   "id": 74300032
   },
   {
    "key": "chapter:night1",
@@ -1572,7 +1692,7 @@
      "task:night1:common_room"
     ]
    },
-   "id": 74300030
+   "id": 74300033
   },
   {
    "key": "chapter:day2",
@@ -1589,7 +1709,7 @@
      "task:day2:comc"
     ]
    },
-   "id": 74300031
+   "id": 74300034
   },
   {
    "key": "chapter:night2",
@@ -1607,7 +1727,7 @@
      "task:night2:escape"
     ]
    },
-   "id": 74300032
+   "id": 74300035
   },
   {
    "key": "chapter:day3",
@@ -1627,7 +1747,7 @@
      "task:day3:carpe"
     ]
    },
-   "id": 74300033
+   "id": 74300036
   },
   {
    "key": "chapter:night3",
@@ -1649,7 +1769,7 @@
      "task:night3:common_room"
     ]
    },
-   "id": 74300034
+   "id": 74300037
   },
   {
    "key": "chapter:day5",
@@ -1669,7 +1789,29 @@
      "task:day5:stadium"
     ]
    },
-   "id": 74300035
+   "id": 74300038
+  },
+  {
+   "key": "chapter:night5",
+   "name": "Night5: Chapter Complete",
+   "region": "DarkTower",
+   "group": "chapters",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Night 5 Pass",
+    "areas": [
+     "Dark Tower Pass"
+    ],
+    "spells": [],
+    "prereq": [
+     "task:night5:hagrid",
+     "task:night5:protect_sirius",
+     "task:night5:repel",
+     "task:night5:buckbeak"
+    ]
+   },
+   "id": 74300039
   },
   {
    "key": "chapter:day6",
@@ -1688,7 +1830,7 @@
      "task:day6:house_cup"
     ]
    },
-   "id": 74300036
+   "id": 74300040
   },
   {
    "key": "spellbook:expelliarmus",
@@ -1707,7 +1849,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300037
+   "id": 74300041
   },
   {
    "key": "spellbook:lumos_duo",
@@ -1726,7 +1868,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300038
+   "id": 74300042
   },
   {
    "key": "spellbook:reparo",
@@ -1745,7 +1887,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300039
+   "id": 74300043
   },
   {
    "key": "spellbook:draconifors",
@@ -1764,7 +1906,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300040
+   "id": 74300044
   },
   {
    "key": "card:1",
@@ -1783,7 +1925,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300041
+   "id": 74300045
   },
   {
    "key": "card:2",
@@ -1802,7 +1944,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300042
+   "id": 74300046
   },
   {
    "key": "card:3",
@@ -1821,7 +1963,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300043
+   "id": 74300047
   },
   {
    "key": "card:4",
@@ -1840,7 +1982,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300044
+   "id": 74300048
   },
   {
    "key": "card:5",
@@ -1859,7 +2001,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300045
+   "id": 74300049
   },
   {
    "key": "card:6",
@@ -1878,7 +2020,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300046
+   "id": 74300050
   },
   {
    "key": "card:7",
@@ -1897,7 +2039,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300047
+   "id": 74300051
   },
   {
    "key": "card:8",
@@ -1916,7 +2058,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300048
+   "id": 74300052
   },
   {
    "key": "card:9",
@@ -1935,7 +2077,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300049
+   "id": 74300053
   },
   {
    "key": "card:10",
@@ -1954,7 +2096,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300050
+   "id": 74300054
   },
   {
    "key": "card:11",
@@ -1973,7 +2115,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300051
+   "id": 74300055
   },
   {
    "key": "card:12",
@@ -1992,7 +2134,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300052
+   "id": 74300056
   },
   {
    "key": "card:13",
@@ -2011,7 +2153,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300053
+   "id": 74300057
   },
   {
    "key": "card:14",
@@ -2030,7 +2172,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300054
+   "id": 74300058
   },
   {
    "key": "card:15",
@@ -2049,7 +2191,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300055
+   "id": 74300059
   },
   {
    "key": "card:16",
@@ -2068,7 +2210,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300056
+   "id": 74300060
   },
   {
    "key": "card:17",
@@ -2087,7 +2229,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300057
+   "id": 74300061
   },
   {
    "key": "card:18",
@@ -2106,7 +2248,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300058
+   "id": 74300062
   },
   {
    "key": "card:19",
@@ -2125,7 +2267,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300059
+   "id": 74300063
   },
   {
    "key": "card:20",
@@ -2144,7 +2286,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300060
+   "id": 74300064
   },
   {
    "key": "card:21",
@@ -2163,7 +2305,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300061
+   "id": 74300065
   },
   {
    "key": "card:22",
@@ -2182,7 +2324,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300062
+   "id": 74300066
   },
   {
    "key": "card:23",
@@ -2201,7 +2343,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300063
+   "id": 74300067
   },
   {
    "key": "card:24",
@@ -2220,7 +2362,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300064
+   "id": 74300068
   },
   {
    "key": "card:25",
@@ -2239,7 +2381,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300065
+   "id": 74300069
   },
   {
    "key": "card:26",
@@ -2258,7 +2400,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300066
+   "id": 74300070
   },
   {
    "key": "card:27",
@@ -2277,7 +2419,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300067
+   "id": 74300071
   },
   {
    "key": "card:28",
@@ -2296,7 +2438,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300068
+   "id": 74300072
   },
   {
    "key": "card:29",
@@ -2315,7 +2457,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300069
+   "id": 74300073
   },
   {
    "key": "card:30",
@@ -2334,7 +2476,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300070
+   "id": 74300074
   },
   {
    "key": "card:31",
@@ -2353,7 +2495,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300071
+   "id": 74300075
   },
   {
    "key": "card:32",
@@ -2372,7 +2514,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300072
+   "id": 74300076
   },
   {
    "key": "card:33",
@@ -2391,7 +2533,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300073
+   "id": 74300077
   },
   {
    "key": "card:34",
@@ -2410,7 +2552,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300074
+   "id": 74300078
   },
   {
    "key": "card:35",
@@ -2429,7 +2571,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300075
+   "id": 74300079
   },
   {
    "key": "card:36",
@@ -2448,7 +2590,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300076
+   "id": 74300080
   },
   {
    "key": "card:37",
@@ -2467,7 +2609,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300077
+   "id": 74300081
   },
   {
    "key": "card:38",
@@ -2486,7 +2628,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300078
+   "id": 74300082
   },
   {
    "key": "card:39",
@@ -2505,7 +2647,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300079
+   "id": 74300083
   },
   {
    "key": "card:40",
@@ -2524,7 +2666,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300080
+   "id": 74300084
   },
   {
    "key": "card:41",
@@ -2543,7 +2685,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300081
+   "id": 74300085
   },
   {
    "key": "card:42",
@@ -2562,7 +2704,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300082
+   "id": 74300086
   },
   {
    "key": "card:43",
@@ -2581,7 +2723,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300083
+   "id": 74300087
   },
   {
    "key": "card:44",
@@ -2600,7 +2742,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300084
+   "id": 74300088
   },
   {
    "key": "card:45",
@@ -2619,7 +2761,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300085
+   "id": 74300089
   },
   {
    "key": "card:46",
@@ -2638,7 +2780,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300086
+   "id": 74300090
   },
   {
    "key": "card:47",
@@ -2657,7 +2799,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300087
+   "id": 74300091
   },
   {
    "key": "card:48",
@@ -2676,7 +2818,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300088
+   "id": 74300092
   },
   {
    "key": "card:49",
@@ -2695,7 +2837,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300089
+   "id": 74300093
   },
   {
    "key": "card:50",
@@ -2714,7 +2856,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300090
+   "id": 74300094
   },
   {
    "key": "card_set:witches",
@@ -2740,7 +2882,7 @@
      "Beatrix Bloxam Card"
     ]
    },
-   "id": 74300091
+   "id": 74300095
   },
   {
    "key": "card_set:wizards",
@@ -2766,7 +2908,7 @@
      "Edgar Stroulger Card"
     ]
    },
-   "id": 74300092
+   "id": 74300096
   },
   {
    "key": "card_set:vampires",
@@ -2788,7 +2930,7 @@
      "Blodwyn Bludd Card"
     ]
    },
-   "id": 74300093
+   "id": 74300097
   },
   {
    "key": "card_set:goblins",
@@ -2810,7 +2952,7 @@
      "Urg the Unclean Card"
     ]
    },
-   "id": 74300094
+   "id": 74300098
   },
   {
    "key": "card_set:hags",
@@ -2836,7 +2978,7 @@
      "Old Mother Hubbard Card"
     ]
    },
-   "id": 74300095
+   "id": 74300099
   },
   {
    "key": "card_set:giants",
@@ -2858,7 +3000,7 @@
      "Morholt Card"
     ]
    },
-   "id": 74300096
+   "id": 74300100
   },
   {
    "key": "card_set:dragons",
@@ -2884,7 +3026,7 @@
      "Romanian Longhorn Dragon Card"
     ]
    },
-   "id": 74300097
+   "id": 74300101
   },
   {
    "key": "card_set:beasts",
@@ -2906,7 +3048,7 @@
      "Billywig Card"
     ]
    },
-   "id": 74300098
+   "id": 74300102
   },
   {
    "key": "card_set:classical_beasts",
@@ -2932,7 +3074,7 @@
      "Mountain Troll Card"
     ]
    },
-   "id": 74300099
+   "id": 74300103
   },
   {
    "key": "card_set:quidditch",
@@ -2958,7 +3100,7 @@
      "Roderick Plumpton Card"
     ]
    },
-   "id": 74300100
+   "id": 74300104
   },
   {
    "key": "folio:1",
@@ -2977,7 +3119,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300101
+   "id": 74300105
   },
   {
    "key": "folio:2",
@@ -2996,7 +3138,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300102
+   "id": 74300106
   },
   {
    "key": "folio:3",
@@ -3015,7 +3157,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300103
+   "id": 74300107
   },
   {
    "key": "folio:4",
@@ -3034,7 +3176,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300104
+   "id": 74300108
   },
   {
    "key": "folio:5",
@@ -3053,7 +3195,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300105
+   "id": 74300109
   },
   {
    "key": "folio:6",
@@ -3072,7 +3214,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300106
+   "id": 74300110
   },
   {
    "key": "folio:7",
@@ -3091,7 +3233,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300107
+   "id": 74300111
   },
   {
    "key": "folio:8",
@@ -3110,7 +3252,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300108
+   "id": 74300112
   },
   {
    "key": "folio:9",
@@ -3129,7 +3271,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300109
+   "id": 74300113
   },
   {
    "key": "folio:10",
@@ -3148,7 +3290,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300110
+   "id": 74300114
   },
   {
    "key": "folio:11",
@@ -3167,7 +3309,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300111
+   "id": 74300115
   },
   {
    "key": "folio:12",
@@ -3186,7 +3328,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300112
+   "id": 74300116
   },
   {
    "key": "folio:13",
@@ -3205,7 +3347,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300113
+   "id": 74300117
   },
   {
    "key": "folio:14",
@@ -3224,7 +3366,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300114
+   "id": 74300118
   },
   {
    "key": "folio:15",
@@ -3243,7 +3385,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300115
+   "id": 74300119
   },
   {
    "key": "folio:16",
@@ -3262,7 +3404,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300116
+   "id": 74300120
   },
   {
    "key": "laf:prefect_badge",
@@ -3281,7 +3423,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300117
+   "id": 74300121
   },
   {
    "key": "laf:remembrall",
@@ -3300,7 +3442,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300118
+   "id": 74300122
   },
   {
    "key": "laf:potion_vial_case",
@@ -3319,7 +3461,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300119
+   "id": 74300123
   },
   {
    "key": "laf:dragon_hide_gloves",
@@ -3338,7 +3480,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300120
+   "id": 74300124
   },
   {
    "key": "laf:owl_post_parcel",
@@ -3357,7 +3499,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300121
+   "id": 74300125
   },
   {
    "key": "laf:key",
@@ -3376,7 +3518,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300122
+   "id": 74300126
   },
   {
    "key": "laf:telescope",
@@ -3395,7 +3537,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300123
+   "id": 74300127
   },
   {
    "key": "laf:daily_prophet",
@@ -3414,7 +3556,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300124
+   "id": 74300128
   },
   {
    "key": "laf:brass_scales",
@@ -3433,7 +3575,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300125
+   "id": 74300129
   },
   {
    "key": "laf:potion_jar",
@@ -3452,7 +3594,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300126
+   "id": 74300130
   },
   {
    "key": "statue:bridget_wenlock",
@@ -3467,7 +3609,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300127
+   "id": 74300131
   },
   {
    "key": "statue:glanmore_peakes",
@@ -3482,7 +3624,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300128
+   "id": 74300132
   },
   {
    "key": "statue:hengist_of_woodcroft",
@@ -3497,7 +3639,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300129
+   "id": 74300133
   },
   {
    "key": "statue:gondoline_oliphant",
@@ -3512,7 +3654,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300130
+   "id": 74300134
   },
   {
    "key": "statue:beaumont_marjoribanks",
@@ -3527,7 +3669,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300131
+   "id": 74300135
   },
   {
    "key": "statue:gunhilda_of_gorsemoor",
@@ -3542,7 +3684,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300132
+   "id": 74300136
   },
   {
    "key": "statue:gregory_the_smarmy",
@@ -3557,7 +3699,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300133
+   "id": 74300137
   },
   {
    "key": "statue:jocunda_sykes",
@@ -3572,7 +3714,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300134
+   "id": 74300138
   },
   {
    "key": "statue:hooky_the_house_elf",
@@ -3587,64 +3729,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300135
-  },
-  {
-   "key": "statue:homework_3",
-   "name": "Hermione's Homework: 3 Statues",
-   "region": "Hogwarts",
-   "group": "statues",
-   "reward_class": "reward",
-   "swap": {
-    "grant": "item_add",
-    "arg": null,
-    "item": "Dark Forces Chapter"
-   },
-   "access": {
-    "chapter": null,
-    "areas": [],
-    "spells": [],
-    "prereq": []
-   },
-   "id": 74300136
-  },
-  {
-   "key": "statue:homework_6",
-   "name": "Hermione's Homework: 6 Statues",
-   "region": "Hogwarts",
-   "group": "statues",
-   "reward_class": "reward",
-   "swap": {
-    "grant": "item_add",
-    "arg": null,
-    "item": "Dark Forces Chapter"
-   },
-   "access": {
-    "chapter": null,
-    "areas": [],
-    "spells": [],
-    "prereq": []
-   },
-   "id": 74300137
-  },
-  {
-   "key": "statue:homework_9",
-   "name": "Hermione's Homework: 9 Statues",
-   "region": "Hogwarts",
-   "group": "statues",
-   "reward_class": "reward",
-   "swap": {
-    "grant": "item_add",
-    "arg": null,
-    "item": "Dark Forces Chapter"
-   },
-   "access": {
-    "chapter": null,
-    "areas": [],
-    "spells": [],
-    "prereq": []
-   },
-   "id": 74300138
+   "id": 74300139
   },
   {
    "key": "ingredient:fire_seeds",
@@ -3659,7 +3744,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300139
+   "id": 74300140
   },
   {
    "key": "ingredient:chizpurfle",
@@ -3674,7 +3759,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300140
+   "id": 74300141
   },
   {
    "key": "ingredient:graphorn_horn",
@@ -3689,7 +3774,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300141
+   "id": 74300142
   },
   {
    "key": "ingredient:billywig_stings",
@@ -3704,7 +3789,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300142
+   "id": 74300143
   },
   {
    "key": "ingredient:flying_seahorses",
@@ -3721,7 +3806,7 @@
     ],
     "prereq": []
    },
-   "id": 74300143
+   "id": 74300144
   },
   {
    "key": "ingredient:dragonfly_thoraxes",
@@ -3736,7 +3821,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300144
+   "id": 74300145
   },
   {
    "key": "ingredient:doxy_eggs",
@@ -3751,7 +3836,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300145
+   "id": 74300146
   },
   {
    "key": "ingredient:fairy_wings",
@@ -3766,7 +3851,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300146
+   "id": 74300147
   },
   {
    "key": "potion:wiggenweld",
@@ -3781,7 +3866,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300147
+   "id": 74300148
   },
   {
    "key": "potion:antidote",
@@ -3798,7 +3883,7 @@
      "task:day3:antidote_ingredients"
     ]
    },
-   "id": 74300148
+   "id": 74300149
   },
   {
    "key": "potion:girding",
@@ -3815,7 +3900,7 @@
      "task:day5:girding_ingredients"
     ]
    },
-   "id": 74300149
+   "id": 74300150
   },
   {
    "key": "minigame:broom_flight:complete",
@@ -3832,7 +3917,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300150
+   "id": 74300151
   },
   {
    "key": "minigame:advanced_broom_flight:complete",
@@ -3849,7 +3934,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300151
+   "id": 74300152
   },
   {
    "key": "minigame:dragon_statues:complete",
@@ -3866,7 +3951,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300152
+   "id": 74300153
   },
   {
    "key": "minigame:hippogriff_flight:complete",
@@ -3883,7 +3968,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300153
+   "id": 74300154
   },
   {
    "key": "minigame:owl_racing:complete",
@@ -3900,7 +3985,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300154
+   "id": 74300155
   },
   {
    "key": "minigame:seahorse_fishing:complete",
@@ -3919,11 +4004,11 @@
     ],
     "prereq": []
    },
-   "id": 74300155
+   "id": 74300156
   },
   {
    "key": "minigame:duelling_club:complete",
-   "name": "Bonus: Duelling Club",
+   "name": "Bonus: Dueling Club",
    "region": "BonusActivities",
    "group": "minigames",
    "reward_class": "reward",
@@ -3936,11 +4021,11 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300156
+   "id": 74300157
   },
   {
    "key": "minigame:snot_slinging:complete",
-   "name": "Bonus: Snot Slinging",
+   "name": "Bonus: Fred and George's Snot Slinging",
    "region": "BonusActivities",
    "group": "minigames",
    "reward_class": "reward",
@@ -3955,7 +4040,7 @@
     ],
     "prereq": []
    },
-   "id": 74300157
+   "id": 74300158
   },
   {
    "key": "marauder:night0",
@@ -3972,7 +4057,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300158
+   "id": 74300159
   },
   {
    "key": "marauder:day1",
@@ -3989,7 +4074,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300159
+   "id": 74300160
   },
   {
    "key": "marauder:night1",
@@ -4006,7 +4091,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300160
+   "id": 74300161
   },
   {
    "key": "marauder:day2",
@@ -4023,7 +4108,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300161
+   "id": 74300162
   },
   {
    "key": "marauder:night2",
@@ -4040,7 +4125,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300162
+   "id": 74300163
   },
   {
    "key": "marauder:day3",
@@ -4057,7 +4142,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300163
+   "id": 74300164
   },
   {
    "key": "marauder:night3",
@@ -4074,7 +4159,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300164
+   "id": 74300165
   },
   {
    "key": "marauder:day5",
@@ -4091,7 +4176,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300165
+   "id": 74300166
   },
   {
    "key": "marauder:night5",
@@ -4108,7 +4193,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300166
+   "id": 74300167
   },
   {
    "key": "marauder:day6",
@@ -4125,7 +4210,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300167
+   "id": 74300168
   },
   {
    "key": "fg:statues:3",
@@ -4140,7 +4225,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300168
+   "id": 74300169
   },
   {
    "key": "fg:statues:6",
@@ -4155,7 +4240,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300169
+   "id": 74300170
   },
   {
    "key": "fg:statues:9",
@@ -4170,7 +4255,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300170
+   "id": 74300171
   },
   {
    "key": "fg:dungbomb:5",
@@ -4185,7 +4270,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300171
+   "id": 74300172
   },
   {
    "key": "fg:dungbomb:10",
@@ -4200,7 +4285,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300172
+   "id": 74300173
   },
   {
    "key": "fg:dungbomb:15",
@@ -4215,7 +4300,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300173
+   "id": 74300174
   },
   {
    "key": "fg:dungbomb:20",
@@ -4230,7 +4315,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300174
+   "id": 74300175
   },
   {
    "key": "fg:snot:1",
@@ -4247,7 +4332,7 @@
     ],
     "prereq": []
    },
-   "id": 74300175
+   "id": 74300176
   },
   {
    "key": "fg:confiscated:1",
@@ -4262,7 +4347,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300176
+   "id": 74300177
   },
   {
    "key": "fg:confiscated:2",
@@ -4277,7 +4362,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300177
+   "id": 74300178
   },
   {
    "key": "fg:confiscated:3",
@@ -4292,7 +4377,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300178
+   "id": 74300179
   },
   {
    "key": "fg:confiscated:4",
@@ -4307,11 +4392,11 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300179
+   "id": 74300180
   },
   {
    "key": "shop:rare_card_1",
-   "name": "Shop: Rare Collector's Card 1",
+   "name": "Shop: Rare Collector's Card (1)",
    "region": "Hogwarts",
    "group": "shop",
    "reward_class": "reward",
@@ -4323,11 +4408,11 @@
     "prereq": [],
     "passes": 2
    },
-   "id": 74300180
+   "id": 74300181
   },
   {
    "key": "shop:rare_card_2",
-   "name": "Shop: Rare Collector's Card 2",
+   "name": "Shop: Rare Collector's Card (2)",
    "region": "Hogwarts",
    "group": "shop",
    "reward_class": "reward",
@@ -4339,7 +4424,7 @@
     "prereq": [],
     "passes": 4
    },
-   "id": 74300181
+   "id": 74300182
   },
   {
    "key": "shop:owl_care_kit",
@@ -4359,7 +4444,7 @@
     "prereq": [],
     "passes": 1
    },
-   "id": 74300182
+   "id": 74300183
   },
   {
    "key": "shop:broom_handle_polish",
@@ -4379,7 +4464,7 @@
     "prereq": [],
     "passes": 1
    },
-   "id": 74300183
+   "id": 74300184
   },
   {
    "key": "shop:brass_compass",
@@ -4399,7 +4484,7 @@
     "prereq": [],
     "passes": 2
    },
-   "id": 74300184
+   "id": 74300185
   },
   {
    "key": "shop:tail_twig_clippers",
@@ -4419,7 +4504,7 @@
     "prereq": [],
     "passes": 2
    },
-   "id": 74300185
+   "id": 74300186
   },
   {
    "key": "shop:snufflifors",
@@ -4439,7 +4524,7 @@
     "prereq": [],
     "passes": 1
    },
-   "id": 74300186
+   "id": 74300187
   },
   {
    "key": "shop:mucus_projectum",
@@ -4459,11 +4544,11 @@
     "prereq": [],
     "passes": 2
    },
-   "id": 74300187
+   "id": 74300188
   },
   {
    "key": "shop:dark_forces_1",
-   "name": "Shop: Dark Forces: Chapter 1",
+   "name": "Shop: Dark Forces: A Guide to Self Protection - Chapter 1",
    "region": "Hogwarts",
    "group": "shop",
    "reward_class": "reward",
@@ -4479,11 +4564,11 @@
     "prereq": [],
     "passes": 1
    },
-   "id": 74300188
+   "id": 74300189
   },
   {
    "key": "shop:dark_forces_2",
-   "name": "Shop: Dark Forces: Chapter 2",
+   "name": "Shop: Dark Forces: A Guide to Self Protection - Chapter 2",
    "region": "Hogwarts",
    "group": "shop",
    "reward_class": "reward",
@@ -4499,11 +4584,11 @@
     "prereq": [],
     "passes": 3
    },
-   "id": 74300189
+   "id": 74300190
   },
   {
    "key": "shop:dark_forces_3",
-   "name": "Shop: Dark Forces: Chapter 3",
+   "name": "Shop: Dark Forces: A Guide to Self Protection - Chapter 3",
    "region": "Hogwarts",
    "group": "shop",
    "reward_class": "reward",
@@ -4519,7 +4604,7 @@
     "prereq": [],
     "passes": 5
    },
-   "id": 74300190
+   "id": 74300191
   },
   {
    "key": "shop:stink_pellet_bag",
@@ -4539,7 +4624,7 @@
     "prereq": [],
     "passes": 1
    },
-   "id": 74300191
+   "id": 74300192
   },
   {
    "key": "shop:dungbomb_case",
@@ -4559,26 +4644,11 @@
     "prereq": [],
     "passes": 1
    },
-   "id": 74300192
-  },
-  {
-   "key": "secret:floor7_passage",
-   "name": "Secret: Secret Passageway (Seventh Floor)",
-   "region": "Hogwarts",
-   "group": "secrets",
-   "reward_class": "reward",
-   "swap": null,
-   "access": {
-    "chapter": null,
-    "areas": [],
-    "spells": [],
-    "prereq": []
-   },
    "id": 74300193
   },
   {
-   "key": "secret:floor4_way_down",
-   "name": "Secret: Secret Way to the Second Floor",
+   "key": "secret:enthall_003",
+   "name": "Secret: Broom Cupboard (Entrance Hall)",
    "region": "Hogwarts",
    "group": "secrets",
    "reward_class": "reward",
@@ -4592,8 +4662,8 @@
    "id": 74300194
   },
   {
-   "key": "secret:floor4_passage",
-   "name": "Secret: Secret Passageway (Fourth Floor)",
+   "key": "secret:floor2_002",
+   "name": "Secret: Secret Way to the Fourth Floor (Second Floor)",
    "region": "Hogwarts",
    "group": "secrets",
    "reward_class": "reward",
@@ -4607,8 +4677,8 @@
    "id": 74300195
   },
   {
-   "key": "secret:floor4_room",
-   "name": "Secret: Secret Room (Fourth Floor)",
+   "key": "secret:floor2_003",
+   "name": "Secret: Secret Passageway (Second Floor)",
    "region": "Hogwarts",
    "group": "secrets",
    "reward_class": "reward",
@@ -4622,8 +4692,8 @@
    "id": 74300196
   },
   {
-   "key": "secret:floor2_way_up",
-   "name": "Secret: Secret Way to the Fourth Floor",
+   "key": "secret:floor4_004",
+   "name": "Secret: Secret Way to the Second Floor (Fourth Floor)",
    "region": "Hogwarts",
    "group": "secrets",
    "reward_class": "reward",
@@ -4637,8 +4707,8 @@
    "id": 74300197
   },
   {
-   "key": "secret:floor2_passage",
-   "name": "Secret: Secret Passageway (Second Floor)",
+   "key": "secret:floor4_006",
+   "name": "Secret: Secret Passageway (Fourth Floor)",
    "region": "Hogwarts",
    "group": "secrets",
    "reward_class": "reward",
@@ -4652,8 +4722,8 @@
    "id": 74300198
   },
   {
-   "key": "secret:broom_cupboard",
-   "name": "Secret: Broom Cupboard",
+   "key": "secret:floor4_007",
+   "name": "Secret: Secret Room (Fourth Floor)",
    "region": "Hogwarts",
    "group": "secrets",
    "reward_class": "reward",
@@ -4665,6 +4735,21 @@
     "prereq": []
    },
    "id": 74300199
+  },
+  {
+   "key": "secret:floor7_006",
+   "name": "Secret: Secret Passageway (Seventh Floor)",
+   "region": "Hogwarts",
+   "group": "secrets",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300200
   },
   {
    "key": "point:50",
@@ -4679,7 +4764,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300200
+   "id": 74300201
   },
   {
    "key": "point:100",
@@ -4695,7 +4780,7 @@
     "prereq": [],
     "passes": 1
    },
-   "id": 74300201
+   "id": 74300202
   },
   {
    "key": "point:150",
@@ -4711,7 +4796,7 @@
     "prereq": [],
     "passes": 1
    },
-   "id": 74300202
+   "id": 74300203
   },
   {
    "key": "point:200",
@@ -4727,7 +4812,7 @@
     "prereq": [],
     "passes": 2
    },
-   "id": 74300203
+   "id": 74300204
   },
   {
    "key": "point:250",
@@ -4743,7 +4828,7 @@
     "prereq": [],
     "passes": 2
    },
-   "id": 74300204
+   "id": 74300205
   },
   {
    "key": "point:300",
@@ -4759,7 +4844,7 @@
     "prereq": [],
     "passes": 3
    },
-   "id": 74300205
+   "id": 74300206
   },
   {
    "key": "point:350",
@@ -4775,7 +4860,7 @@
     "prereq": [],
     "passes": 3
    },
-   "id": 74300206
+   "id": 74300207
   },
   {
    "key": "point:400",
@@ -4791,7 +4876,7 @@
     "prereq": [],
     "passes": 4
    },
-   "id": 74300207
+   "id": 74300208
   },
   {
    "key": "point:450",
@@ -4807,7 +4892,7 @@
     "prereq": [],
     "passes": 4
    },
-   "id": 74300208
+   "id": 74300209
   },
   {
    "key": "point:500",
@@ -4823,7 +4908,7 @@
     "prereq": [],
     "passes": 5
    },
-   "id": 74300209
+   "id": 74300210
   },
   {
    "key": "bean:50",
@@ -4838,7 +4923,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300210
+   "id": 74300211
   },
   {
    "key": "bean:100",
@@ -4853,7 +4938,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300211
+   "id": 74300212
   },
   {
    "key": "bean:200",
@@ -4868,7 +4953,7 @@
     "spells": [],
     "prereq": []
    },
-   "id": 74300212
+   "id": 74300213
   },
   {
    "key": "bean:300",
@@ -4884,7 +4969,7 @@
     "prereq": [],
     "passes": 1
    },
-   "id": 74300213
+   "id": 74300214
   },
   {
    "key": "bean:400",
@@ -4900,7 +4985,7 @@
     "prereq": [],
     "passes": 1
    },
-   "id": 74300214
+   "id": 74300215
   },
   {
    "key": "bean:500",
@@ -4916,7 +5001,7 @@
     "prereq": [],
     "passes": 2
    },
-   "id": 74300215
+   "id": 74300216
   },
   {
    "key": "bean:750",
@@ -4932,7 +5017,7 @@
     "prereq": [],
     "passes": 3
    },
-   "id": 74300216
+   "id": 74300217
   },
   {
    "key": "bean:1000",
@@ -4948,7 +5033,7 @@
     "prereq": [],
     "passes": 4
    },
-   "id": 74300217
+   "id": 74300218
   },
   {
    "key": "bean:1250",
@@ -4964,7 +5049,7 @@
     "prereq": [],
     "passes": 5
    },
-   "id": 74300218
+   "id": 74300219
   },
   {
    "key": "bean:1500",
@@ -4980,7 +5065,7 @@
     "prereq": [],
     "passes": 6
    },
-   "id": 74300219
+   "id": 74300220
   },
   {
    "key": "bean:2000",
@@ -4996,7 +5081,7 @@
     "prereq": [],
     "passes": 8
    },
-   "id": 74300220
+   "id": 74300221
   }
  ],
  "groups": {
@@ -5016,7 +5101,7 @@
     "maximum"
    ],
    "option": null,
-   "count": 8
+   "count": 12
   },
   "spellbooks": {
    "preset": [
@@ -5065,7 +5150,7 @@
     "maximum"
    ],
    "option": "include_statues",
-   "count": 12
+   "count": 9
   },
   "potions": {
    "preset": [
