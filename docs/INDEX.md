@@ -62,6 +62,15 @@ One per stage, in the order you run them.
 - [Burnout 3 Reunification](technical/burnout3-reunification.md) — Bringing the origin title back onto the extracted toolkit
 - [xemu GDB Debugging](technical/xemu-debugging.md) — xemu's GDB stub as a reference debugger for runtime state
 
+## Archipelago (randomizer)
+
+- [Overview and method](ap/README.md) — scope, what is verified, what is open
+- [01 Audit](ap/01-audit.md) — disc, scripts, chapter/room table, code seams, what the recompilation permits
+- [02 Check census](ap/02-census.md) — every check system with counts, evidence and detection
+- [03 Design](ap/03-design.md) — start state, open castle, story missions as checks and gates, options
+- [04 Roadmap](ap/04-roadmap.md) — phases, risks, branch model
+- [05 Handoff](ap/05-handoff.md) — 2026-10-31 night session
+
 ## Xbox Formats
 
 - [XBE File Format](formats/xbe.md) — Xbox executable format reference
