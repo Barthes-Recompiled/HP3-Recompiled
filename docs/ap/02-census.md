@@ -32,7 +32,8 @@ hook (`sub_001AD3B0`, [01-audit §4.1](01-audit.md#41-the-apt-variable-setter--s
 | 21 | Pursuits | per chapter | `*_Pursuit` scripts | pursuit complete/fail | `pursuits` (Max only) | medium |
 | 22 | Enemies | open | `SetAI*` scripts | kill/spawn events | `enemies` (Max only) | low |
 
-**Rough check budget.** Minimal (story only) ≈ **47**. Standard (items 1–15) ≈ **190–220**. Maximum (all
+**Rough check budget.** Minimal (story only) ≈ **40** (28 reachable tasks + 12 chapter ends; HOGEX/Night0's seven
+tasks are pre-completed at the Day 1 start, design §5). Standard (items 1–15) ≈ **185–215**. Maximum (all
 categories incl. pickups/talk/pursuits) ≈ **800–1,500+**, dominated by world pickups and dialogue — the same shape
 as HP1's census.
 
@@ -58,6 +59,9 @@ The Tasks page is the game's own mission list (`Task_Done_1…4`, `Task1_Display
 Detection: the UI writes `Task_Done_n` when a task completes; the underlying state is script-side. First hook is
 the variable write; if that is too coarse (UI page open only), the script VM is needed. A task completed out of
 order still writes its own flag, which is what the randomizer wants.
+
+At the Day 1 start, HOGEX and Night0 are seeded complete, so their seven tasks are **pre-completed, not in the
+pool**: a seed carries **28 of the 35** task checks unless HOGEX/Night0 flashbacks are added later (design §5).
 
 ## 3. Collector's cards — 52 slots, 10 sets
 

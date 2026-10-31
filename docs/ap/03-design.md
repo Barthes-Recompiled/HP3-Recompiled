@@ -55,7 +55,7 @@ Status: **decisions taken 2026-10-31**; nothing built yet. Numbers are in [02-ce
                   └────────┬────────┘
                            │
                   ┌────────▼────────┐
-                  │  Dark Tower     │  goal: N tokens + Night5 pass
+                  │  Dark Tower     │  goal: 8/11 tokens + Night5 pass
                   │  (Night 5 end)  │  + Expecto Patronum  (OoT medallions)
                   └─────────────────┘
 ```
@@ -73,7 +73,7 @@ Options:
 
 | Option | Values | Default | Effect |
 |---|---|---|---|
-| `start_chapter` | `intro`, `night0`, `day1`, `random` | `day1` | Where a new seed starts; the chapter's pass is pre-collected. |
+| `start_chapter` | `night0`, `day1`, `random` | `day1` | Where a new seed starts; the chapter's pass is pre-collected. The Intro is never a start (it is the flashback). |
 | `skip_intro` | on/off | on | Skips the Privet Drive/Express opening at the start; the Intro stays a playable flashback either way (§3.1). |
 | `starting_spells` | `flipendo`, `lumos`… | `flipendo` | The one spell that must be known to not soft-lock the movement tutorial. |
 
@@ -123,7 +123,7 @@ chapter out of order; the snapshot/restore is what keeps the main run's flags in
 `open_castle` off = classic linear chapter order: only the next chapter's pass is in the pool, the rest are
 pre-collected in order. Same code, different item pool.
 
-**What is not open:** cutscenes and story beats that assume a prior event. Those are handled by seeding + mission
+**What is not open:** cutscenes and story beats that assume a prior event. Those are handled by seeding + area
 passes, not by making the engine ignore its flags. If a mission's script cannot run without an earlier flag, the
 area pass that opens it also sets that flag.
 
@@ -162,7 +162,7 @@ Options:
 | `mission_passes` | Shape | For |
 |---|---|---|
 | `areas` (default) | the ten above; tasks inside a chapter are free | smooth run |
-| `tasks` | all 35 tasks get a pass | maximum fragmentation / check-slop runs |
+| `tasks` | every task check in the seed (28) gets a pass | maximum fragmentation / check-slop runs |
 | `chain` | no passes; a mission's completion yields the next mission's pass | vanilla-like, one order |
 
 **Seeded chapters.** The Intro, Hogwarts Express and Night0 are past at the Day 1 start. The Intro has no tasks.
@@ -275,14 +275,14 @@ One preset plus granular toggles. The preset sets the defaults; the toggles over
 | Preset | Contents |
 |---|---|
 | `minimal` | story tasks + chapter ends + goal |
-| `standard` (default) | + cards, card sets, folio, L&F, statues, potions, minigames, Marauder's, secrets, house-point and bean milestones |
-| `maximum` | + world pickups, loose pickups, lessons, spell pickups, enemies, **talks**, **pursuits** |
+| `standard` (default) | + cards, card sets, folio, L&F, statues, potions, minigames, Marauder's, Fred & George, shop, secrets, challenge shields, house-point and bean milestones |
+| `maximum` | + world pickups, loose pickups, lessons, spell pickups, enemies, intro memories, **talks**, **pursuits** |
 
 Granular groups (each `include_*`, default per preset):
 
 `cards`, `card_sets`, `folio`, `lost_and_found`, `statues`, `potions`, `minigames`, `marauders_challenge`,
-`fred_and_george`, `shop`, `secrets`, `house_points`, `bean_milestones`, `pickups`, `loose_pickups`, `lessons`,
-`spells_as_checks`, `enemies`, `talks`, `pursuits`.
+`fred_and_george`, `shop`, `secrets`, `challenge_shields`, `house_points`, `bean_milestones`, `pickups`,
+`loose_pickups`, `lessons`, `spells_as_checks`, `intro_memories`, `enemies`, `talks`, `pursuits`.
 
 Rules:
 - **Talk and pursuit checks exist only in `maximum`** (and only if the group is on) — Austin's rule.
@@ -294,7 +294,7 @@ Other options:
 
 | Option | Default | Notes |
 |---|---|---|
-| `goal` | `dark_tower` | `dark_tower` (9/12 tokens), `house_cup` (Day6), `cards` (N cards) |
+| `goal` | `dark_tower` | `dark_tower` (8/11 tokens), `house_cup` (Day6), `cards` (N cards) |
 | `tokens_required` | 8 | only for `dark_tower` (of 11; 2 pre-collected) |
 | `cards_goal` | 40 | only for `cards` |
 | `start_chapter` | `day1` | see §3 |
@@ -364,9 +364,9 @@ Decision 8. Two layers, both themed.
 | Tab | Shows |
 |---|---|
 | Travel | held chapter and area passes, current chapter, the Floo/fireplace list |
-| Checks | sent/total, per-group counts (`cards 17/52`, `folio 3/16`, `statues 4/9`, `tasks 6/35`, …), unchecked in this room |
+| Checks | sent/total, per-group counts (`cards 17/52`, `folio 3/16`, `statues 4/9`, `tasks 6/28`, …), unchecked in this room |
 | Items | received list, recent items, pending queue |
-| Status | seed/slot, catalog version, connection, goal progress (tokens 5/9, cards 17/52) |
+| Status | seed/slot, catalog version, connection, goal progress (tokens 5/8, cards 17/52) |
 
 Drawn by the port (the settings row-table UI is the precedent), not by the game's APT UI; an APT-native version is
 later polish.
