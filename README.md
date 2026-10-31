@@ -21,6 +21,10 @@ put your disc's files or the .iso in a `game` folder beside the executables and 
 **This repository contains no game content.** To build it you need the files from your own copy of the Xbox disc
 (USA for now; the European disc later). The build regenerates the recompiled code from your `default.xbe`.
 
+F10 opens the same option rows as the sibling ports: Graphics, Audio, Controls, Gameplay, Accessibility and Debug.
+Click the arrows or use left/right to change a value; descriptions wrap and the rows scroll in smaller windows.
+Cutscene fast-forward and logo skip stay visible but greyed out as not working yet.
+
 ## Building
 
 See [port/DEVELOPING.md](port/DEVELOPING.md): MSYS2 (UCRT64) setup, regenerating the code from the XBE, building,

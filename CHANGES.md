@@ -17,7 +17,8 @@ this exists without you.
   keep their original letterbox.
 - The settings of the sibling ports in the launcher and F10: resolution up to 4K, render scale, MSAA, SMAA,
   anisotropic filtering, windowed / borderless / fullscreen, keyboard and mouse with rebinding, controller remapping,
-  deadzones and vibration, and "Controller in background".
+  deadzones and vibration, and "Controller in background". F10 uses the sibling ports' shared row table,
+  with left/right arrows, descriptions and a scrolling layout for 4:3 through 4K.
 - Sound, including the narrator's line on the "I solemnly swear" screen.
 
 ### Known issues
@@ -25,5 +26,6 @@ this exists without you.
 - Levels after the first have not been checked yet.
 - No settings pages inside the game's menus yet (use F10 or the launcher), and no "Quit To Desktop" entry in the
   menus (use Alt+F4).
-- Cutscene fast-forward and the start-up logo skip are listed as options but don't work yet.
+- Cutscene fast-forward and the start-up logo skip are visible but greyed out, marked
+  "Not working in this game yet", in F10 and the launcher.
 - Button prompts are always Xbox's; PlayStation and Switch pads work through Steam Input or DS4Windows.

@@ -202,6 +202,7 @@ if(WIN32)
         src/scda/gpu/texture.cpp
         src/scda/gpu/vertex.cpp
         src/scda/app/menu.cpp
+        src/scda/app/rows.cpp
         src/scda/app/input.cpp
     )
     # Dear ImGui v1.91.0 (third_party/imgui, MIT), as SCDA: the F10 options panel
@@ -218,7 +219,7 @@ if(WIN32)
     set_source_files_properties(
         src/scda/xdk/hle_d3d8.cpp src/scda/app/app.cpp src/scda/gpu/d3d12.cpp
         src/scda/gpu/pipeline_cache.cpp src/scda/gpu/render_thread.cpp src/scda/gpu/shaders.cpp
-        src/scda/gpu/texture.cpp src/scda/gpu/vertex.cpp src/scda/app/menu.cpp src/scda/app/input.cpp
+        src/scda/gpu/texture.cpp src/scda/gpu/vertex.cpp src/scda/app/menu.cpp src/scda/app/rows.cpp src/scda/app/input.cpp
         PROPERTIES INCLUDE_DIRECTORIES
         "${CMAKE_CURRENT_SOURCE_DIR}/src/scda;${XBOXRECOMP_DIR}/src;${IMGUI_DIR}"
         COMPILE_OPTIONS "-msse4.1")

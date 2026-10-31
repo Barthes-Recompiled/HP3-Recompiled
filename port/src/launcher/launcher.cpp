@@ -556,9 +556,12 @@ bool DrawPage(Settings& s, std::string& error) {
     ImGui::Checkbox("Invert camera Y", &s.invert_y);
     ImGui::Checkbox("Controller works while the game is in the background", &s.background_input);
     ImGui::TextDisabled("Key bindings, button remapping and stick settings: F10 > Controls in the game.");
+    ImGui::BeginDisabled();
     ImGui::Checkbox("Hold Start or Back to fast-forward cutscenes", &s.cutscene_skip);
     ImGui::SameLine(0, 30 * sc);
     ImGui::Checkbox("Skip the start-up logos", &s.intro_skip);
+    ImGui::EndDisabled();
+    ImGui::TextDisabled("Not working in this game yet");
     ImGui::PopItemWidth();
 
     ImGui::Spacing();
