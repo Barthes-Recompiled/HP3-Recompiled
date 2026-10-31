@@ -1,14 +1,22 @@
-# Harry Potter and the Prisoner of Azkaban — Xbox to PC port (work in progress)
+# Harry Potter and the Prisoner of Azkaban — Xbox to PC port (beta)
 
-A native Windows port of the original Xbox game *Harry Potter and the Prisoner of Azkaban* (2004) in the making,
+A native Windows port of the original Xbox game *Harry Potter and the Prisoner of Azkaban* (2004), in beta, made
 by **static recompilation**: the game's x86 code is translated to C and compiled for Windows, with the Xbox kernel,
 Direct3D 8, DirectSound and input replaced by native code. No emulator. It is the third of the barthes_recompiled
 Harry Potter ports, beside Philosopher's Stone (hp1_recomp) and Chamber of Secrets (hp2_recomp).
 
-**State (2026-10-30): not playable yet.** The recompiled code regenerates from the USA disc and links; the game has
-not been started. Next: boot to the title screen ([docs/bringup.md](docs/bringup.md)). The first release aims at the
-sibling ports' features (4K, MSAA, true 16:9, 60 fps, keyboard and mouse, Quit To Desktop, cutscene skip), then
-more (higher frame rates, an in-game settings menu, an Archipelago randomizer).
+**State: 0.5.0 Beta.** New Game plays through the Hogwarts Express into the first level at 60 fps in true 16:9,
+with saving and loading; later levels haven't been checked yet. What works and the known issues are in
+[CHANGES.md](CHANGES.md). Still to come: settings pages inside the game's menus, Quit To Desktop, cutscene
+fast-forward, the European disc, and an Archipelago randomizer (coming soon).
+
+## Playing
+
+The easiest way is the **[Barthes Launcher](https://github.com/Barthes-Recompiled/Barthes-Launcher/releases/latest)**,
+one launcher for all three Barthes Recompiled Harry Potter ports: it installs the port, unpacks your disc and keeps the
+port up to date. To set it up by hand, download the [latest release](https://github.com/Barthes-Recompiled/HP3-Recompiled/releases/latest),
+put your disc's files or the .iso in a `game` folder beside the executables and start `hppoa_launcher.exe`
+([port/README.txt](port/README.txt) has the details).
 
 **This repository contains no game content.** To build it you need the files from your own copy of the Xbox disc
 (USA for now; the European disc later). The build regenerates the recompiled code from your `default.xbe`.

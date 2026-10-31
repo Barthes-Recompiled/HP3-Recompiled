@@ -1,12 +1,17 @@
-HARRY POTTER AND THE PRISONER OF AZKABAN - PC PORT (WORK IN PROGRESS)
-=====================================================================
+HARRY POTTER AND THE PRISONER OF AZKABAN - PC PORT (BETA)
+=========================================================
 
 A native Windows port of the original Xbox game, made by static recompilation.
 It contains no game data: you need the files from your own copy of the Xbox disc.
 
-NOT PLAYABLE YET. This readme is carried over from the Philosopher's Stone port and
-describes how the finished port will be installed and set up; the PoA-specific parts
-(controls, options that depend on the game) will be rewritten as they work.
+BETA (0.5.0). Tested from New Game through the Hogwarts Express and the
+first level, with saving and loading, at 30 and 60 fps. Later levels have not
+been checked yet. Works with the North American (NTSC-U) disc only.
+
+Not in this beta yet: settings pages inside the game's menus, "Quit To
+Desktop" in the menus (use Alt+F4), and cutscene fast-forward (its option is
+there but does nothing yet). Parts of this readme come from the Philosopher's
+Stone port; options that don't apply to this game will be removed.
 
 
 MINIMUM SYSTEM REQUIREMENTS
@@ -60,7 +65,7 @@ the page again.
 Only one copy of the game runs at a time: starting it again brings the
 running game to the front.
 
-Quitting: "Quit To Desktop" in the main menu or the pause menu, or Alt+F4.
+Quitting: Alt+F4 (a "Quit To Desktop" menu entry comes in a later version).
 
 Keys that always work
   F10          Options (see below)
