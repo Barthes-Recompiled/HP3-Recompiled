@@ -92,13 +92,14 @@ target to `icall_seeds.json` and regenerate. `port/tools/scan_code_ptrs.py` list
 
 ### 3.1 Regions
 
-The USA disc is canonical. The European disc's `default.xbe` is the same program (same size, 534 bytes differ); its
-profile is not made yet (M4), so regen.sh refuses it for now and lists the supported SHA-1.
+The USA disc is canonical. The European disc's `default.xbe` has identical stored sections and virtual layouts
+(534 header bytes differ). Both profiles are supported; EUR gameplay smoke testing is pending. See the
+[address audit](../docs/region-eur.md).
 
 | Disc | `default.xbe` SHA-1 | Profile |
 |---|---|---|
 | USA (NTSC) | `51b09e01169fda86f2cb7e5ce45ee80a10268918` | `poa-usa` (canonical) |
-| Europe (PAL, En/Fr/De/Es/It/Nl/Sv) | `c8841e3c1d2d5ec20dbe286e5bec9bb5104b41f9` | not yet |
+| Europe (PAL, En/Fr/De/Es/It/Nl/Sv) | `c8841e3c1d2d5ec20dbe286e5bec9bb5104b41f9` | `poa-eur` |
 
 The hand-written sources (overrides, `icall_seeds.json`, `tools/patch_gen.py`) always use the canonical XBE's
 addresses. `regen.sh` starts by running `tools/region/retarget.py`, which hashes `game/default.xbe` and picks the
@@ -115,8 +116,8 @@ that isn't classified yet: list it in `port/region/retarget.json` under `numbers
 `addresses` (mapped). New override code needs no other care. Write it in canonical addresses as before and run
 regen once for each region.
 
-After the first level loads, the log has one line, e.g. `[REGION] ps-usa: ... -> ok`. It confirms that
-the game state the overrides read sits where the profile says. `SUSPECT` means the profile needs a look.
+After the first level loads, the log has one line, e.g. `[REGION] poa-eur: ... -> ok`. It confirms that
+the game clock and D3D device the overrides read sit where the profile says. `SUSPECT` means the profile needs a look.
 
 Rebuilding the address map, for example for a new revision of a disc, is described in `tools/region/README.md`.
 Each checkout has a single `src/recomp/gen/`, so switching discs means rerunning `regen.sh`.
@@ -126,7 +127,7 @@ Each checkout has a single `src/recomp/gen/`, so switching discs means rerunning
 ```
 cd port
 cmake -S . -B build-win -G Ninja -DCMAKE_BUILD_TYPE=Release
-cmake --build build-win -j$(nproc)
+cmake --build build-win -j4
 ```
 
 Outputs in `port/build-win/`: `hppoa.exe`, `hppoa_launcher.exe`, `hppoa_trainer.exe`.

@@ -85,6 +85,28 @@
     "src/difftest_hle.h"
    ],
    "why": "the D3D functions difftest runs as HLE (a table of entry points)"
+  },
+  {
+   "values": [
+    "0x00268400"
+   ],
+   "files": [
+    "src/scda/xdk/hle_d3d8.cpp"
+   ],
+   "why": "D3DDevice_SetTexture guest entry point passed to the recompiled-call helper during Swap BYPASSCOPY"
+  },
+  {
+   "values": [
+    "0x00266100",
+    "0x00268400",
+    "0x00268700",
+    "0x0026C800",
+    "0x00270D00"
+   ],
+   "files": [
+    "src/difftest_hle.h"
+   ],
+   "why": "PoA D3D HLE guest entry points in k_hle_vas, where Unicorn stops to call the host override"
   }
  ]
 }

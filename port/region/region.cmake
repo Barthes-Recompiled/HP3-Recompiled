@@ -3,6 +3,7 @@
 # src/recomp/region/ with a stamp, region.cmake there, naming the profile and the copied sources. When that stamp
 # exists, every target here compiles the copies instead of the originals; otherwise nothing changes.
 # Include this at the end of CMakeLists.txt, after the last target.
+target_sources(${PROJECT_NAME} PRIVATE src/region_check.c)
 set(REGION_OUT "${CMAKE_CURRENT_SOURCE_DIR}/src/recomp/region")
 # globbed so that regen.sh adding or removing the stamp re-runs the configure
 file(GLOB REGION_STAMP CONFIGURE_DEPENDS "${REGION_OUT}/region.cmake")

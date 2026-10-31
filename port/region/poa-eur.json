@@ -1,0 +1,216 @@
+{
+ "name": "poa-eur",
+ "sha1": "c8841e3c1d2d5ec20dbe286e5bec9bb5104b41f9",
+ "canonical": false,
+ "canonical_sha1": "51b09e01169fda86f2cb7e5ce45ee80a10268918",
+ "image_end": "0x003D6B78",
+ "segments": [
+  {
+   "from_start": "0x00011000",
+   "from_end": "0x00264C64",
+   "delta": 0,
+   "section": ".text",
+   "confidence": "high"
+  },
+  {
+   "from_start": "0x00264C80",
+   "from_end": "0x00274F28",
+   "delta": 0,
+   "section": "D3D",
+   "confidence": "high"
+  },
+  {
+   "from_start": "0x00274F28",
+   "from_end": "0x00278A0C",
+   "delta": 0,
+   "section": "D3D",
+   "confidence": "low"
+  },
+  {
+   "from_start": "0x00278A20",
+   "from_end": "0x00295460",
+   "delta": 0,
+   "section": "D3DX",
+   "confidence": "high"
+  },
+  {
+   "from_start": "0x00295460",
+   "from_end": "0x00295468",
+   "delta": 0,
+   "section": "D3DX",
+   "confidence": "low"
+  },
+  {
+   "from_start": "0x00295480",
+   "from_end": "0x002B5A54",
+   "delta": 0,
+   "section": "XGRPH",
+   "confidence": "high"
+  },
+  {
+   "from_start": "0x002B5A54",
+   "from_end": "0x002B66D0",
+   "delta": 0,
+   "section": "XGRPH",
+   "confidence": "low"
+  },
+  {
+   "from_start": "0x002B66E0",
+   "from_end": "0x002BF6AC",
+   "delta": 0,
+   "section": "DSOUND",
+   "confidence": "high"
+  },
+  {
+   "from_start": "0x002BF6AC",
+   "from_end": "0x002BF914",
+   "delta": 0,
+   "section": "DSOUND",
+   "confidence": "low"
+  },
+  {
+   "from_start": "0x002BF920",
+   "from_end": "0x002C77A8",
+   "delta": 0,
+   "section": "XPP",
+   "confidence": "high"
+  },
+  {
+   "from_start": "0x002C77C0",
+   "from_end": "0x002F8ED4",
+   "delta": 0,
+   "section": ".rdata",
+   "confidence": "high"
+  },
+  {
+   "from_start": "0x002F8ED4",
+   "from_end": "0x002F8EE4",
+   "delta": 0,
+   "section": ".rdata",
+   "confidence": "low"
+  },
+  {
+   "from_start": "0x002F8F00",
+   "from_end": "0x0030E05C",
+   "delta": 0,
+   "section": ".data",
+   "confidence": "high"
+  },
+  {
+   "from_start": "0x0030E05C",
+   "from_end": "0x003CBA80",
+   "delta": 0,
+   "section": ".data",
+   "confidence": "low"
+  },
+  {
+   "from_start": "0x003CBA80",
+   "from_end": "0x003D2BEC",
+   "delta": 0,
+   "section": "DOLBY",
+   "confidence": "high"
+  },
+  {
+   "from_start": "0x003D2BEC",
+   "from_end": "0x003D2C00",
+   "delta": 0,
+   "section": "DOLBY",
+   "confidence": "low"
+  },
+  {
+   "from_start": "0x003D2C00",
+   "from_end": "0x003D2E56",
+   "delta": 0,
+   "section": "$$XTINFO",
+   "confidence": "high"
+  },
+  {
+   "from_start": "0x003D2E60",
+   "from_end": "0x003D5660",
+   "delta": 0,
+   "section": "$$XTIMAGE",
+   "confidence": "high"
+  },
+  {
+   "from_start": "0x003D5660",
+   "from_end": "0x003D6660",
+   "delta": 0,
+   "section": "$$XSIMAGE",
+   "confidence": "high"
+  }
+ ],
+ "explicit": [
+  {
+   "from": "0x00275B48",
+   "to": "0x00275B48",
+   "kind": "data",
+   "name": "D3D__DirtyFlags",
+   "confidence": "high",
+   "why": "Identical instruction at 0x0002D168 reads the BSS word. All section layouts and stored section bytes are identical in USA and EUR."
+  },
+  {
+   "from": "0x00275B50",
+   "to": "0x00275B50",
+   "kind": "data",
+   "name": "D3D__TextureState",
+   "confidence": "high",
+   "why": "Identical instruction at 0x0002D16F writes the BSS array. All section layouts and stored section bytes are identical in USA and EUR."
+  },
+  {
+   "from": "0x00275D50",
+   "to": "0x00275D50",
+   "kind": "data",
+   "name": "D3D__RenderState",
+   "confidence": "high",
+   "why": "Identical instruction at 0x0002D234 writes the BSS array. All section layouts and stored section bytes are identical in USA and EUR."
+  },
+  {
+   "from": "0x00275FE8",
+   "to": "0x00275FE8",
+   "kind": "data",
+   "name": "D3D__pDevice",
+   "confidence": "high",
+   "why": "Identical CreateDevice instruction at 0x00264E13 stores the device pointer. All section layouts and stored section bytes are identical in USA and EUR."
+  },
+  {
+   "from": "0x00275FF0",
+   "to": "0x00275FF0",
+   "kind": "data",
+   "name": "CDevice",
+   "confidence": "high",
+   "why": "Identical CreateDevice instruction at 0x00264E09 loads the static device address. All section layouts and stored section bytes are identical in USA and EUR."
+  },
+  {
+   "from": "0x00278490",
+   "to": "0x00278490",
+   "kind": "data",
+   "name": "g_Stream",
+   "confidence": "high",
+   "why": "Identical instruction at 0x00266D00 reads the BSS stream array. All section layouts and stored section bytes are identical in USA and EUR."
+  },
+  {
+   "from": "0x0038A2F8",
+   "to": "0x0038A2F8",
+   "kind": "data",
+   "name": "APT set-variable callback",
+   "confidence": "high",
+   "why": "Identical instruction at 0x0002031A calls through the BSS pointer. All section layouts and stored section bytes are identical in USA and EUR."
+  },
+  {
+   "from": "0x0038BA6C",
+   "to": "0x0038BA6C",
+   "kind": "data",
+   "name": "game clock",
+   "confidence": "high",
+   "why": "Identical initializer at 0x001A7572 and getter at 0x001A75AF use this BSS object. All section layouts and stored section bytes are identical in USA and EUR."
+  },
+  {
+   "from": "0x00264C64",
+   "to": "0x00264C64",
+   "kind": "bound",
+   "name": ".text exclusive end",
+   "confidence": "high",
+   "why": "Both section headers give .text VA 0x00011000 and size 0x00253C64; the return-address scan uses this exclusive bound. All section layouts and stored section bytes are identical in USA and EUR."
+  }
+ ]
+}

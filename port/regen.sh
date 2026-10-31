@@ -8,9 +8,11 @@ cd "$(dirname "$0")/.."
 # canonical one it removes that folder; for an unknown one it stops and lists the supported SHA-1s.
 python3 tools/region/retarget.py --port port --xbe game/default.xbe --out port/src/recomp/region
 src() { if [ -f "port/src/recomp/region/$1" ]; then echo "port/src/recomp/region/$1"; else echo "port/$1"; fi; }
-# the XBE's layout (sections, imports, entry), which disasm reads as game/default_analysis.json
-python3 -m tools.xbe_parser game/default.xbe --json game/default_analysis.json
-python3 -m tools.disasm game/default.xbe --text-only --extra-sections D3D,D3DX,XGRPH,DSOUND,XPP \
+# Keep generated analysis in this checkout, including when game/ is a read-only disc junction.
+mkdir -p tools/disasm/output
+analysis=tools/disasm/output/default_analysis.json
+python3 -m tools.xbe_parser game/default.xbe --json "$analysis"
+python3 -m tools.disasm game/default.xbe --analysis-json "$analysis" --text-only --extra-sections D3D,D3DX,XGRPH,DSOUND,XPP \
     --seed-functions "$(src icall_seeds.json)"
 # hand-written code may name only functions this XBE has (an address carried over from another title would replace
 # part of an unrelated function), and every address literal must be one this XBE's code uses (comments and #if 0
@@ -34,5 +36,5 @@ python3 -m tools.recomp game/default.xbe --all --split 1000 --gen-dir port/src/r
 # hooks inside generated functions (debug traces) that an override file can't express
 python3 "$(src tools/patch_gen.py)" port/src/recomp/gen
 # title-called Direct3D / DirectSound functions the HLE does not replace (report only while bringing the game up)
-python3 port/tools/check_hle_coverage.py --gen port/src/recomp/gen --analysis game/default_analysis.json \
+python3 port/tools/check_hle_coverage.py --gen port/src/recomp/gen --analysis "$analysis" \
     --allow port/hle_coverage_allow.txt

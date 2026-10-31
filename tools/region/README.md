@@ -57,7 +57,8 @@ supported XBEs are handled by retargeting.
   - Another known profile: it copies every hand-written file whose addresses change into
     `port/src/recomp/region/`, keeping paths relative to `port/`. It rewrites `sub_`/`loc_` names and in-image hex
     literals, keeping each literal's width and case. Files that include a rewritten header are copied too. It
-    writes a stamp, `region.cmake`, listing the copied sources.
+    writes a stamp, `region.cmake`, listing the copied sources. Identity maps still write the stamp with an empty
+    source list, so CMake identifies the selected region.
   - Unknown hash: it stops and lists the supported SHA-1s.
 - **Failures:** a literal in code that can't be mapped stops the run with file:line, and nothing is written.
   Literals in comments are rewritten when they map and left alone otherwise.
