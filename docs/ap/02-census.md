@@ -10,7 +10,7 @@ hook (`sub_001AD3B0`, [01-audit §4.1](01-audit.md#41-the-apt-variable-setter--s
 | # | System | Checks | Source | Detection | Option group | Confidence |
 |---|---|---|---|---|---|---|
 | 1 | Story tasks | **35** (11 chapters, ≤4 each) | `GUI_TASKLIST_*` | task variable / task UI | always on | high |
-| 2 | Chapter completions | **12** chapters (11 have `*_endchapter.hpb`) | chapter table + `EndChapter_StartNextChapter` | chapter/room state, `End Day` | always on | high |
+| 2 | Chapter completions | **12** chapters (10 have `*_endchapter.hpb`, plus Minigames) | chapter table + `EndChapter_StartNextChapter` | chapter/room state, `End Day` | always on | high |
 | 3 | Collector's cards | **52** slots (50 named) | `WizardCards` 52-char string, card album | card bit arrays / `WizardCards` | `cards` | high (count 52), open (per-set) |
 | 4 | Card sets completed | **10** | `GUI_COLLECTORS_FETXT_003…012`, `GUI_COLLECT_*` | set-completion message/state | `card_sets` | high |
 | 5 | Folio Bruti pages | **16** | `GUI_BRUTI_TITLE_001…016` | `FolioBrutiPagesCollected`, `HasFolioBrutiPage` | `folio` | high |

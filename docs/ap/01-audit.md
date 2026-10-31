@@ -12,7 +12,7 @@ game/data/
   audio/                    .sdt sound banks, .mus/.mpf music
   english/ usenglish/       speech .ids + .sdt, variables/Apt_Text.txt (UI + dialogue), LOCALE_*.loc
   gui/                      APT menus as .big (front end, pause, quest pages, card album, minigames)
-  misc/                     384 .hpb room scripts, 34 *_definitions.hpb tables, LOCALE_*.loc
+  misc/                     384 .hpb room scripts, 34 non-function tables (mostly *_definitions.hpb), LOCALE_*.loc
   movie/                    .mad
   packages/                 2,095 .pkg/.pkgA files
 ```
@@ -110,7 +110,7 @@ systems are present in every chapter and that the per-chapter scripts are the pl
 | `poa_quest_herm_homework.big` | Hermione's statue-list homework |
 | `poa_ig_remembral.big` | Remembrall screen (statues, tasks) |
 | `poa_ig_inventory.big` | inventory |
-| `poa_ig_maps.big`, `poa_ig_tasks.big` | maps, tasks |
+| `poa_ig_maps.big` | map page |
 | `poa_mini_*.big` ×5 | broom flight, duelling, fishing, hippogriff, owl racing |
 | `poa_debugmenu.big` | developer chapter/room select |
 
@@ -142,7 +142,7 @@ certain; the id pairing in my extraction drifts where two names share one preced
 **Chapters (12 playable + extras):**
 `Intro`, `HogwartsExpress`, `Night0`, `Day1`, `Night1`, `Day2`, `Night2`, `Day3`, `Night3`, `Day5`, `Night5`,
 `Day6`; plus `Minigames`, `SinglePlayer_DuelClub`, `MultiPlayer_DuelClub`; plus 18 `TestChapter_*` developer
-chapters (AH, AW, BB, CW, GW, JTB, PB, PS, SW, TG×5, WJ, WL, TM).
+chapters (AH, AW, BB, CW, GW, JTB, PB, PS, SW, TG×6, WJ, WL, TM).
 
 **Rooms** (~50 named, matching `plfs/`): EntranceHall, GreatHall, GrandStaircase, the floors
 (1,2,3,4,6,7 — no 5), GryffindorCommonRoom, DadaClassroom, PotionsClassroom, TransfigurationClassroom,
@@ -161,7 +161,8 @@ alias for another chapter — open, and harmless for the design (treat as absent
 
 ### 2.1 Chapter scripts
 
-Every chapter has `*_initialisechapter.hpb` and `*_endchapter.hpb`:
+Each chapter has an `*_initialisechapter.hpb`; 10 of the 12 also have an `*_endchapter.hpb` (Minigames has one too;
+Intro and the Hogwarts Express have none):
 
 - `InitialiseVars`, `InitialiseChapter`, `DeinitialiseChapter`, `SetStartRoom`.
 - `intro_initialisechapter` additionally has `AddSpells` — spell granting is chapter-script state, not a global.
@@ -197,7 +198,7 @@ chapter, displayed on the Tasks page via `Task_Done_1…4` / `Task1_Display…Ta
 `GoToBed_StartReminderTimer` in the scripts) — that is the chapter gate, not a level exit.
 
 This gives the AP design its **mission vocabulary**: 35 canonical tasks, each with a name, a chapter and (usually)
-one room. They are the natural "story mission = check + gate" units the user asked for.
+one room. They are the natural "story mission = check + gate" units the design calls for.
 
 ## 4. Verified code seams
 
@@ -260,7 +261,7 @@ The XBE string table (0x2B5E00–0x2B7D00 region) is the APT variable/function v
 `GEOnQueryTaskList`, `GEOnQueryStatuesInRemembrall`, `GEOnRequestRememberallAvailability`, `GEOnQueryLostAndFound`,
 `Lost_And_Found`, `RequestSaveGameAvailability`, `SaveGameAvailable`, `SwitchToInventoryScreen`,
 `AptCallFncActivateInventory`, `DisableInventory`, `Housepoints`, `House_Points`, `beans`, `Beans_Amount`,
-`Beans_Amount`, `Task_Done_1…4`, `Task1_Display…4`, `ChapterId`, `GotoBed`, `GotoBedAvailable`,
+`Task_Done_1…4`, `Task1_Display…4`, `ChapterId`, `GotoBed`, `GotoBedAvailable`,
 `HousePointGradeDistinction/APlus/A/B/C`, `SeaHorseFishing`, `HippogriffFlyingAvailable`, `OwlRacingAvailable`,
 `BroomFlyingAvailable`.
 
@@ -316,7 +317,7 @@ listed in `regen.sh --exclude-manual`, no game data in git, no behaviour change 
 | `sub_001AD3B0(name,value)` | `recomp_0011.c:14219`; pointer read at 0x38A2F8 (265 sites) |
 | loader `sub_00115390(chapter,room,start,flag)` | `recomp_0000.c:73029-73175` |
 | card test `sub_00071840(id)` | `recomp_0002.c:74938`; arrays 0x3661C0/0x3661C4 |
-| 52-char `WizardCards` | `recomp_0000.c:58859` (`cmp esi,0x34`), seven variants to 59310 |
+| 52-char `WizardCards` | `recomp_0000.c:58859` (`cmp esi,0x34`), seven variants to 59332 |
 | chapter/room table | `data/misc/system_chapterroom.hpb`, `Init` constant pool |
 | task lists | `Apt_Text.txt` keys `GUI_TASKLIST_*` (35 entries) |
 | 10 card sets | `Apt_Text.txt` `GUI_COLLECTORS_FETXT_003…012`; `pqca_*.big` ×10 |
