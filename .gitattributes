@@ -1,3 +1,6 @@
 # Shell scripts must stay LF: a CRLF checkout breaks the shebang on Linux
 # ("bad interpreter: /usr/bin/env bash^M").
 *.sh text eol=lf
+
+# The AP catalog is copied byte for byte into the apworld and hashed: keep it LF everywhere.
+port/ap/*.json text eol=lf
