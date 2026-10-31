@@ -115,7 +115,7 @@ Slugs are lowercase, ASCII, `[a-z0-9_]+`. A key is immutable once shipped.
 | `marauders_challenge` | off | on | on | 10 |
 | `fred_and_george` | off | on | on | 4 tracks + milestones |
 | `shop` | off | on | on | purchases |
-| `secrets` | off | on | on | 6 named |
+| `secrets` | off | on | on | 7 named (`GUI_LOCTXT_*`; 02 missed `FLOOR2_003`) |
 | `challenge_shields` | off | on | on | count open |
 | `house_points` | off | on | on | milestones |
 | `bean_milestones` | off | on | on | milestones |
@@ -153,7 +153,8 @@ Progression:
 - 10 spells: Flipendo pre-collected; Expelliarmus, Glacius, Lumos Duo, Reparo, Carpe Retractum, Expecto Patronum,
   Draconifors, Snufflifors, Mucus Projectum in the pool.
 - 11 story tokens (2 pre-collected).
-- 6 upgrades: 5 endurance (card sets) + broom set.
+- 6 Endurance upgrades: six card sets raise Endurance (Witches, Wizards, Hags, Dragons, Classical Beasts,
+  Quidditch; `GUI_COLLECT_001…034`), the other four give house points. Shop upgrades are listed per item (§13).
 - 3 Dark Forces chapters.
 
 Useful/filler: beans, house points, Wiggenweld/Antidote/Girding, dungbombs, stink pellets, chocolate frogs,
@@ -229,3 +230,43 @@ or read the spell bitfield after each spellbook. Until then the catalog uses the
 
 Card 5th/rare split (50 vs 52), challenge shields, F&G milestone counts, pickup placements, enemy list, talk
 granularity, intro memories, spell-id confirmation.
+
+## 13. As built (Phase 1, 2026-10-31)
+
+`port/ap/make_catalog.py` → `catalog.json` version **94d5b65540b6**: 220 locations, 137 item names. Where the build
+differs from the sections above, this section wins.
+
+**Generator.** The census tables are embedded in the generator (like HP2's), each row citing its `Apt_Text` key, so
+the build needs no game files. `--apt-keys out/ap/apt-keys.tsv` checks every cited key exists and contains the
+printed name. IDs live in `port/ap/ids.lock.json` (committed): a key keeps its ID, new keys take the next number, a
+removed key leaves a hole. `--check` fails when the committed catalog or lock is stale. `test_catalog.py` covers
+§11's catalog-side tests.
+
+**Schema additions** (schema stays 1; all additive):
+- `regions.area_chapters`: area → the chapter it lives in (null = any chapter).
+- `goal`: `{region, tokens_required, requires}` for the Dark Tower goal.
+- items: `start` (pre-collected), `count` (copies), `pool` (groups whose vanilla grant the item replaces; the item is
+  in the pool only when one of them is on), `region`/`chapter` on passes. Extra kinds `card`, `collectible`.
+- `access` names are **item names** (`"Day 1 Pass"`, `"Glacius Challenge Pass"`), plus `cards` (item names a card
+  set needs when cards are shuffled) and `passes` (pool chapter passes a milestone or shop purchase needs).
+- `groups.<g>`: `{preset, option, count}`; `option` is null for always-on groups.
+
+**Counts per group** (spec → built): tasks 28 (the seven HOGEX/Night0 tasks are not in the catalog; a flashback group
+can add them later with new keys) · chapters **8** (Day1–Day6 except Night5, whose end is the goal) · **spellbooks 4**
+(new always-on group: the non-task spellbooks Expelliarmus/Night0, Lumos Duo/Night1, Reparo/Night2,
+Draconifors/Night3; the Glacius, Carpe and Patronum spellbooks are tasks with `reward_class` progression-spell) ·
+cards 50 · card_sets 10 · folio 16 · lost_and_found 10 · statues **12** (9 + Hermione's homework at 3/6/9 →
+Dark Forces chapter) · potions 11 · minigames **8** (one per mode, `minigame:<mode>:complete`, until grade tiers are
+known) · marauders_challenge 10 · fred_and_george **12** (statues 3/6/9, dungbombs 5/10/15/20, snot 1,
+confiscated 1–4) · shop **13** one-time purchases · secrets **7** · house_points 10 (50–500) · bean_milestones 11
+(50–2000). Empty until their census: challenge_shields, pickups, loose_pickups, enemies, talks, pursuits,
+intro_memories (pickups is Maximum-only until then).
+
+**Swap args.** `card_bit` args are card ids 1–50 (bit = id − 1); `spell_grant` args are the §10 candidates;
+`item_add` args are null until the grant is found (Phase 4). Points card sets, statues, secrets, milestones,
+ingredients, minigames, F&G tracks and the rare cards have `swap: null` (vanilla reward stays) until their grants are
+known.
+
+**Logic guesses to confirm in play:** the Night3 chapter end needs the Shrieking Shack pass; the Girding ingredients
+(flying seahorses) and Seahorse Fishing need Carpe Retractum; Snot Slinging and the F&G snot track need Mucus
+Projectum; milestones need one pool chapter pass per 100 house points / 250 beans; shop purchases need 1–5.
