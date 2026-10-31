@@ -12,7 +12,10 @@ import sys
 
 # (function, label the hook goes after, declaration, hook line)
 PATCHES = [
-    # none yet for PoA
+    # CGameChapter::Start has loaded the chapter; its stack path buffer is live
+    # until the epilogue restores esp. The check skips frontend*.pkg and logs once.
+    ("sub_00115500", "loc_00115678: ;", "extern void hppoa_RegionCheck(uint32_t chapter_path);",
+     "    hppoa_RegionCheck(ebp - 0x40);"),
 ]
 
 

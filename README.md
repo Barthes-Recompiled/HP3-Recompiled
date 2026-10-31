@@ -8,7 +8,7 @@ Harry Potter ports, beside Philosopher's Stone (hp1_recomp) and Chamber of Secre
 **State: 0.5.0 Beta.** New Game plays through the Hogwarts Express into the first level at 60 fps in true 16:9,
 with saving and loading; later levels haven't been checked yet. What works and the known issues are in
 [CHANGES.md](CHANGES.md). Back on the pause menu opens a PC Settings page. Still to come: Quit To Desktop, cutscene
-fast-forward, the European disc, and an Archipelago randomizer (coming soon).
+fast-forward and an Archipelago randomizer (coming soon).
 
 ## Playing
 
@@ -19,7 +19,8 @@ put your disc's files or the .iso in a `game` folder beside the executables and 
 ([port/README.txt](port/README.txt) has the details).
 
 **This repository contains no game content.** To build it you need the files from your own copy of the Xbox disc
-(USA for now; the European disc later). The build regenerates the recompiled code from your `default.xbe`.
+(USA or Europe; see the region table in [port/DEVELOPING.md](port/DEVELOPING.md)). The build regenerates the
+recompiled code from your `default.xbe`.
 
 F10 opens the same option rows as the sibling ports: Graphics, Audio, Controls, Gameplay, Accessibility and Debug.
 Click the arrows or use left/right to change a value; descriptions wrap and the rows scroll in smaller windows.

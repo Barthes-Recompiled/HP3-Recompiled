@@ -1,5 +1,10 @@
 # Changes
 
+## Unreleased
+
+- European (PAL) disc build profile (`poa-eur`); gameplay smoke test pending. USA stays canonical.
+- One `[REGION]` log line after the first gameplay chapter loads checks the clock and D3D BSS state.
+
 ## 0.5.0 Beta (2026-10-31): the first release
 
 The first public build of the Prisoner of Azkaban port, a beta. It stands entirely on **MiddleDucky's**
@@ -25,7 +30,7 @@ this exists without you.
 - Sound, including the narrator's line on the "I solemnly swear" screen.
 
 ### Known issues
-- Only the North American (NTSC-U) disc works.
+- The 0.5.0 release supports the North American (NTSC-U) disc; European builds are added above.
 - Levels after the first have not been checked yet.
 - No "Quit To Desktop" entry in the menus (use Alt+F4). The main menu has no settings page (use F10 there).
 - Cutscene fast-forward and the start-up logo skip are visible but greyed out, marked

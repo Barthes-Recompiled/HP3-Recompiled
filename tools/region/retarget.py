@@ -353,6 +353,9 @@ def main(argv=None):
         if rel not in copy:
             copy.append(rel)
     remove_out(out)
+    # A second region can have identical addresses: it still needs a profile stamp
+    # even when there are no source copies to create the output directory.
+    out.mkdir(parents=True, exist_ok=True)
     for rel in copy:
         dst = out / rel
         dst.parent.mkdir(parents=True, exist_ok=True)
