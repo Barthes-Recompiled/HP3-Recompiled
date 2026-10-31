@@ -27,7 +27,7 @@ hook (`sub_001AD3B0`, [01-audit §4.1](01-audit.md#41-the-apt-variable-setter--s
 | 16 | World pickups | **open** (hundreds?) | manifests, scripts, `.pkg` | item grant / object census | `pickups` | low until census |
 | 17 | Loose pickups | open | grant log (HP2 method) | play-through census | `loose_pickups` | low |
 | 18 | Lessons | ~6 | task list, class scripts | chapter task / spell grant | `lessons` | high |
-| 19 | Spells | ~7 | `AddSpells`, capability sets | spell state | `spells` | medium |
+| 19 | Spells | **10** (named in text) | `AddSpells`, `_Support_InitCapabilitySets`, `Apt_Text` | spell state | `spells` | medium |
 | 20 | Talk | 4,356 dialogue keys | `SV3_*` | dialogue played | `talks` (Max only) | medium |
 | 21 | Pursuits | per chapter | `*_Pursuit` scripts | pursuit complete/fail | `pursuits` (Max only) | medium |
 | 22 | Enemies | open | `SetAI*` scripts | kill/spawn events | `enemies` (Max only) | low |
@@ -207,3 +207,25 @@ Until one of these lands, `pickups`/`loose_pickups` stay off by default and the 
 | whether Inventory/Quests pages are reachable | AP UI page host |
 | enemy/creature list | Max-tier "enemies" |
 | talk granularity (per line vs per conversation) | Max-tier size |
+
+## 15. Spells — names verified in the game's text
+
+The scripts carry spell **ids**, not names (`intro_initialisechapter.hpb`'s `AddSpells` is a two-integer function;
+`.hpb` constants contain no spell words at all). The names are in `Apt_Text.txt`, counted there:
+
+| Spell | Mentions | Role |
+|---|---|---|
+| Glacius | 91 | ice/freeze, Glacius Challenge |
+| Expelliarmus | 48 | duelling, Night0 practice |
+| Flipendo | 38 | the starting spell |
+| Carpe Retractum | 25 | pull/grapple, Carpe Retractum Challenge |
+| Draconifors | 18 | turns statues into dragons, broom challenge |
+| Lumos | 16 | light, Notice Board, dark rooms |
+| Snufflifors | 10 | books into mice (Fred & George) |
+| Reparo | 8 | repair |
+| Expecto Patronum | 6 | the Patronus, Night3/Night5 |
+| Mucus Projectum | 6 | Fred & George's snot spell |
+
+`Petrificus` (13) is a duelling-club incantation used by NPCs; Alohomora, Incendio, Diffindo, Spongify and
+Wingardium do **not** appear — PoA's spell set is the ten above. Mapping each name to the numeric id used by
+`AddSpells`/the capability sets is still open; that mapping is what lets a spell item actually be granted.

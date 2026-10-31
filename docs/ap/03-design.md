@@ -29,10 +29,11 @@ Status: **proposal**. Nothing here is built; the numbers it leans on are in [02-
             └──────────────┬────────────────┘
                            │
             ┌──────────────▼────────────────┐
-            │  Spells (7)                   │  Zelda dungeon items
-            │  Lumos, Alohomora, Glacius,   │  → traversal + mission prereq
-            │  Carpe Retractum, Expelliarmus│
-            │  Draconifors, Expecto Patronum│
+            │  Spells (10)                  │  Zelda dungeon items
+            │  Lumos, Glacius, Expelliarmus │  → traversal + mission prereq
+            │  Carpe Retractum, Draconifors │
+            │  Snufflifors, Reparo, Patronum│
+            │  Mucus Projectum (shop)       │
             └──────────────┬────────────────┘
                            │
                   ┌────────▼────────┐
@@ -254,8 +255,9 @@ Other options:
 mission pass.
 
 **Items (progression)**: 12 chapter passes (one per chapter; the start's is pre-collected, so 11 in the pool),
-12–18 mission passes, 7 spells, 12 story tokens, 6 upgrades (5 endurance from card sets + one broom set),
-3 Dark Forces chapters, bean-bag and ammo holders.
+12–18 mission passes, 10 spells (Flipendo, Lumos, Glacius, Expelliarmus, Carpe Retractum, Draconifors,
+Snufflifors, Reparo, Expecto Patronum, Mucus Projectum), 12 story tokens, 6 upgrades (5 endurance from card sets +
+one broom set), 3 Dark Forces chapters, bean-bag and ammo holders.
 
 **Items (useful/filler)**: beans, house points, Wiggenweld/Antidote/Girding vials, dungbombs, stink pellets,
 chocolate frogs, cauldron cakes.
