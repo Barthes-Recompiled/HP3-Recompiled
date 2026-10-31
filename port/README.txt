@@ -7,8 +7,7 @@ It contains no game data: you need the files from your own copy of the Xbox disc
 BETA (0.5.0). Tested from New Game through the Hogwarts Express and the
 first level, with saving and loading, at 30 and 60 fps. Later levels have not
 been checked yet. Builds support the North American (NTSC-U) and European
-(PAL) discs; use a build made for your disc region. The European build
-is awaiting its first gameplay smoke test.
+(PAL) discs; use a build made for your disc region.
 
 Not in this beta yet: "Quit To Desktop" in the menus (use Alt+F4), and cutscene fast-forward (its option is
 there but greyed out, as is the start-up logo skip).

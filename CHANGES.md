@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- European (PAL) disc build profile (`poa-eur`); gameplay smoke test pending. USA stays canonical.
+- European (PAL) disc build profile (`poa-eur`): boots to its language screen and plays New Game into the Hogwarts Express. USA stays canonical.
 - One `[REGION]` log line after the first gameplay chapter loads checks the clock and D3D BSS state.
 
 ## 0.5.0 Beta (2026-10-31): the first release
