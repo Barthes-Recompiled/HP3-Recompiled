@@ -16,6 +16,7 @@ The game is the USA disc (`default.xbe` SHA-1 `51b09e01…`), played through `hp
 | [04-roadmap.md](04-roadmap.md) | Phases from census to playable seed, the open questions that gate each phase, and the risks. |
 | [05-handoff.md](05-handoff.md) | State at the end of the 2026-10-31 night session. |
 | [06-handoff-2026-10-31.md](06-handoff-2026-10-31.md) | Post-decision handoff: the eight answers, the area-pass call, and the next workstreams (check/pickup audit, check slop, tracker, suppression, Intro). |
+| [07-prompt-next-session.md](07-prompt-next-session.md) | Copy-paste prompt for the next agent session, scoped to the audit and the catalog spec. |
 
 ## Method
 
