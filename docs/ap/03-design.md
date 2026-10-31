@@ -181,6 +181,34 @@ with a partial chapter; that is the live test matrix (§9).
 | save from an AP run loaded without AP | detect lineage mismatch, warn, keep playing vanilla |
 | chapter 5 / floor numbering gaps (no Floor5) | region list is data-driven from the chapter table, not hard-coded |
 
+### 6.6 The gamestates the player can be in
+
+"Various gamestates" is the real risk surface: the AP layer must know where the player is before it sends, gives
+or travels. The states below are the ones the game demonstrably has.
+
+| State | How the port knows | AP behaviour |
+|---|---|---|
+| **Front end** (title, save select, Bonus Activities menu) | `ChapterId` unset / FE scripts running | connect, flush queues, allow "start run" |
+| **Loading / chapter transition** | loader entered (`sub_00115390`), loading screen up | queue everything; apply at the first "ready" |
+| **Cutscene** | `IsMoviePlaying`, `CutsceneSkipped`, fade state | no travel, no item application; story checks fire from the cutscene's own end |
+| **Free roam** | a room is up, no mission lock | checks live; travel allowed **from pause only** |
+| **Mission active** | task script running / mission pass consumed | mission checks at completion; travel discouraged |
+| **Minigame / challenge** | mode flag, minigame script, `poa_mini_*` UI | score/grade checks at result; no travel |
+| **Duelling Club** (single/multiplayer) | duel-club chapter scripts | result checks; no travel |
+| **Shop (Fred & George)** | shop UI open | purchases are checks/items; beans are the currency |
+| **Pause menu** | pause UI (`Game Paused`) | **safe point**: apply received items, open travel page, save |
+| **End of day** | `GotoBed` / `End Day` task | chapter-end check, token, next-chapter pass |
+| **Death / instant restart** | `GenericPlayerDeath_*`, `CombatUtils_RestartLevel` | no rollback of sent checks; re-apply state on respawn |
+| **Save / load** | save slot flow (`SaveGame-0..2`) | lineage check; re-apply state after load |
+| **Disconnected / offline** | no bridge session | queue checks; queue items; never block play |
+
+Two rules fall out of the table:
+
+- **Items are applied only in a safe state** (pause, front end, or the first frame after a chapter is ready).
+  Everything else queues. This is what prevents a delivery from being overwritten by `InitialiseChapter`.
+- **Travel is only offered from pause**, never during a cutscene, loading screen, minigame or mission. HP2 learned
+  this the hard way (warping during a level's opening cutscene black-screens it).
+
 ## 7. Options — "-sanity" and check slop
 
 One preset plus granular toggles. The preset sets the defaults; the toggles override.
