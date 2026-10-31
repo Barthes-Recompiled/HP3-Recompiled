@@ -10,7 +10,7 @@ hook (`sub_001AD3B0`, [01-audit §4.1](01-audit.md#41-the-apt-variable-setter--s
 | # | System | Checks | Source | Detection | Option group | Confidence |
 |---|---|---|---|---|---|---|
 | 1 | Story tasks | **35** (11 chapters, ≤4 each) | `GUI_TASKLIST_*` | task variable / task UI | always on | high |
-| 2 | Chapter completions | **12** | chapter table + `EndChapter_StartNextChapter` | chapter/room state, `End Day` | always on | high |
+| 2 | Chapter completions | **12** chapters (11 have `*_endchapter.hpb`) | chapter table + `EndChapter_StartNextChapter` | chapter/room state, `End Day` | always on | high |
 | 3 | Collector's cards | **52** slots (50 named) | `WizardCards` 52-char string, card album | card bit arrays / `WizardCards` | `cards` | high (count 52), open (per-set) |
 | 4 | Card sets completed | **10** | `GUI_COLLECTORS_FETXT_003…012`, `GUI_COLLECT_*` | set-completion message/state | `card_sets` | high |
 | 5 | Folio Bruti pages | **16** | `GUI_BRUTI_TITLE_001…016` | `FolioBrutiPagesCollected`, `HasFolioBrutiPage` | `folio` | high |
@@ -21,7 +21,7 @@ hook (`sub_001AD3B0`, [01-audit §4.1](01-audit.md#41-the-apt-variable-setter--s
 | 10 | Minigames | **8 modes** | `GUI_GENFRTXT_*`, `poa_mini_*.big` | challenge scores, availability flags | `minigames` | high (modes), open (grade tiers) |
 | 11 | Marauder's Challenge | **10** (one per chapter) | `*_marauderschallenge.hpb` in every chapter | challenge completion/score | `marauders_challenge` | medium |
 | 12 | Challenge Shields | open | `GUI_GEN_HLPTXT_105` | shield state | `challenge_shields` | open |
-| 13 | Secrets | **5+** named | `GUI_LOCTXT_*`, `SecretDoor_InitForDay/Night` | secret-door state | `secrets` | medium |
+| 13 | Secrets | **6** named | `GUI_LOCTXT_*`, `SecretDoor_InitForDay/Night` | secret-door state | `secrets` | medium |
 | 14 | House points | milestones | `Housepoints`, grades | variable milestones | `house_points` | high |
 | 15 | Beans | milestones | `Beans_Amount` | variable milestones | `bean_milestones` | high |
 | 16 | World pickups | **open** (hundreds?) | manifests, scripts, `.pkg` | item grant / object census | `pickups` | low until census |

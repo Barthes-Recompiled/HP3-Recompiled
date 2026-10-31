@@ -17,8 +17,9 @@ Status: **proposal**. Nothing here is built; the numbers it leans on are in [02-
 
 ```
             ┌───────────────────────────────┐
-            │  Chapter passes (11)          │  KH world visits / ME planets
+            │  Chapter passes (12)          │  KH world visits / ME planets
             │  "Day 1", "Night 3", …        │  → region + travel destination
+            │  11 in the pool at start      │
             └──────────────┬────────────────┘
                            │
             ┌──────────────▼────────────────┐
@@ -252,9 +253,9 @@ Other options:
 `Challenges`, `ShriekingShack`, `DarkTower`. Chapter edges require the chapter pass; mission edges require the
 mission pass.
 
-**Items (progression)**: 11 chapter passes (start chapter pre-collected), 12–18 mission passes, 7 spells,
-12 story tokens, 6 upgrades (5 endurance from card sets + one broom set), 3 Dark Forces chapters, bean-bag and
-ammo holders.
+**Items (progression)**: 12 chapter passes (one per chapter; the start's is pre-collected, so 11 in the pool),
+12–18 mission passes, 7 spells, 12 story tokens, 6 upgrades (5 endurance from card sets + one broom set),
+3 Dark Forces chapters, bean-bag and ammo holders.
 
 **Items (useful/filler)**: beans, house points, Wiggenweld/Antidote/Girding vials, dungbombs, stink pellets,
 chocolate frogs, cauldron cakes.
