@@ -43,23 +43,30 @@ Tools: the `.hpb` reader (`Harry Potter Xbox Decomps/tools/hpbfn.py`), the censu
 | Card state read | `sub_00071840` / 0x3661C0,C4 | none |
 | Chapter/task state read | 0x376B44/48/4C, `ChapterId` | none |
 | Travel | `sub_00115390` + globals | medium (only from safe states) |
+| Return to common room | same loader, hub/start room | medium (pause only) |
 
 - Whitelist variables → checks; debounce duplicate writes; persist sent-checks in the sidecar.
 - Add the pause "Archipelago" page (Marauder's Map): Travel / Checks / Items / Status; native parchment toasts for
   sent checks and received items; optional Remembrall HUD.
+- Add the **Return to the common room** action (Floo) as the softlock escape hatch; wire it before any spell is
+  shuffled in anger.
 - **Exit**: a live run sends card/task/statue checks, travels between two chapters, the tracker shows the right
-  counts, and a toast fires for one check and one item.
+  counts, a toast fires for one check and one item, and the retreat recovers from a mission.
 
 ## Phase 4 — delivery (the expensive hooks)
 
 - Find the **item grant / inventory add**; wire AP item → spell/upgrade/consumable.
 - Find the **progress/save block**; wire lineage and "apply after chapter ready".
 - Story tokens and area-pass flags: per-mission flag table, seeded on grant.
+- **Spells** (decision 9): the nine spellbook/purchase checks, the spell grant, and the task-vs-ownership test;
+  `shuffle_spells` on by default.
 - **Reward suppression** (decision 6): grant-site test, the reward-swap table, and re-evaluating card-set
-  completion when a card arrives from AP.
+  completion when a card arrives from AP; spellbook grants suppressed with the AP item as the spell.
+- **Mission snapshot/restore** for the retreat (progress block + AP state on mission entry).
 - **Intro flashback**: snapshot/restore around the Intro load, no `EndChapter_StartNextChapter`.
-- **Exit**: a fresh seed starts, one item of each class is delivered, one mission completes and its token opens
-  another, one suppressed card/statue arrives exactly once, and the Intro leaves the Day 1 state untouched.
+- **Exit**: a fresh seed starts, one item of each class is delivered (spell included), one mission completes and its
+  token opens another, one suppressed card/statue/spellbook arrives exactly once, the retreat recovers a stuck
+  mission, and the Intro leaves the Day 1 state untouched.
 
 ## Phase 5 — options, goal, polish
 
@@ -86,6 +93,13 @@ Tools: the `.hpb` reader (`Harry Potter Xbox Decomps/tools/hpbfn.py`), the censu
 7. **Suppression edge cases** — a card that never reaches the album, a set that never completes, a grant that fires
    twice. Mitigation: exactly-once test in the live matrix, set re-evaluation on card add, the reward-swap table in
    the catalog, and a group-level `suppress_rewards` switch to fall back.
+8. **Spell self-lock.** A spell's check behind a gate that needs that spell (or a cycle). Mitigation: the apworld
+   no-self-lock test, plus the retreat as the in-game escape.
+9. **Spellbook task depends on ownership.** If the story task only completes when the spell is owned, the mission
+   chain waits for the AP item; the retreat + snapshot make that livable, but the logic must gate the next mission
+   on the task *and* the spell. Test G3 decides.
+10. **Retreat disabled where it is needed.** Some mission states may block the pause menu; the live matrix finds
+    them, and the mission snapshot is the fallback (restore rather than reload).
 
 ## Branch and review model
 

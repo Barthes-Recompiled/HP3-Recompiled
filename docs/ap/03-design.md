@@ -14,6 +14,7 @@ Status: **decisions taken 2026-10-31**; nothing built yet. Numbers are in [02-ce
 | 6 | Vanilla rewards | **Suppressed** when the same thing is an AP item; progression grants are exempt (§12). |
 | 7 | Intro | **Playable flashback in every seed**, skipped at the start, revisitable in-game (§3.1). |
 | 8 | Tracker / messages | **In-game themed tracker + check/item notifications** (§11). |
+| 9 | Spells | **All 10 in the multiworld**: 9 obtainable checks + Flipendo start; vanilla grant suppressed; the **return-to-common-room retreat** and a mission snapshot make it safe (§5.1, §6.7). |
 
 ## 1. Axioms
 
@@ -43,9 +44,11 @@ Status: **decisions taken 2026-10-31**; nothing built yet. Numbers are in [02-ce
                            │
             ┌──────────────▼────────────────┐
             │  Spells (10)                  │  Zelda dungeon items
-            │  Lumos, Glacius, Expelliarmus │  → traversal + mission prereq
-            │  Carpe Retractum, Draconifors │
-            │  Snufflifors, Reparo, Patronum│
+            │  Lumos Duo, Glacius,          │  → traversal + mission prereq
+            │  Expelliarmus,                │
+            │  Carpe Retractum,             │
+            │  Draconifors, Snufflifors,    │
+            │  Reparo, Expecto Patronum,    │
             │  Mucus Projectum (shop)       │
             └──────────────┬────────────────┘
                            │
@@ -75,7 +78,7 @@ Options:
 |---|---|---|---|
 | `start_chapter` | `night0`, `day1`, `random` | `day1` | Where a new seed starts; the chapter's pass is pre-collected. The Intro is never a start (it is the flashback). |
 | `skip_intro` | on/off | on | Skips the Privet Drive/Express opening at the start; the Intro stays a playable flashback either way (§3.1). |
-| `starting_spells` | `flipendo`, `lumos`… | `flipendo` | The one spell that must be known to not soft-lock the movement tutorial. |
+| `starting_spells` | `flipendo` / `random` | `flipendo` | The one spell that must be known to not soft-lock the movement tutorial; `random` picks one of the ten. |
 
 Why not the Intro? It is a cutscene-heavy prologue; it makes a poor randomizer start and a worse "open castle"
 statement. Why not Night0? It is the tutorial night; Day1 is the first day where all four task types are available.
@@ -164,6 +167,33 @@ Options:
 | `areas` (default) | the ten above; tasks inside a chapter are free | smooth run |
 | `tasks` | every task check in the seed (28) gets a pass | maximum fragmentation / check-slop runs |
 | `chain` | no passes; a mission's completion yields the next mission's pass | vanilla-like, one order |
+
+### 5.1 Spells in the multiworld
+
+Spells are the Zelda-dungeon layer and they stay in the pool (decision 9). The game's spell table has 11 entries;
+10 are world spells and 9 of those are obtainable — Flipendo is the starting spell:
+
+| Spell | Source check |
+|---|---|
+| Expelliarmus | Night0, Peeves' spellbook (inferred) |
+| Glacius | Day1 DADA, Lupin's spellbook |
+| Lumos Duo | Night1 Muggle Studies (inferred) |
+| Reparo | Night2 Lower Dungeon |
+| Carpe Retractum | Day3 Charms |
+| Expecto Patronum | Night3 History of Magic |
+| Draconifors | Night3 (second spellbook) |
+| Snufflifors | Fred & George's shop |
+| Mucus Projectum | Fred & George's shop |
+
+The nine sources are **checks**; the vanilla grant is suppressed and the AP item is the spell (§12). The starting
+Flipendo is pre-collected and never shuffled. `shuffle_spells` off means all ten are pre-collected (vanilla-ish),
+which is the fallback if the spell layer ever misbehaves.
+
+Two rules keep it sane:
+
+- **No self-locks.** No spell's check may sit behind a gate that requires that spell (or a cycle of spells). The
+  apworld test asserts every spell is reachable without itself.
+- **The retreat.** A missing spell must never be a dead end — see §6.7.
 
 **Seeded chapters.** The Intro, Hogwarts Express and Night0 are past at the Day 1 start. The Intro has no tasks.
 HOGEX (3) and Night0 (4) do, and those seven checks are **pre-completed, not in the pool**: replaying them would
@@ -268,6 +298,25 @@ Two rules fall out of the table:
 - **Travel is only offered from pause**, never during a cutscene, loading screen, minigame or mission. HP2 learned
   this the hard way (warping during a level's opening cutscene black-screens it).
 
+### 6.7 Softlocks and the retreat
+
+Shuffled spells make the "stuck without the spell" case real. Three layers answer it:
+
+1. **Return to the common room (Floo)** — a pause action and a controller shortcut that reloads the chapter's safe
+   room: `GryffindorCommonRoom` when the chapter has one, otherwise the chapter's start room. Always available in
+   free roam and missions; refused only in cutscenes, loading screens and minigames. It is not an item, never
+   consumed, and works offline. The player asked for exactly this button, and it is the general escape hatch, not a
+   spell-only patch.
+2. **Mission snapshot** — on mission entry the port copies the progress block and the AP state; the retreat
+   restores it. This is the answer to a save made inside an unwinnable mission, which a plain reload cannot fix.
+3. **Logic** — the no-self-lock test (§5.1) plus normal AP fill means a missing spell is always obtainable
+   somewhere reachable.
+
+What the retreat does not fix: engine states that disable the pause menu entirely (cutscenes, minigames, duelling —
+the live matrix tests which), or a mission script that marks itself failed on exit. Those states are short and, in
+the data, not spell-gated. Everything spatial — a door that needs Glacius, a one-way drop, a mission that cannot be
+finished — is escapable, and the snapshot covers the save case.
+
 ## 7. Options — "-sanity" and check slop
 
 One preset plus granular toggles. The preset sets the defaults; the toggles override.
@@ -298,8 +347,7 @@ Other options:
 | `tokens_required` | 8 | only for `dark_tower` (of 11; 2 pre-collected) |
 | `cards_goal` | 40 | only for `cards` |
 | `start_chapter` | `day1` | see §3 |
-| `mission_passes` | `areas` | `areas` / `tasks` / `chain` (§5) |
-| `open_castle` | on | see §4 |
+| `mission_passes` | `areas` | `areas` / `tasks` / `chain` (§5) || `open_castle` | on | see §4 |
 | `travel_requires_floo` | off | fireplace-only travel, for flavour runs (§4) |
 | `tracker` | on | Marauder's Map page + Remembrall HUD (§11) |
 | `notifications` | `overlay` | `overlay` / `game` / `off` (§11) |
@@ -316,9 +364,9 @@ Other options:
 area pass.
 
 **Items (progression)**: 12 chapter passes (Day1, Intro, HOGEX and Night0 pre-collected, so 8 in the pool),
-10 area passes (§5), 10 spells (Flipendo, Lumos, Glacius, Expelliarmus, Carpe Retractum, Draconifors,
-Snufflifors, Reparo, Expecto Patronum, Mucus Projectum), 11 story tokens (2 pre-collected), 6 upgrades (5 endurance
-from card sets + one broom set), 3 Dark Forces chapters, bean-bag and ammo holders.
+10 area passes (§5), 10 spells (Flipendo pre-collected; Expelliarmus, Glacius, Lumos Duo, Reparo, Carpe Retractum,
+Expecto Patronum, Draconifors, Snufflifors, Mucus Projectum in the pool), 11 story tokens (2 pre-collected),
+6 upgrades (5 endurance from card sets + one broom set), 3 Dark Forces chapters, bean-bag and ammo holders.
 
 **Items (useful/filler)**: beans, house points, Wiggenweld/Antidote/Girding vials, dungbombs, stink pellets,
 chocolate frogs, cauldron cakes.
@@ -343,6 +391,10 @@ chocolate frogs, cauldron cakes.
    item does, exactly once, and the album/set-completion state is consistent.
 9. **Tracker**: the pause page opens in every gamestate and shows the right counts; a toast fires for one check and
    one item; the Remembrall glows only where unchecked locations exist.
+10. **Spell retreat**: pick up a spellbook with suppression on, then use Return to the common room; confirm the
+    chapter reloads, the task state is sane, and the mission can be re-entered after the AP item grants the spell.
+11. **Spell task dependency**: does the spellbook task complete on the pickup (works) or only on ownership (needs
+    the item first)? That decides whether the next mission is gated on the task, the spell, or both.
 
 ## 10. Remaining questions
 
@@ -353,7 +405,8 @@ chocolate frogs, cauldron cakes.
 3. **Intro memories**: should the flashback carry optional checks at all, or be pure replay?
 4. **Floo-only default**: recommended off (fireplace-only as an option); confirm.
 5. **Text channel**: pursue the game's own text display for messages, or stop at the native overlay?
-6. **Suppression scope**: confirm that progression grants (spellbooks, story, chapter ends) stay vanilla (§12).
+6. **Suppression scope**: confirm the story/chapter/area grants stay vanilla; spells are suppressed (§12).
+7. **Starting spell**: always Flipendo, or `random` (one of the ten)?
 
 ## 11. The tracker and in-game messages
 
@@ -390,12 +443,13 @@ Rule: the tracker is the log, the toast is the feedback — a check must never b
 ## 12. Reward suppression
 
 Decision 6: when a check's vanilla reward is the same thing as an AP item, the vanilla grant is suppressed and the
-AP item is what grants it. Two classes:
+AP item is what grants it. Three classes:
 
 | Class | Examples | Suppress? | Why |
 |---|---|---|---|
 | Reward | cards, beans, house points, endurance, folio pages, L&F items, statue rewards, minigame grades, F&G rewards | **yes** | the AP item is the same reward; leaving both doubles it |
-| Progression | spellbooks/lessons, story tasks, chapter ends, area passes | **no** (keep vanilla) | suppressing can soft-lock the mission that expects the spell; the check is the event, the AP item is the token/key |
+| Progression-spell | the nine spellbook/purchase checks (§5.1) | **yes** | the AP item is the spell; the retreat + snapshot (§6.7) make it safe |
+| Progression-story | story tasks, chapter ends, area passes | **no** (keep vanilla) | suppressing can soft-lock the mission that expects it; the check is the event, the AP item is the token/key |
 
 Implementation:
 

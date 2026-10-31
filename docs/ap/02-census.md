@@ -212,36 +212,46 @@ Until one of these lands, `pickups`/`loose_pickups` stay off by default and the 
 | enemy/creature list | Max-tier "enemies" |
 | talk granularity (per line vs per conversation) | Max-tier size |
 
-## 15. Spells — names verified in the game's text
+## 15. Spells — 10 world spells, 9 obtainable
 
-The scripts carry spell **ids**, not names (`intro_initialisechapter.hpb`'s `AddSpells` is a two-integer function;
-`.hpb` constants contain no spell words at all). The names are in `Apt_Text.txt`, counted there:
+The script layer carries spell **ids**, not names (`intro_initialisechapter.hpb`'s `AddSpells` is a two-integer
+function; `.hpb` constants contain no spell words). The game's own spell table is `GUI_SPLTXT_*` in `Apt_Text.txt`:
+11 entries, one of which (`Melofors`) is a duelling-club move rather than a world spell.
 
-| Spell | Mentions | Role |
-|---|---|---|
-| Glacius | 91 | ice/freeze, Glacius Challenge |
-| Expelliarmus | 48 | duelling, Night0 practice |
-| Flipendo | 38 | the starting spell |
-| Carpe Retractum | 25 | pull/grapple, Carpe Retractum Challenge |
-| Draconifors | 18 | turns statues into dragons, broom challenge |
-| Lumos | 16 | light, Notice Board, dark rooms |
-| Snufflifors | 10 | books into mice (Fred & George) |
-| Reparo | 8 | repair |
-| Expecto Patronum | 6 | the Patronus, Night3/Night5 |
-| Mucus Projectum | 6 | Fred & George's snot spell |
+| Spell | Source | Check? | Confidence |
+|---|---|---|---|
+| Flipendo | start (pre-collected) | no | high |
+| Expelliarmus | Night0, Peeves' spellbook | yes | inferred |
+| Glacius | Day1 DADA, Lupin's spellbook | yes | high |
+| Lumos Duo | Night1 Muggle Studies | yes | inferred |
+| Reparo | Night2 Lower Dungeon, Hermione's spellbook | yes | high |
+| Carpe Retractum | Day3 Charms, Flitwick's spellbook | yes | high |
+| Expecto Patronum | Night3 History of Magic, Lupin's spellbook | yes | high |
+| Draconifors | Night3, Hermione's second spellbook | yes | high |
+| Snufflifors | Fred & George's shop | yes (purchase) | high |
+| Mucus Projectum | Fred & George's shop | yes (purchase) | high |
+| (Melofors) | duelling-club move | no | high |
 
-`Petrificus` (13) is a duelling-club incantation used by NPCs; Alohomora, Incendio, Diffindo, Spongify and
-Wingardium do **not** appear — PoA's spell set is the ten above. Mapping each name to the numeric id used by
-`AddSpells`/the capability sets is still open; that mapping is what lets a spell item actually be granted.
+Evidence: `SV3_LUP_D1DADA1_002`, `SV3_HER_D1GLACIUS_015`, `SV3_HER_N1MUGGLE_016` + `SV3_RON_N1MUGGLE_020`,
+`SV3_HER_N2LOWDUNG_007`, `SV3_FLT_D3CHARMS1_005`, `SV3_LUP_N3HISTMG1_003`, `SV3_HER_N3HISTMG2_004`,
+`GUI_FANDG_SHOPTXT_010`, `SV3_RON_FANDGRON_015`; `GUI_SPLTXT_*` gives the names and descriptions.
+`SV3_PVS_N0PEEVES_*` is the Peeves spellbook scene; Expelliarmus is the inferred match (Night0's task is to
+practise it, and its description is "repels spells back at an opponent").
+
+The earlier "Lumos" note was wrong: the game's light spell is **Lumos Duo** (`GUI_SPLTXT_LUMOSDUO_001`); plain
+"Lumos" appears only in help text. Alohomora, Incendio, Diffindo, Spongify and Wingardium do not appear at all.
+Mapping each name to the numeric id used by `AddSpells`/the capability sets is still open; that mapping is what
+lets a spell item be granted.
 
 ## 16. Reward classes (for suppression)
 
-Every check's vanilla grant falls into one of two classes, and the catalog records it (design §12):
+Every check's vanilla grant falls into one of three classes, and the catalog records it (design §12):
 
 | Class | Checks | Suppressed when AP owns it? |
 |---|---|---|
 | **Reward** | cards, beans, house points, endurance, folio pages, L&F items, statue rewards, minigame grades, Fred & George rewards | **yes** — the AP item is the same reward |
-| **Progression** | spellbooks/lessons, story tasks, chapter ends, area passes | **no** — suppressing can soft-lock the mission that expects it |
+| **Progression-spell** | the nine spellbook/purchase checks | **yes** — the AP item is the spell; the retreat and mission snapshot make it safe (design §6.7) |
+| **Progression-story** | story tasks, chapter ends, area passes | **no** — suppressing can soft-lock the mission that expects it |
 
 The **reward-swap table** (check key → suppressed grant → AP item) is part of the catalog. Cards are the awkward
 case: the world entity is the check, so it must still spawn, but its ownership grant is suppressed until the AP
