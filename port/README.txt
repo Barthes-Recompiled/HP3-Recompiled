@@ -8,8 +8,7 @@ BETA (0.5.0). Tested from New Game through the Hogwarts Express and the
 first level, with saving and loading, at 30 and 60 fps. Later levels have not
 been checked yet. Works with the North American (NTSC-U) disc only.
 
-Not in this beta yet: settings pages inside the game's menus, "Quit To
-Desktop" in the menus (use Alt+F4), and cutscene fast-forward (its option is
+Not in this beta yet: "Quit To Desktop" in the menus (use Alt+F4), and cutscene fast-forward (its option is
 there but greyed out, as is the start-up logo skip).
 
 
@@ -97,6 +96,16 @@ Keyboard and mouse (defaults; change them under F10 > Controls)
 Sneaking: on a controller, push the left stick gently. Keys always move at
 full speed, so use the sneak toggle; a controller button can toggle it too
 (F10 > Controls > Sneak toggle button).
+
+
+PC SETTINGS (PAUSE MENU)
+------------------------
+
+While the game is paused, Back (the controller's View/Select button, or the
+key it is bound to) opens PC Settings over the pause menu: the display, frame
+rate, anti-aliasing, controller and keyboard settings. Up/down picks a row,
+left/right (or A on an on/off row) changes it, B or Back closes. Arrow keys,
+Enter and Esc work too. Changes apply at once and are saved to hppoa.toml.
 
 
 OPTIONS (F10)

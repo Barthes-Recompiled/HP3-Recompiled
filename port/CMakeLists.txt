@@ -84,6 +84,7 @@ set(GAME_SOURCES
     src/hle_skip.c
     # The developers' debug menu, allowed by hppoa.toml debug_menu (off = Xbox).
     src/hle_debug.c
+    src/hle_pause.c
     src/profiler.c
     # Direct3D 8 on a host D3D12 renderer, ported from SCDA-XBERecomp
     # (src/scda, MIT): the XDK's D3D entry points instead of the NV2A.

@@ -162,6 +162,7 @@ void Step(const Row& row, int step);  // -1 or 1, saved to hppoa.toml at once
 void Defaults(int page);              // the page's rows as a new hppoa.toml has them (the aspect ratio stays)
 bool Shown(const Row& row);           // F10: false leaves it out for now (render scale with a fixed resolution)
 bool Enabled(const Row& row);         // F10: false greys it (vibration strength with vibration off)
+bool TwoValues(const Row& row);      // A / Enter can toggle it on the pause page
 const char* Note(const Row& row);     // F10: the grey line under it, or null
 }  // namespace rows
 

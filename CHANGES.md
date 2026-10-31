@@ -19,13 +19,15 @@ this exists without you.
   anisotropic filtering, windowed / borderless / fullscreen, keyboard and mouse with rebinding, controller remapping,
   deadzones and vibration, and "Controller in background". F10 uses the sibling ports' shared row table,
   with left/right arrows, descriptions and a scrolling layout for 4:3 through 4K.
+- **PC Settings in the pause menu:** Back on the pause menu opens a page of the port's settings (display, frame
+  rate, anti-aliasing, controller, keyboard and mouse, cutscene bars), drawn over the paused game in its 4:3 menu
+  area; a "Back  PC Settings" hint shows on the pause screen.
 - Sound, including the narrator's line on the "I solemnly swear" screen.
 
 ### Known issues
 - Only the North American (NTSC-U) disc works.
 - Levels after the first have not been checked yet.
-- No settings pages inside the game's menus yet (use F10 or the launcher), and no "Quit To Desktop" entry in the
-  menus (use Alt+F4).
+- No "Quit To Desktop" entry in the menus (use Alt+F4). The main menu has no settings page (use F10 there).
 - Cutscene fast-forward and the start-up logo skip are visible but greyed out, marked
   "Not working in this game yet", in F10 and the launcher.
 - Button prompts are always Xbox's; PlayStation and Switch pads work through Steam Input or DS4Windows.

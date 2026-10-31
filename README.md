@@ -7,7 +7,7 @@ Harry Potter ports, beside Philosopher's Stone (hp1_recomp) and Chamber of Secre
 
 **State: 0.5.0 Beta.** New Game plays through the Hogwarts Express into the first level at 60 fps in true 16:9,
 with saving and loading; later levels haven't been checked yet. What works and the known issues are in
-[CHANGES.md](CHANGES.md). Still to come: settings pages inside the game's menus, Quit To Desktop, cutscene
+[CHANGES.md](CHANGES.md). Back on the pause menu opens a PC Settings page. Still to come: Quit To Desktop, cutscene
 fast-forward, the European disc, and an Archipelago randomizer (coming soon).
 
 ## Playing

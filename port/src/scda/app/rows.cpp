@@ -380,6 +380,10 @@ bool Enabled(const Row& row) {
     }
 }
 
+bool TwoValues(const Row& row) {
+    return row.kind == Kind::Value && (kDefs[row.id].flag || kDefs[row.id].count == 2);
+}
+
 const char* Note(const Row& row) {
     std::lock_guard lock(UiLock());
     const Settings& s = Get();
