@@ -11,7 +11,7 @@ hook (`sub_001AD3B0`, [01-audit §4.1](01-audit.md#41-the-apt-variable-setter--s
 |---|---|---|---|---|---|---|
 | 1 | Story tasks | **35** (11 chapters, ≤4 each) | `GUI_TASKLIST_*` | task variable / task UI | always on | high |
 | 2 | Chapter completions | **12** chapters (10 have `*_endchapter.hpb`, plus Minigames) | chapter table + `EndChapter_StartNextChapter` | chapter/room state, `End Day` | always on | high |
-| 3 | Collector's cards | **52** slots (50 named) | `WizardCards` 52-char string, card album | card bit arrays / `WizardCards` | `cards` | high (count 52), open (per-set) |
+| 3 | Collector's cards | **50** in 10 sets (52 slots) | `GUI_NAR_CARDS*`, `pqca_*.big`, `WizardCards` | card bit arrays / `WizardCards` | `cards` | high |
 | 4 | Card sets completed | **10** | `GUI_COLLECTORS_FETXT_003…012`, `GUI_COLLECT_*` | set-completion message/state | `card_sets` | high |
 | 5 | Folio Bruti pages | **16** | `GUI_BRUTI_TITLE_001…016` | `FolioBrutiPagesCollected`, `HasFolioBrutiPage` | `folio` | high |
 | 6 | Lost & Found | **10** | `GUI_QST_LAF_001…010` | `Lost_And_Found`, item vars | `lost_and_found` | high |
@@ -24,7 +24,7 @@ hook (`sub_001AD3B0`, [01-audit §4.1](01-audit.md#41-the-apt-variable-setter--s
 | 13 | Secrets | **6** named | `GUI_LOCTXT_*`, `SecretDoor_InitForDay/Night` | secret-door state | `secrets` | medium |
 | 14 | House points | milestones | `Housepoints`, grades | variable milestones | `house_points` | high |
 | 15 | Beans | milestones | `Beans_Amount` | variable milestones | `bean_milestones` | high |
-| 16 | World pickups | **open** (hundreds?) | manifests, scripts, `.pkg` | item grant / object census | `pickups` | low until census |
+| 16 | World pickups | **open** (hundreds?) | `.pkg`/`.cpb` object data (not scripts) | item grant / object census | `pickups` | low until census |
 | 17 | Loose pickups | open | grant log (HP2 method) | play-through census | `loose_pickups` | low |
 | 18 | Lessons | ~6 | task list, class scripts | chapter task / spell grant | `lessons` | high |
 | 19 | Spells | **10** (named in text) | `AddSpells`, `_Support_InitCapabilitySets`, `Apt_Text` | spell state | `spells` | medium |
@@ -256,3 +256,47 @@ Every check's vanilla grant falls into one of three classes, and the catalog rec
 The **reward-swap table** (check key → suppressed grant → AP item) is part of the catalog. Cards are the awkward
 case: the world entity is the check, so it must still spawn, but its ownership grant is suppressed until the AP
 item arrives (HP2's "world cards AP-only" problem, in scope here).
+
+## 17. Research pass, 2026-10-31
+
+### 17.1 Cards — 50 in 10 sets
+
+- **10 sets × 5 cards = 50.** The set order is the album order and the narration groups:
+  Witches, Wizards, Vampires, Goblins, Hags, Giants, Dragons, Beasts, Classical Beasts, Quidditch.
+- Each set page (`pqca_<set>.big`) contains `Card1`, `Card2`, `Card3`, `Card4` and `fifth_card`: the fifth is
+  presented specially, most likely the set-completion card rather than a world pickup.
+- The 52-character `WizardCards` string has two slots beyond the 50; the likely reading is the two "Rare
+  Collector's Card" Fred & George rewards, which have no album page. Not verified.
+- The full table (id, set, slot, name, narration key) is in `out/ap/card_table.tsv`; IDs 1–50 in set order, card
+  *N* at bit *N−1*.
+- Open: whether the fifth card is a world pickup or a set reward; whether the 2 extra slots are real cards.
+
+### 17.2 Spells — ids partly mapped
+
+The inventory UI (`poa_ig_inventory.big`) lists the ten spells in a fixed order: LumosDuo, ExpectoPatronum,
+CarpeRetractum, MucusProjectum, Draconifors, Snufflifors, Reparo, Rictusempra (= Flipendo), Glacius, Expelliarmus.
+The script side gives different numbers — `AddSpells` at Intro/Night0 passes 7, Night1 passes 7/8/9, the Glacius
+spellbook function carries 10, the Carpe one 13 — so those are probably **item ids**, not the UI enum. Candidate
+map and the live confirmation plan are in [08-catalog-spec.md](08-catalog-spec.md) §10.
+
+### 17.3 Pickup scan — the scripts do not carry placements
+
+The three rooms scanned (`day1_entrancehall`, `day1_greathall`, `day1_floor6`) all carry the same shared pickup
+boilerplate: `WizardCard_Callback_OnPickup`, `WizardCard_CheckForFullSet`, `Bean_Groper`, `Bean_CacheModels`,
+`CreateStinkPelletHolder`, `SetupItemPickupMusic`, the `GUI_COLLECT_*` set messages and the `ar3_wp_PUP_Bean`
+model. Room-specific object references are **orchestrator packages** (`<Orchestrator>D1POTION1_03.orc`,
+`HPTOTALS_01/02.orc` in the Entrance Hall), not placements.
+
+The room payloads (`plfs/<chapter>-<room>.pkg`) do contain the pickup model names and variables, but no readable
+placement table; the likely home is the `.cpb` object data or the `.pkg` object chunks. Conclusion: the script
+route is closed; use the `.pkg`/`.cpb` object tables or a play-through grant log.
+
+### 17.4 Item grant — not found, save framework mapped
+
+- The card module's save/load vtable entries are `sub_00088520` (save) and `sub_00088540` (load); they call
+  `sub_0008CAE0` / `sub_0008CB30`, which copy the two 7-byte arrays to/from a block at +0 / +0x10.
+  `sub_00088560` returns `0xF4` (the module's serialized size or offset).
+- The progress block is a **vtable-module system**: each subsystem has a save/load/size trio. The card trio sits at
+  `0x88520/540/560`; the inventory and spell modules' trios are the route to both the grant and the block layout.
+- The generic item grant is still unfound. Next search: the module vtable registry (the table listing these trios)
+  and the shop/pickup callers.
