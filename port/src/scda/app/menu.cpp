@@ -1,5 +1,6 @@
-// The options panel on F10, after SCDA-XBERecomp's (src/app/menu.cpp): its graphics settings on one ImGui page,
-// applied at once and saved to hppoa.toml. Alt+Enter flips windowed and borderless. The fps counter draws here too.
+// The options panel on F10, after SCDA-XBERecomp's (src/app/menu.cpp): one tab per page of the settings' row table
+// (rows.cpp, shared with the game's own Settings pages), each row stepped left / right, applied at once and saved to
+// hppoa.toml. Alt+Enter flips windowed and borderless. The fps counter draws here too.
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
@@ -10,6 +11,7 @@
 #include <windows.h>
 
 #include <algorithm>
+#include <cfloat>
 #include <atomic>
 #include <cstdio>
 #include <iterator>
@@ -23,6 +25,7 @@
 #include "app/app.h"
 #include "core/log.h"
 
+extern "C" int hppoa_GamePaused(void);  // hle_pause.c: between APT's PauseGame and UnpauseGame
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND, UINT, WPARAM, LPARAM);
 extern "C" void xbox_FramebufferWindowSetMsgHook(int (*fn)(void*, unsigned, uintptr_t, intptr_t));
 
@@ -34,245 +37,125 @@ std::atomic<bool> g_open{false};
 std::atomic<bool> g_start{false};  // xboxrecomp: the start menu is up, the title waits for it
 std::atomic<bool> g_ui{false};  // ImGui is set up
 
-constexpr uint32_t kAnisoValues[] = {0, 2, 4, 8, 16};
-const char* const kAnisoNames[] = {"Game's", "2x", "4x", "8x", "16x"};
-constexpr uint32_t kMsaaValues[] = {0, 2, 4, 8};
-const char* const kMsaaNames[] = {"Off", "2x", "4x", "8x"};
-// internal resolution: render lines, 0 follows the window
-constexpr uint32_t kInternalValues[] = {0, 480, 720, 960, 1080, 1440, 1920, 2160};
-const char* const kInternalNames[] = {"Follow window",  "480 (Xbox, 1x)", "720 (1.5x)", "960 (2x)",
-                                      "1080 (2.25x)",   "1440 (3x)",      "1920 (4x)",  "2160 (4.5x, 4K)"};
-const char* const kDisplayNames[] = {"Windowed", "Borderless", "Fullscreen"};
-const char* const kAspectNames[] = {"4:3", "16:9", "Stretch"};
-
-template <size_t N>
-int IndexOf(const uint32_t (&values)[N], uint32_t v) {
-    for (size_t i = 0; i < N; i++) {
-        if (values[i] == v) return int(i);
-    }
-    return 0;
-}
-
-// the primary monitor's modes, biggest first, each size once
-const std::vector<std::pair<uint32_t, uint32_t>>& Modes() {
-    static std::vector<std::pair<uint32_t, uint32_t>> modes = [] {
-        std::vector<std::pair<uint32_t, uint32_t>> m;
-        DEVMODEA dm{};
-        dm.dmSize = sizeof(dm);
-        for (DWORD i = 0; EnumDisplaySettingsA(nullptr, i, &dm); i++) {
-            if (dm.dmPelsWidth >= 640 && dm.dmPelsHeight >= 480) m.emplace_back(dm.dmPelsWidth, dm.dmPelsHeight);
-        }
-        for (auto s : {std::pair<uint32_t, uint32_t>{1280, 960}, {1440, 1080}, {1920, 1080}, {2560, 1440}})
-            m.push_back(s);
-        std::sort(m.begin(), m.end(), [](auto a, auto b) { return a.first * a.second > b.first * b.second; });
-        m.erase(std::unique(m.begin(), m.end()), m.end());
-        return m;
-    }();
-    return modes;
-}
-
-// xboxrecomp: the sizes for an aspect ratio, biggest first: the monitor's own modes of that shape and the common ones
-// that fit the desktop; stretch takes every mode
-bool Shaped(uint32_t w, uint32_t h, AspectMode a) {
-    if (a == AspectMode::Stretch) return true;
-    float r = float(w) / float(h), want = a == AspectMode::Wide ? 16.0f / 9.0f : 4.0f / 3.0f;
-    return r > want - 0.02f && r < want + 0.02f;
-}
-
-std::vector<std::pair<uint32_t, uint32_t>> ModesFor(AspectMode a) {
-    static const std::pair<uint32_t, uint32_t> kCommon[] = {
-        {640, 480},   {800, 600},   {1024, 768},  {1280, 960},  {1440, 1080}, {1600, 1200}, {1920, 1440},
-        {2048, 1536}, {2880, 2160}, {1280, 720},  {1600, 900},  {1920, 1080}, {2560, 1440}, {3200, 1800},
-        {3840, 2160}};
-    uint32_t dw = GetSystemMetrics(SM_CXSCREEN), dh = GetSystemMetrics(SM_CYSCREEN);
-    std::vector<std::pair<uint32_t, uint32_t>> m;
-    for (auto [w, h] : Modes())
-        if (Shaped(w, h, a)) m.emplace_back(w, h);
-    for (auto [w, h] : kCommon)
-        if (Shaped(w, h, a) && w <= dw && h <= dh) m.emplace_back(w, h);
-    std::sort(m.begin(), m.end(), [](auto x, auto y) { return x.first * x.second > y.first * y.second; });
-    m.erase(std::unique(m.begin(), m.end()), m.end());
-    return m;
-}
-
 // a setting changed: applied by the renderer next frame, kept in hppoa.toml
 void Changed(bool display = false) {
     Save();
     if (display) ApplyDisplay();
 }
 
-bool Combo(const char* label, int* cur, const char* const* names, int n) {
-    return ImGui::Combo(label, cur, names, n);
-}
-
-void Row(const char* text) {
+void Section(const char* text) {
     ImGui::Spacing();
     ImGui::SeparatorText(text);
 }
 
-// xboxrecomp: the Controls tab: keyboard and mouse bindings (click, then press a key or a mouse button; Escape clears),
-// the controller's remapping, sticks, camera and vibration
-void DrawControls(Settings& s) {
-    ImGuiIO& io = ImGui::GetIO();
-    uint32_t vk;
-    if (int b = KeyCaptureBinding(); b >= 0 && TakeCapturedKey(&vk)) {
-        s.keys[b] = vk;
-        Changed();
+// xboxrecomp: a value row as SCDA's OptionRow: the label left, the value between arrows right. The row is the one nav
+// stop (left / right on it step the value, held arrows keep stepping); -1 or 1 when it was stepped
+int OptionRow(const char* label, const char* value) {
+    const ImGuiStyle& style = ImGui::GetStyle();
+    float scale = ImGui::GetIO().FontGlobalScale, arrow = ImGui::GetFrameHeight();
+    float value_w = 220 * scale, block_w = value_w + 2 * (arrow + style.ItemSpacing.x);
+    ImVec2 at = ImGui::GetCursorPos();
+    float row_w = ImGui::GetContentRegionAvail().x;
+    ImGui::PushID(label);
+    int step = 0;
+    ImGui::Selectable("##row", false, ImGuiSelectableFlags_AllowOverlap, ImVec2(row_w, arrow));
+    if (ImGui::IsItemFocused()) {
+        if (ImGui::IsKeyPressed(ImGuiKey_LeftArrow) || ImGui::IsKeyPressed(ImGuiKey_GamepadDpadLeft)) step = -1;
+        if (ImGui::IsKeyPressed(ImGuiKey_RightArrow) || ImGui::IsKeyPressed(ImGuiKey_GamepadDpadRight)) step = 1;
     }
-    Row("Keyboard and mouse");
-    if (ImGui::Checkbox("Keyboard and mouse play as controller 1", &s.kbm)) Changed();
-    int ms = int(s.mouse_sensitivity);
-    if (ImGui::SliderInt("Mouse sensitivity", &ms, 1, 100)) s.mouse_sensitivity = uint32_t(ms);
-    if (ImGui::IsItemDeactivatedAfterEdit()) Changed();
-    // xboxrecomp: the movement keys' pace; the mouse wheel steps it in game (as in HP:CoS)
-    int mv = int(std::min<uint32_t>(s.move_mode, kMoveModes - 1));
-    if (ImGui::Combo("Movement keys (mouse wheel)", &mv, kMoveModeNames, int(kMoveModes))) {
-        s.move_mode = uint32_t(mv);
-        Changed();
-    }
-    ImGui::TextDisabled("Mouse wheel in game:  down  Sneak  <  Walk  <  Run  up");
-    int ps = int(s.pace_sneak), pw = int(s.pace_walk);
-    if (ImGui::SliderInt("Sneak speed %", &ps, 5, 100)) s.pace_sneak = uint32_t(ps);
-    if (ImGui::IsItemDeactivatedAfterEdit()) Changed();
-    if (ImGui::SliderInt("Walk speed %", &pw, 5, 100)) s.pace_walk = uint32_t(pw);
-    if (ImGui::IsItemDeactivatedAfterEdit()) Changed();
-    if (ImGui::Checkbox("Invert mouse Y", &s.mouse_invert_y)) Changed();
-    ImGui::BeginDisabled(!s.kbm);
-    if (ImGui::TreeNode("Key bindings")) {
-        if (ImGui::BeginTable("##keys", 2, ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp)) {
-            for (uint32_t i = 0; i < kKeyBinds; i++) {
-                ImGui::TableNextRow();
-                ImGui::TableNextColumn();
-                ImGui::TextUnformatted(kKeyBindNames[i]);
-                ImGui::TableNextColumn();
-                ImGui::PushID(int(i));
-                bool waiting = KeyCaptureBinding() == int(i);
-                std::string label = waiting ? "Press a key or mouse button (Esc clears)" : KeyName(s.keys[i]);
-                if (ImGui::Button(label.c_str(), ImVec2(-1, 0))) {
-                    if (waiting) CancelKeyCapture();
-                    else StartKeyCapture(int(i));
-                }
-                ImGui::PopID();
-            }
-            ImGui::EndTable();
-        }
-        if (ImGui::Button("Default keys")) {
-            Settings d;
-            std::copy(std::begin(d.keys), std::end(d.keys), std::begin(s.keys));
-            Changed();
-        }
-        ImGui::TreePop();
-    }
-    ImGui::EndDisabled();
-
-    Row("Controller");
-    if (ImGui::Checkbox("Use controller", &s.controller)) Changed();
-    if (!s.controller) ImGui::TextDisabled("The game ignores the controller; keyboard and mouse still play.");
-    if (ImGui::Checkbox("Controller works while the window is in the background", &s.background_pad)) Changed();
-    int dl = int(s.deadzone_left), dr = int(s.deadzone_right), sl = int(s.sensitivity_left), sr = int(s.sensitivity_right);
-    if (ImGui::SliderInt("Left stick deadzone %", &dl, 0, 50)) s.deadzone_left = uint32_t(dl);
-    if (ImGui::IsItemDeactivatedAfterEdit()) Changed();
-    if (ImGui::SliderInt("Left stick sensitivity %", &sl, 25, 200)) s.sensitivity_left = uint32_t(sl);
-    if (ImGui::IsItemDeactivatedAfterEdit()) Changed();
-    if (ImGui::SliderInt("Right stick deadzone %", &dr, 0, 50)) s.deadzone_right = uint32_t(dr);
-    if (ImGui::IsItemDeactivatedAfterEdit()) Changed();
-    if (ImGui::SliderInt("Right stick sensitivity %", &sr, 25, 200)) s.sensitivity_right = uint32_t(sr);
-    if (ImGui::IsItemDeactivatedAfterEdit()) Changed();
-    if (ImGui::Checkbox("Invert camera X", &s.invert_x)) Changed();
-    ImGui::SameLine();
-    if (ImGui::Checkbox("Invert camera Y", &s.invert_y)) Changed();
-    {   // xboxrecomp: a pad button for the sneak toggle (keyboard: the "Sneak (toggle)" binding above)
-        const char* names[kPadInputs + 1];
-        names[0] = "None";
-        for (uint32_t i = 0; i < kPadInputs; i++) names[i + 1] = kPadInputNames[i];
-        int sn = s.sneak_pad >= kPadInputs ? 0 : int(s.sneak_pad) + 1;
-        if (ImGui::Combo("Sneak toggle button", &sn, names, int(kPadInputs + 1))) {
-            s.sneak_pad = sn == 0 ? kPadInputs : uint32_t(sn - 1);
-            Changed();
-        }
-        ImGui::TextDisabled("Harry sneaks with a gentle push of the stick; the toggle holds that pace.");
-    }
-    if (ImGui::Checkbox("Vibration", &s.vibration)) Changed();
-    ImGui::BeginDisabled(!s.vibration);
-    int vs = int(s.vibration_strength);
-    if (ImGui::SliderInt("Vibration strength %", &vs, 0, 100)) s.vibration_strength = uint32_t(vs);
-    if (ImGui::IsItemDeactivatedAfterEdit()) Changed();
-    ImGui::EndDisabled();
-    if (ImGui::TreeNode("Button remapping")) {
-        ImGui::TextDisabled("The pad button each game button reads (a 360/One pad's LB is White, RB Black).");
-        ImGui::PushItemWidth(160 * io.FontGlobalScale);
-        for (uint32_t i = 0; i < kPadInputs; i++) {
-            int m = int(std::min(s.pad_map[i], kPadInputs - 1));
-            std::string label = std::string("Game ") + kPadInputNames[i];
-            if (ImGui::Combo(label.c_str(), &m, kPadInputNames, int(kPadInputs))) {
-                s.pad_map[i] = uint32_t(m);
-                Changed();
-            }
-        }
-        ImGui::PopItemWidth();
-        if (ImGui::Button("Default buttons")) {
-            for (uint32_t i = 0; i < kPadInputs; i++) s.pad_map[i] = i;
-            Changed();
-        }
-        ImGui::TreePop();
-    }
+    ImGui::SetCursorPos(at);
+    ImGui::AlignTextToFramePadding();
+    ImGui::TextUnformatted(label);
+    ImGui::PushItemFlag(ImGuiItemFlags_NoNav | ImGuiItemFlags_ButtonRepeat, true);
+    float x = at.x + row_w - block_w;
+    ImGui::SetCursorPos(ImVec2(x, at.y));
+    if (ImGui::ArrowButton("##dec", ImGuiDir_Left)) step = -1;
+    float pad = std::max((value_w - ImGui::CalcTextSize(value).x) * 0.5f, 0.0f);
+    ImGui::SetCursorPos(ImVec2(x + arrow + style.ItemSpacing.x + pad, at.y));
+    ImGui::AlignTextToFramePadding();
+    ImGui::TextUnformatted(value);
+    ImGui::SetCursorPos(ImVec2(x + arrow + value_w + 2 * style.ItemSpacing.x, at.y));
+    if (ImGui::ArrowButton("##inc", ImGuiDir_Right)) step = 1;
+    ImGui::PopItemFlag();
+    ImGui::PopID();
+    return step;
 }
 
-// xboxrecomp: F10's Defaults resets the page it is on, not every setting (the aspect ratio, a boot setting, stays)
-static void ResetPage(Settings& s, const char* page) {
-    const Settings d;
-    if (!std::strcmp(page, "Graphics")) {
-        std::memcpy(&s.aniso, &d.aniso, sizeof(s.aniso));
-        std::memcpy(&s.brightness, &d.brightness, sizeof(s.brightness));
-        std::memcpy(&s.contrast, &d.contrast, sizeof(s.contrast));
-        std::memcpy(&s.cutscene_bars, &d.cutscene_bars, sizeof(s.cutscene_bars));
-        std::memcpy(&s.display_mode, &d.display_mode, sizeof(s.display_mode));
-        std::memcpy(&s.fps_counter, &d.fps_counter, sizeof(s.fps_counter));
-        std::memcpy(&s.fps_limit, &d.fps_limit, sizeof(s.fps_limit));
-        std::memcpy(&s.height, &d.height, sizeof(s.height));
-        std::memcpy(&s.internal_height, &d.internal_height, sizeof(s.internal_height));
-        std::memcpy(&s.msaa, &d.msaa, sizeof(s.msaa));
-        std::memcpy(&s.render_max_height, &d.render_max_height, sizeof(s.render_max_height));
-        std::memcpy(&s.render_percent, &d.render_percent, sizeof(s.render_percent));
-        std::memcpy(&s.smaa, &d.smaa, sizeof(s.smaa));
-        std::memcpy(&s.vsync, &d.vsync, sizeof(s.vsync));
-        std::memcpy(&s.width, &d.width, sizeof(s.width));
+// xboxrecomp: the Controls tab's keyboard and mouse bindings: click, then press a key or a mouse button; Escape clears
+void DrawKeyBindings(Settings& s, const char* label) {
+    if (!ImGui::TreeNode(label)) return;
+    if (ImGui::BeginTable("##keys", 2, ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp)) {
+        for (uint32_t i = 0; i < kKeyBinds; i++) {
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            ImGui::TextUnformatted(kKeyBindNames[i]);
+            ImGui::TableNextColumn();
+            ImGui::PushID(int(i));
+            bool waiting = KeyCaptureBinding() == int(i);
+            std::string text = waiting ? "Press input (Esc clears)" : KeyName(s.keys[i]);
+            if (ImGui::Button(text.c_str(), ImVec2(-1, 0))) {
+                if (waiting) CancelKeyCapture();
+                else StartKeyCapture(int(i));
+            }
+            ImGui::PopID();
+        }
+        ImGui::EndTable();
     }
-    if (!std::strcmp(page, "Audio")) {
-        std::memcpy(&s.speakers, &d.speakers, sizeof(s.speakers));
+    if (ImGui::Button("Default keys")) {
+        Settings d;
+        std::copy(std::begin(d.keys), std::end(d.keys), std::begin(s.keys));
+        Changed();
     }
-    if (!std::strcmp(page, "Controls")) {
-        std::memcpy(&s.controller, &d.controller, sizeof(s.controller));
-        std::memcpy(&s.background_pad, &d.background_pad, sizeof(s.background_pad));
-        std::memcpy(&s.deadzone_left, &d.deadzone_left, sizeof(s.deadzone_left));
-        std::memcpy(&s.deadzone_right, &d.deadzone_right, sizeof(s.deadzone_right));
-        std::memcpy(&s.invert_x, &d.invert_x, sizeof(s.invert_x));
-        std::memcpy(&s.invert_y, &d.invert_y, sizeof(s.invert_y));
-        std::memcpy(&s.kbm, &d.kbm, sizeof(s.kbm));
-        std::memcpy(&s.keys, &d.keys, sizeof(s.keys));
-        std::memcpy(&s.mouse_invert_y, &d.mouse_invert_y, sizeof(s.mouse_invert_y));
-        std::memcpy(&s.mouse_sensitivity, &d.mouse_sensitivity, sizeof(s.mouse_sensitivity));
-        std::memcpy(&s.move_mode, &d.move_mode, sizeof(s.move_mode));
-        std::memcpy(&s.pace_sneak, &d.pace_sneak, sizeof(s.pace_sneak));
-        std::memcpy(&s.pace_walk, &d.pace_walk, sizeof(s.pace_walk));
-        std::memcpy(&s.pad_map, &d.pad_map, sizeof(s.pad_map));
-        std::memcpy(&s.sensitivity_left, &d.sensitivity_left, sizeof(s.sensitivity_left));
-        std::memcpy(&s.sensitivity_right, &d.sensitivity_right, sizeof(s.sensitivity_right));
-        std::memcpy(&s.sneak_pad, &d.sneak_pad, sizeof(s.sneak_pad));
-        std::memcpy(&s.vibration, &d.vibration, sizeof(s.vibration));
-        std::memcpy(&s.vibration_strength, &d.vibration_strength, sizeof(s.vibration_strength));
+    ImGui::TreePop();
+}
+
+// xboxrecomp: the controller's remapping: the pad button each game button reads
+void DrawPadMap(Settings& s, const char* label) {
+    if (!ImGui::TreeNode(label)) return;
+    ImGui::TextWrapped("The pad button each game button reads (a 360/One pad's LB is White, RB Black).");
+    ImGui::PushItemWidth(160 * ImGui::GetIO().FontGlobalScale);
+    for (uint32_t i = 0; i < kPadInputs; i++) {
+        int m = int(std::min(s.pad_map[i], kPadInputs - 1));
+        std::string name = std::string("Game ") + kPadInputNames[i];
+        if (ImGui::Combo(name.c_str(), &m, kPadInputNames, int(kPadInputs))) {
+            s.pad_map[i] = uint32_t(m);
+            Changed();
+        }
     }
-    if (!std::strcmp(page, "Gameplay")) {
-        std::memcpy(&s.cutscene_skip, &d.cutscene_skip, sizeof(s.cutscene_skip));
-        std::memcpy(&s.intro_skip, &d.intro_skip, sizeof(s.intro_skip));
+    ImGui::PopItemWidth();
+    if (ImGui::Button("Default buttons")) {
+        for (uint32_t i = 0; i < kPadInputs; i++) s.pad_map[i] = i;
+        Changed();
     }
-    if (!std::strcmp(page, "Accessibility")) {
-        std::memcpy(&s.colorblind, &d.colorblind, sizeof(s.colorblind));
-        std::memcpy(&s.colorblind_strength, &d.colorblind_strength, sizeof(s.colorblind_strength));
-    }
-    if (!std::strcmp(page, "Debug")) {
-        std::memcpy(&s.debug_logs, &d.debug_logs, sizeof(s.debug_logs));
-        std::memcpy(&s.debug_menu, &d.debug_menu, sizeof(s.debug_menu));
+    ImGui::TreePop();
+}
+
+// xboxrecomp: one F10 tab: its rows from the shared table (rows.cpp), as the game's own Settings pages list them
+void DrawRows(Settings& s, int page) {
+    size_t count = 0;
+    const rows::Row* list = rows::Page(page, &count);
+    for (size_t i = 0; i < count; i++) {
+        const rows::Row& r = list[i];
+        if (r.kind == rows::Kind::Heading) {
+            Section(r.label);
+            continue;
+        }
+        if (!rows::Shown(r)) continue;
+        bool enabled = rows::Enabled(r);
+        ImGui::BeginDisabled(!enabled);
+        if (r.kind == rows::Kind::Keys) {
+            DrawKeyBindings(s, r.label);
+        } else if (r.kind == rows::Kind::PadMap) {
+            DrawPadMap(s, r.label);
+        } else if (int step = OptionRow(r.label, rows::Value(r).c_str()); step && enabled) {
+            rows::Step(r, step);
+        }
+        ImGui::EndDisabled();
+        if (const char* note = rows::Note(r)) {
+            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+            ImGui::TextWrapped("%s", note);
+            ImGui::PopStyleColor();
+        }
     }
 }
 
@@ -280,177 +163,43 @@ static void ResetPage(Settings& s, const char* page) {
 void DrawPanel(bool start) {
     Settings& s = Get();
     ImGuiIO& io = ImGui::GetIO();
-    ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_Appearing,
+    uint32_t vk;
+    if (int b = KeyCaptureBinding(); b >= 0 && TakeCapturedKey(&vk)) {
+        s.keys[b] = vk;
+        Changed();
+    }
+    // keep the rows inside the window, with room for the tabs and footer even at 640 x 480
+    ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_Always,
                             ImVec2(0.5f, 0.5f));
-    ImGui::SetNextWindowSize(ImVec2(520 * io.FontGlobalScale, 0), ImGuiCond_Appearing);
+    ImGui::SetNextWindowSize(ImVec2(std::min(680 * io.FontGlobalScale, io.DisplaySize.x - 24),
+                                    io.DisplaySize.y - 24), ImGuiCond_Always);
     bool open = true;
     const char* title = start ? "Harry Potter and the Prisoner of Azkaban - Settings###start" : "Options (F10)";
-    if (!ImGui::Begin(title, start ? nullptr : &open, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize)) {
+    if (!ImGui::Begin(title, start ? nullptr : &open, ImGuiWindowFlags_NoCollapse |
+                                                    ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove)) {
         ImGui::End();
         if (!open) g_open = false;
         return;
     }
-    ImGui::PushItemWidth(260 * io.FontGlobalScale);
 
-    bool tabs = ImGui::BeginTabBar("##tabs");
-    static const char* page = "Graphics";  // the open page, for Defaults
-    if (tabs && ImGui::BeginTabItem("Graphics")) {
-        page = "Graphics";
-    Row("Display");
-    // the aspect ratio first: the sizes below follow it
-    int asp = int(s.aspect);
-    if (Combo("Aspect ratio", &asp, kAspectNames, 3)) {
-        s.aspect = AspectMode(asp);
-        // a window or mode of the old shape: the biggest of the new one
-        if (s.width && s.height && !Shaped(s.width, s.height, s.aspect)) {
-            auto m = ModesFor(s.aspect);
-            if (!m.empty()) {
-                s.width = m.front().first;
-                s.height = m.front().second;
-            }
+    static int page = rows::kGraphics;  // the open tab, for Defaults
+    if (ImGui::BeginTabBar("##tabs")) {
+        for (int p = 0; p < rows::kPages; p++) {
+            if (!ImGui::BeginTabItem(rows::PageName(p))) continue;
+            page = p;
+            float footer = ImGui::GetFrameHeightWithSpacing() * 3 + ImGui::GetStyle().ItemSpacing.y * 2;
+            ImGui::BeginChild("##rows", ImVec2(0, -footer), ImGuiChildFlags_NavFlattened,
+                              ImGuiWindowFlags_AlwaysVerticalScrollbar);
+            DrawRows(s, p);
+            ImGui::EndChild();
+            ImGui::EndTabItem();
         }
-        if (start) SetBootAspect(s.aspect);
-        Changed(true);
+        ImGui::EndTabBar();
     }
-    if (!start && s.aspect != BootAspect())
-        ImGui::TextDisabled("Aspect ratio applies at the next start.");
-    if (s.aspect == AspectMode::Wide && ImGui::Checkbox("Cutscene bars", &s.cutscene_bars)) Changed();
-    int dm = int(s.display_mode);
-    if (Combo("Display mode", &dm, kDisplayNames, 3)) {
-        s.display_mode = DisplayMode(dm);
-        Changed(true);
-    }
-    {
-        const auto modes = ModesFor(s.aspect);
-        std::string cur = s.width && s.height ? std::to_string(s.width) + " x " + std::to_string(s.height) : "Desktop";
-        if (ImGui::BeginCombo(s.display_mode == DisplayMode::Windowed ? "Window size" : "Resolution", cur.c_str())) {
-            if (ImGui::Selectable("Desktop", !(s.width && s.height))) {
-                s.width = s.height = 0;
-                Changed(true);
-            }
-            for (auto [w, h] : modes) {
-                std::string name = std::to_string(w) + " x " + std::to_string(h);
-                if (ImGui::Selectable(name.c_str(), w == s.width && h == s.height)) {
-                    s.width = w;
-                    s.height = h;
-                    Changed(true);
-                }
-            }
-            ImGui::EndCombo();
-        }
-        if (s.display_mode == DisplayMode::Borderless)
-            ImGui::TextDisabled("Borderless covers the monitor; the size is for windowed / fullscreen.");
-    }
-    if (ImGui::Checkbox("Vsync", &s.vsync)) Changed();
-    int fl = FpsChoice(s.fps_limit);
-    if (Combo("Frame rate", &fl, kFpsChoiceNames, int(kFpsChoiceCount))) {
-        s.fps_limit = kFpsChoices[fl];
-        Changed();
-    }
-
-    Row("Resolution");
-    int ir = IndexOf(kInternalValues, s.internal_height);
-    if (Combo("Internal resolution", &ir, kInternalNames, int(std::size(kInternalNames)))) {
-        s.internal_height = kInternalValues[ir];
-        Changed();
-    }
-    if (!s.internal_height) {
-        int pct = int(s.render_percent);
-        if (ImGui::SliderInt("Render scale %", &pct, 25, 200)) s.render_percent = uint32_t(pct);
-        if (ImGui::IsItemDeactivatedAfterEdit()) Changed();
-        int cap = int(s.render_max_height);
-        if (ImGui::SliderInt("Max render height", &cap, 0, 4320, cap ? "%d lines" : "No limit")) s.render_max_height = uint32_t(cap);
-        if (ImGui::IsItemDeactivatedAfterEdit()) Changed();
-    }
-
-    Row("Anti-aliasing and filtering");
-    int ms = IndexOf(kMsaaValues, s.msaa);
-    if (Combo("MSAA", &ms, kMsaaNames, int(std::size(kMsaaNames)))) {
-        s.msaa = kMsaaValues[ms];
-        Changed();
-    }
-    if (ImGui::Checkbox("SMAA", &s.smaa)) Changed();
-    int an = IndexOf(kAnisoValues, s.aniso);
-    if (Combo("Anisotropic filtering", &an, kAnisoNames, int(std::size(kAnisoNames)))) {
-        s.aniso = kAnisoValues[an];
-        Changed();
-    }
-
-    Row("Picture");
-    int br = int(s.brightness), co = int(s.contrast);
-    if (ImGui::SliderInt("Brightness", &br, 0, 100)) s.brightness = uint32_t(br);
-    if (ImGui::IsItemDeactivatedAfterEdit()) Changed();
-    if (ImGui::SliderInt("Contrast", &co, 0, 100)) s.contrast = uint32_t(co);
-    if (ImGui::IsItemDeactivatedAfterEdit()) Changed();
-    if (ImGui::Checkbox("FPS counter", &s.fps_counter)) Changed();
-        ImGui::EndTabItem();
-    }
-    if (tabs && ImGui::BeginTabItem("Audio")) {
-        page = "Audio";
-        Row("Output");
-        // xboxrecomp: the console mixes to 5.1 (Dolby Digital out of the console); stereo folds it down
-        int sp = s.speakers == 6 ? 1 : 0;
-        const char* const kSpeakerNames[] = {"Stereo", "5.1 surround"};
-        if (Combo("Speakers", &sp, kSpeakerNames, 2)) {
-            s.speakers = sp ? 6 : 2;
-            Changed();
-        }
-        ImGui::TextDisabled("Takes effect the next time the game starts.");
-        ImGui::TextDisabled("5.1 needs Windows' speaker setup set to 5.1 (or a 5.1 HDMI receiver).");
-        ImGui::EndTabItem();
-    }
-    if (tabs && ImGui::BeginTabItem("Controls")) {
-        page = "Controls";
-        DrawControls(s);
-        ImGui::EndTabItem();
-    }
-    if (tabs && ImGui::BeginTabItem("Gameplay")) {
-        page = "Gameplay";
-        Row("Cutscenes");
-        if (ImGui::Checkbox("Hold Start or Back to fast-forward a cutscene", &s.cutscene_skip)) Changed();
-        ImGui::TextDisabled("Runs it to its own end, muted and with the picture held, so nothing it sets up is missed.");
-        if (ImGui::Checkbox("Skip the logos at start-up", &s.intro_skip)) Changed();
-        ImGui::TextDisabled("The EA and Warner Bros. logo movies; takes effect at the next start.");
-        ImGui::EndTabItem();
-    }
-    if (tabs && ImGui::BeginTabItem("Accessibility")) {
-        page = "Accessibility";
-        Row("Colour blindness");
-        int cb = int(std::min(s.colorblind, 3u));
-        const char* const kCbNames[] = {"Off", "Protanopia (red-weak)", "Deuteranopia (green-weak)",
-                                        "Tritanopia (blue-weak)"};
-        if (Combo("Correction filter", &cb, kCbNames, 4)) {
-            s.colorblind = uint32_t(cb);
-            Changed();
-        }
-        ImGui::BeginDisabled(!s.colorblind);
-        int st = int(s.colorblind_strength);
-        if (ImGui::SliderInt("Strength %", &st, 0, 100)) s.colorblind_strength = uint32_t(st);
-        if (ImGui::IsItemDeactivatedAfterEdit()) Changed();
-        ImGui::EndDisabled();
-        ImGui::TextDisabled("Shifts the colours a colour-blind player confuses toward ones they can tell apart.");
-        ImGui::EndTabItem();
-    }
-    // xboxrecomp: the logs are opened as the game starts (the launcher's hppoa_run.log, the kernel's xbox_kernel.log)
-    if (tabs && ImGui::BeginTabItem("Debug")) {
-        page = "Debug";
-        Row("Logs");
-        if (ImGui::Checkbox("Write debug logs", &s.debug_logs)) Changed();
-        ImGui::TextDisabled("hppoa_run.log and xbox_kernel.log beside the game, for reporting a problem.");
-        ImGui::TextDisabled("Takes effect the next time the game starts.");
-        Row("Developer menu");
-        if (ImGui::Checkbox("Allow the debug menu", &s.debug_menu)) Changed();
-        ImGui::TextDisabled("The developers' chapter and room select, which the front end asks for on its title screen.");
-        ImGui::EndTabItem();
-    }
-    if (tabs) ImGui::EndTabBar();
 
     ImGui::Spacing();
     ImGui::Separator();
-    if (ImGui::Button("Defaults (this page)")) {
-        ResetPage(s, page);
-        Changed(true);
-    }
+    if (ImGui::Button("Defaults (this page)")) rows::Defaults(page);
     ImGui::SameLine();
     if (start) {
         if (ImGui::Checkbox("Show this page at startup", &s.start_menu)) Changed();
@@ -461,16 +210,12 @@ void DrawPanel(bool start) {
             g_start = false;
         }
         ImGui::SetItemDefaultFocus();
-        ImGui::SameLine();
         ImGui::TextDisabled("Saved to hppoa.toml; F10 in game changes them too");
     } else {
         if (ImGui::Button("Close")) open = false;
-        ImGui::SameLine();
         if (ImGui::Checkbox("Show the launcher at startup", &s.show_launcher)) Changed();
-        ImGui::SameLine();
         ImGui::TextDisabled("Saved to hppoa.toml");
     }
-    ImGui::PopItemWidth();
     ImGui::End();
     if (!open) g_open = false;
 }
@@ -485,10 +230,191 @@ void DrawFps() {
     dl->AddText(ImGui::GetFont(), sz, p, IM_COL32(255, 255, 80, 255), text);
 }
 
+// xboxrecomp: the pause menu's PC Settings page. PoA's menus are APT movies, so instead of a row in them (HP1/HP2's
+// hle_frontend.c) the pad's Back opens this page while the game is paused (hle_pause.c): the rows marked for the
+// game's own pages, under their tabs' headings, drawn over the paused game inside its centred 4:3 menu area.
+std::atomic<bool> g_page{false};
+std::atomic<int> g_page_sel{0};
+std::atomic<int> g_page_keys{0};  // arrow keys / Enter / Esc from the window thread, as pad bits (kPad*)
+ImFont* g_page_font = nullptr;    // a book face for the page (Windows' Georgia), ImGui's own if it is missing
+
+ImFont* PageFont() { return g_page_font ? g_page_font : ImGui::GetFont(); }
+
+constexpr uint16_t kPadUp = 0x0001, kPadDown = 0x0002, kPadLeft = 0x0004, kPadRight = 0x0008, kPadBack = 0x0020;
+constexpr uint16_t kPadA = 0x1000, kPadB = 0x2000;  // the analog A / B, folded into the digital bits here
+
+struct PageItem {
+    rows::Row row;
+    bool heading;
+};
+
+// the page's list: each game row the panel shows, a heading before each group that has one
+std::vector<PageItem> PageItems() {
+    std::vector<PageItem> out;
+    for (int p = 0; p < rows::kPages; p++) {
+        size_t n = 0;
+        const rows::Row* list = rows::Page(p, &n);
+        const rows::Row* heading = nullptr;
+        for (size_t i = 0; i < n; i++) {
+            const rows::Row& r = list[i];
+            if (r.kind == rows::Kind::Heading) {
+                heading = &r;
+                continue;
+            }
+            if (!r.game || r.kind != rows::Kind::Value || !rows::Shown(r)) continue;
+            if (heading) out.push_back({*heading, true}), heading = nullptr;
+            out.push_back({r, false});
+        }
+    }
+    return out;
+}
+
+// the selectable row nearest the chosen one, moving by dir (-1 / 1) when asked
+int PageMove(const std::vector<PageItem>& items, int sel, int dir) {
+    int n = int(items.size());
+    if (!n) return 0;
+    sel = std::clamp(sel, 0, n - 1);
+    for (int k = 0; k < n; k++) {
+        int i = dir ? ((sel + dir * (k + 1)) % n + n) % n : (sel + k) % n;
+        if (!items[size_t(i)].heading) return i;
+    }
+    return sel;
+}
+
+void ClosePage() {
+    g_page = false;
+    g_page_keys = 0;
+}
+
+// the game thread, once per pad read: buttons pressed this read (with key repeat) act on the page
+void PageInput(uint16_t pressed) {
+    std::vector<PageItem> items = PageItems();
+    int sel = PageMove(items, g_page_sel, 0);
+    if (pressed & (kPadB | kPadBack)) {
+        ClosePage();
+        return;
+    }
+    if (pressed & kPadUp) sel = PageMove(items, sel, -1);
+    if (pressed & kPadDown) sel = PageMove(items, sel, 1);
+    if (!items.empty()) {
+        const rows::Row& r = items[size_t(sel)].row;
+        if (pressed & kPadLeft) rows::Step(r, -1);
+        if (pressed & kPadRight) rows::Step(r, 1);
+        if ((pressed & kPadA) && rows::TwoValues(r)) rows::Step(r, 1);
+    }
+    g_page_sel = sel;
+}
+
+void PageText(ImDrawList* dl, float size, ImVec2 at, ImU32 colour, const char* text) {
+    dl->AddText(PageFont(), size, ImVec2(at.x + size * 0.06f, at.y + size * 0.06f), IM_COL32(0, 0, 0, 170), text);
+    dl->AddText(PageFont(), size, at, colour, text);
+}
+
+float PageTextWidth(float size, const char* text) {
+    return PageFont()->CalcTextSizeA(size, FLT_MAX, 0.0f, text).x;
+}
+
+// a button name in a pill, as the game's own hints show buttons; returns the width it took
+float PagePill(ImDrawList* dl, float size, ImVec2 at, const char* name) {
+    float w = PageTextWidth(size, name) + size * 0.9f, h = size * 1.3f;
+    dl->AddRectFilled(at, ImVec2(at.x + w, at.y + h), IM_COL32(20, 16, 10, 220), h * 0.5f);
+    dl->AddRect(at, ImVec2(at.x + w, at.y + h), IM_COL32(214, 190, 130, 255), h * 0.5f, 0, std::max(1.0f, size * 0.07f));
+    dl->AddText(PageFont(), size, ImVec2(at.x + size * 0.45f, at.y + size * 0.15f), IM_COL32(240, 228, 196, 255),
+                name);
+    return w;
+}
+
+// the game's 4:3 menu area: the window's middle 4:3 (all of it in a 4:3 window)
+void MenuArea(float* x0, float* w, float* h) {
+    ImGuiIO& io = ImGui::GetIO();
+    *h = io.DisplaySize.y;
+    *w = std::min(io.DisplaySize.x, *h * 4.0f / 3.0f);
+    *x0 = (io.DisplaySize.x - *w) * 0.5f;
+}
+
+void DrawPausePage() {
+    std::vector<PageItem> items = PageItems();
+    int sel = PageMove(items, g_page_sel, 0);
+    float x0, aw, ah;
+    MenuArea(&x0, &aw, &ah);
+    ImDrawList* dl = ImGui::GetForegroundDrawList();
+    // the whole window dimmed, the page a parchment-dark panel inside the 4:3 area
+    dl->AddRectFilled(ImVec2(0, 0), ImGui::GetIO().DisplaySize, IM_COL32(0, 0, 0, 120));
+    ImVec2 p0(x0 + aw * 0.08f, ah * 0.07f), p1(x0 + aw * 0.92f, ah * 0.93f);
+    float r = ah * 0.012f;
+    dl->AddRectFilled(p0, p1, IM_COL32(28, 22, 14, 236), r);
+    dl->AddRect(p0, p1, IM_COL32(184, 152, 88, 255), r, 0, std::max(1.0f, ah / 360.0f));
+    float title = ah / 16.0f, text = ah / 26.0f, small = ah / 34.0f, pad = aw * 0.04f;
+    const char* name = "PC Settings";
+    PageText(dl, title, ImVec2((p0.x + p1.x - PageTextWidth(title, name)) * 0.5f, p0.y + ah * 0.025f),
+             IM_COL32(236, 214, 156, 255), name);
+    float top = p0.y + ah * 0.025f + title * 1.35f;
+    // the description and the hint take the bottom; the rows scroll to keep the chosen one in view
+    float bottom = p1.y - small * 5.0f;
+    float step = text * 1.32f;
+    int visible = std::max(1, int((bottom - top) / step));
+    int first = 0;
+    if (int(items.size()) > visible) first = std::clamp(sel - visible / 2, 0, int(items.size()) - visible);
+    float value_x = p0.x + (p1.x - p0.x) * 0.60f, value_w = p1.x - pad - value_x;
+    for (int i = first; i < int(items.size()) && i < first + visible; i++) {
+        const PageItem& it = items[size_t(i)];
+        float y = top + float(i - first) * step;
+        if (it.heading) {
+            PageText(dl, small, ImVec2(p0.x + pad, y + (text - small)), IM_COL32(184, 152, 88, 255), it.row.label);
+            continue;
+        }
+        bool lit = i == sel, enabled = rows::Enabled(it.row);
+        if (lit)
+            dl->AddRectFilled(ImVec2(p0.x + pad * 0.5f, y - text * 0.12f), ImVec2(p1.x - pad * 0.5f, y + text * 1.18f),
+                              IM_COL32(120, 92, 40, 150), r);
+        ImU32 c = !enabled ? IM_COL32(140, 128, 108, 255) : lit ? IM_COL32(255, 244, 214, 255) : IM_COL32(222, 204, 168, 255);
+        PageText(dl, text, ImVec2(p0.x + pad * 1.4f, y), c, it.row.label);
+        std::string v = rows::Value(it.row);
+        std::string shown = lit && enabled ? "<  " + v + "  >" : v;
+        float vw = PageTextWidth(text, shown.c_str());
+        PageText(dl, text, ImVec2(value_x + std::max(0.0f, (value_w - vw) * 0.5f), y), c, shown.c_str());
+    }
+    if (first > 0) PageText(dl, small, ImVec2(p1.x - pad, top - small * 1.1f), IM_COL32(184, 152, 88, 255), "^");
+    if (first + visible < int(items.size()))
+        PageText(dl, small, ImVec2(p1.x - pad, bottom - small * 0.6f), IM_COL32(184, 152, 88, 255), "v");
+    // the chosen row's description, wrapped, then the hint
+    if (!items.empty()) {
+        if (const char* note = rows::Note(items[size_t(sel)].row))
+            dl->AddText(PageFont(), small, ImVec2(p0.x + pad, bottom + small * 0.3f), IM_COL32(200, 186, 156, 255),
+                        note, nullptr, p1.x - p0.x - 2 * pad);
+    }
+    float hy = p1.y - small * 1.8f, hx = p0.x + pad;
+    hx += PagePill(dl, small, ImVec2(hx, hy), "Left / Right") + small * 0.4f;
+    PageText(dl, small, ImVec2(hx, hy + small * 0.15f), IM_COL32(236, 224, 196, 255), "Change");
+    hx += PageTextWidth(small, "Change") + small * 1.4f;
+    hx += PagePill(dl, small, ImVec2(hx, hy), "B") + small * 0.4f;
+    PageText(dl, small, ImVec2(hx, hy + small * 0.15f), IM_COL32(236, 224, 196, 255), "Back");
+}
+
+// paused, page closed: where to find the page, under the pause menu's own rows
+void DrawPauseHint() {
+    float x0, aw, ah;
+    MenuArea(&x0, &aw, &ah);
+    ImDrawList* dl = ImGui::GetForegroundDrawList();
+    float small = ah / 34.0f;
+    ImVec2 at(x0 + aw * 0.05f, ah * 0.93f - small * 1.3f);
+    float w = PagePill(dl, small, at, "Back") + small * 0.4f;
+    PageText(dl, small, ImVec2(at.x + w, at.y + small * 0.15f), IM_COL32(236, 224, 196, 255), "PC Settings");
+}
+
 // the window thread's messages: the pointer hidden, F10 and Alt+Enter, then ImGui; while the panel is open it keeps the
 // keyboard and mouse
 int MsgHook(void* hwnd, unsigned msg, uintptr_t wp, intptr_t lp) {
     InputMessage(hwnd, msg, wp, lp);  // xboxrecomp: keyboard and mouse as controller 1 (input.cpp)
+    // xboxrecomp: the pause page takes the arrows, Enter and Esc (handed to the game thread's PageInput)
+    if (g_page && !g_open && msg == WM_KEYDOWN) {
+        int bit = wp == VK_UP ? kPadUp : wp == VK_DOWN ? kPadDown : wp == VK_LEFT ? kPadLeft : wp == VK_RIGHT ? kPadRight
+                : wp == VK_RETURN ? kPadA : wp == VK_ESCAPE || wp == VK_BACK ? kPadB : 0;
+        if (bit) {
+            g_page_keys |= bit;
+            return 1;
+        }
+    }
     // xboxrecomp: no mouse pointer over the game; the panel shows it again
     if (msg == WM_SETCURSOR && LOWORD(lp) == HTCLIENT && !g_open && !g_start) {
         SetCursor(nullptr);
@@ -510,7 +436,7 @@ int MsgHook(void* hwnd, unsigned msg, uintptr_t wp, intptr_t lp) {
     if (!g_ui) return 0;
     std::lock_guard lock(UiLock());
     ImGui_ImplWin32_WndProcHandler(static_cast<HWND>(hwnd), msg, WPARAM(wp), LPARAM(lp));
-    if (!g_open && !g_start) return 0;
+    if (!g_open && !g_start && !g_page) return 0;
     switch (msg) {
         case WM_KEYDOWN: case WM_CHAR: case WM_MOUSEWHEEL: case WM_LBUTTONDOWN: case WM_RBUTTONDOWN:
             return 1;
@@ -523,7 +449,7 @@ int MsgHook(void* hwnd, unsigned msg, uintptr_t wp, intptr_t lp) {
 
 }  // namespace
 
-bool MenuOpen() { return g_open || g_start; }
+bool MenuOpen() { return g_open || g_start || g_page; }
 
 void ToggleMenu() { g_open = !g_open; }
 
@@ -540,6 +466,14 @@ void InitUi() {
     io.IniFilename = nullptr;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard | ImGuiConfigFlags_NavEnableGamepad |
                       ImGuiConfigFlags_NoMouseCursorChange;
+    // xboxrecomp: ImGui's own font stays F10's; the pause page draws in a book face, rasterised large so it stays sharp
+    io.Fonts->AddFontDefault();
+    char fonts[MAX_PATH];
+    if (GetWindowsDirectoryA(fonts, MAX_PATH)) {
+        std::string georgia = std::string(fonts) + "\\Fonts\\georgia.ttf";
+        if (GetFileAttributesA(georgia.c_str()) != INVALID_FILE_ATTRIBUTES)
+            g_page_font = io.Fonts->AddFontFromFileTTF(georgia.c_str(), 48.0f);
+    }
     ImGui::StyleColorsDark();
     ImGui::GetStyle().WindowRounding = 4;
     ImGui_ImplWin32_Init(Window());
@@ -556,6 +490,8 @@ void DrawUi() {
     io.MouseDrawCursor = false;
     if (g_start) DrawPanel(true);
     else if (g_open) DrawPanel(false);
+    else if (g_page) DrawPausePage();
+    else if (hppoa_GamePaused()) DrawPauseHint();
     if (Get().fps_counter) DrawFps();
     // xboxrecomp: the keys' pace a moment after the mouse wheel steps it, so a turn of the wheel is seen to do something
     if (GetTickCount64() - g_pace_note.load() < 2000 && !SneakOn()) {
@@ -580,3 +516,50 @@ void DrawUi() {
 
 // hle_input.c: the panel has the controller while it is open
 extern "C" int hppoa_MenuOpen(void) { return app::MenuOpen(); }
+
+// hle_input.c, port 0, after remapping, keyboard and mouse and the trainer: Back while paused opens the PC Settings
+// page, which then reads the pad here. A press that opens or closes the page, and anything held across it, stays
+// from the game until it is let go. (RECOMP_HLE_XINPUT=0 reads the pad elsewhere and has no page.)
+extern "C" void hppoa_PausePad(uint16_t* buttons, uint8_t* analog, int16_t* thumbs) {
+    using namespace app;
+    static uint16_t prev;
+    static bool swallow;
+    static ULONGLONG held_since, last_repeat;
+    uint16_t b = uint16_t(*buttons & 0x0FFF);
+    if (analog[0] > 30) b |= kPadA;
+    if (analog[1] > 30) b |= kPadB;
+    if (thumbs[1] > 16000) b |= kPadUp;
+    if (thumbs[1] < -16000) b |= kPadDown;
+    if (thumbs[0] < -16000) b |= kPadLeft;
+    if (thumbs[0] > 16000) b |= kPadRight;
+    uint16_t pressed = uint16_t(b & ~prev);
+    ULONGLONG now = GetTickCount64();
+    constexpr uint16_t kRepeat = kPadUp | kPadDown | kPadLeft | kPadRight;
+    if (pressed & kRepeat) held_since = last_repeat = now;
+    else if ((b & kRepeat) && now - held_since > 400 && now - last_repeat > 90) {
+        pressed |= uint16_t(b & kRepeat);
+        last_repeat = now;
+    }
+    prev = b;
+    if (g_page && !hppoa_GamePaused()) ClosePage();
+    if (!g_page) {
+        if (hppoa_GamePaused() && (pressed & kPadBack) && !g_open && !g_start) {
+            g_page = true;
+            swallow = true;
+            std::fprintf(stderr, "[PAGE] PC Settings opened\n");
+        }
+    } else {
+        pressed |= uint16_t(g_page_keys.exchange(0));
+        PageInput(pressed);
+        if (!g_page) {
+            swallow = true;
+            std::fprintf(stderr, "[PAGE] PC Settings closed\n");
+        }
+    }
+    if (swallow && !b) swallow = false;
+    if (g_page || swallow) {
+        *buttons = 0;
+        std::memset(analog, 0, 8);
+        std::memset(thumbs, 0, 4 * sizeof(int16_t));
+    }
+}

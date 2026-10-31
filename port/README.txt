@@ -8,10 +8,8 @@ BETA (0.5.0). Tested from New Game through the Hogwarts Express and the
 first level, with saving and loading, at 30 and 60 fps. Later levels have not
 been checked yet. Works with the North American (NTSC-U) disc only.
 
-Not in this beta yet: settings pages inside the game's menus, "Quit To
-Desktop" in the menus (use Alt+F4), and cutscene fast-forward (its option is
-there but does nothing yet). Parts of this readme come from the Philosopher's
-Stone port; options that don't apply to this game will be removed.
+Not in this beta yet: "Quit To Desktop" in the menus (use Alt+F4), and cutscene fast-forward (its option is
+there but greyed out, as is the start-up logo skip).
 
 
 MINIMUM SYSTEM REQUIREMENTS
@@ -93,11 +91,21 @@ Keyboard and mouse (defaults; change them under F10 > Controls)
   Sneak (toggle)        Caps Lock: Harry keeps his sneaking pace until you
                         press it again ("Sneaking" shows in the corner)
   Pace of the keys      mouse wheel: down Sneak < Walk < Run up (Run is the
-                        default; also F10 > Controls > Movement keys)
+                        default; also F10 > Controls > Movement keys pace)
 
 Sneaking: on a controller, push the left stick gently. Keys always move at
 full speed, so use the sneak toggle; a controller button can toggle it too
 (F10 > Controls > Sneak toggle button).
+
+
+PC SETTINGS (PAUSE MENU)
+------------------------
+
+While the game is paused, Back (the controller's View/Select button, or the
+key it is bound to) opens PC Settings over the pause menu: the display, frame
+rate, anti-aliasing, controller and keyboard settings. Up/down picks a row,
+left/right (or A on an on/off row) changes it, B or Back closes. Arrow keys,
+Enter and Esc work too. Changes apply at once and are saved to hppoa.toml.
 
 
 OPTIONS (F10)
@@ -106,19 +114,17 @@ OPTIONS (F10)
 F10 opens the options over the game; most changes apply at once and are saved
 to hppoa.toml. "Defaults (this page)" resets the page you are on (Graphics,
 Controls, ...) and leaves the others; the aspect ratio stays. "Show the
-launcher at startup" turns the launcher's page on or off.
+launcher at startup" turns the launcher's page on or off. Click the arrows
+or use left/right on a row to change its value. Descriptions wrap and the
+rows scroll above the footer, including in a 640x480 window.
 
 Graphics
   Display
     Aspect ratio         4:3 (black bars at the sides), 16:9 (the game's
                          camera widened; menus and movies keep 4:3) or
                          Stretch. Applies at the next start.
-    Cutscene bars        (16:9) cutscenes fill the screen and keep the
-                         original black bars over the picture, with the
-                         subtitles in the bottom bar
     Display mode         Windowed, Borderless (covers the monitor) or
                          Fullscreen (switches the monitor's resolution)
-    Window size /
     Resolution           the window's size, or the fullscreen mode; Desktop
                          uses the monitor's own
     Vsync                waits for the monitor's refresh (no tearing)
@@ -128,7 +134,7 @@ Graphics
     Internal resolution  the lines the 3D is drawn at: 480 is the Xbox's own;
                          720 to 2160 sharpen it; "Follow window" matches the
                          window
-    Render scale %       with "Follow window": the render size as a share of
+    Render scale         with "Follow window": the render size as a share of
                          the window's
     Max render height    with "Follow window": the most lines it follows the
                          window to (1080 by default, so a 4K screen keeps
@@ -143,38 +149,45 @@ Graphics
     Brightness, Contrast 50 leaves the picture as the game draws it
     FPS counter          shows the frame rate
 
-Controls
-  Keyboard and mouse
-    Keyboard and mouse play as controller 1 - alongside a controller
-    Mouse sensitivity, Invert mouse Y
-    Movement keys        the pace W A S D move Harry at: Sneak, Walk or Run;
-                         the mouse wheel steps it in game
-    Key bindings         click a binding, then press a key or mouse button
-                         (Escape clears it); "Default keys" restores them
-  Controller
-    Use controller       off: the game ignores the controller (and it does
-                         not vibrate); keyboard and mouse still play
-    Left / right stick deadzone %      how far a stick moves before it counts
-    Left / right stick sensitivity %   the response past the deadzone
-    Invert camera X / Y
-    Sneak toggle button  a controller button that toggles sneaking (it then
-                         does nothing else), or None
-    Vibration, Vibration strength %
-    Button remapping     which pad button each game button reads;
-                         "Default buttons" restores them
-
 Audio
   Speakers               Stereo, or 5.1 surround: the console's own speaker
                          mix, each channel to its own speaker. Needs Windows'
                          speaker setup set to 5.1 (or a 5.1 HDMI receiver).
                          Applies at the next start.
 
+Controls
+  Controller
+    Use controller       off: the game ignores the controller (and it does
+                         not vibrate); keyboard and mouse still play
+    Controller in background  on: the controller still plays while another
+                         window has the focus; off: it is ignored
+    Left / right stick deadzone        how far a stick moves before it counts
+    Left stick sensitivity / Camera speed  the response past the deadzone
+    Invert camera X / Y
+    Sneak toggle button  a controller button that toggles sneaking (it then
+                         does nothing else), or None
+    Vibration, Vibration strength
+    Button remapping     which pad button each game button reads;
+                         "Default buttons" restores them
+  Keyboard and mouse
+    Keyboard and mouse   plays as controller 1 alongside a controller
+    Mouse sensitivity, Invert mouse Y
+    Movement keys pace   the pace W A S D move Harry at: Sneak, Walk or Run;
+                         the mouse wheel steps it in game
+    Key bindings         click a binding, then press a key or mouse button
+                         (Escape clears it); "Default keys" restores them
+
+Gameplay
+  Cutscene fast-forward, Skip start-up logos
+                         greyed out: "Not working in this game yet"
+  Cutscene bars (16:9)    keeps the original bars over widescreen cutscenes
+
 Accessibility
   Colour blindness
     Correction filter    Off, Protanopia (red-weak), Deuteranopia
                          (green-weak) or Tritanopia (blue-weak): shifts the
                          colours you confuse toward ones you can tell apart
-    Strength %
+    Strength
 
 Debug
   Logs
@@ -182,6 +195,8 @@ Debug
                          game from the next start. Off by default; turn it on
                          to report a problem, and send both files with your
                          report.
+  Developer menu
+    Allow the debug menu  the developers' chapter and room select
 
 
 TROUBLESHOOTING

@@ -669,3 +669,19 @@ SetMixBinVolumes (lesson: an anchored match says where, not what):
   with no reverb stays right (the effects image is zeroed, so the title has no I3DL2 effect anyway).
 - Also read: **0x002B7FAE = SetBufferData** (a whole-library run match): `ret 12`; 0x002B7CC0 compares the new
   pointer and size with the buffer's current ones (+0xBC, +0xC0) before rebuilding it, as SetBufferData does.
+
+## PC Settings page from the pause menu (2026-10-31, branch ui/settings-parity)
+
+PoA's pause menu (Resume / Save Game / Options / Quit Game) is the APT movie POA_IG_OPT, so the HP1/HP2 way (a
+Settings row in a natively drawn menu, `hle_frontend.c`) does not apply. Static (read-only Codex sweep of gen/):
+the FSCommand table (constructor 0x00256C50, 84 `{name, handler}` pairs at 0x30EF28 through sub_001AE6C0) has
+`PauseGame` = sub_00021C90 and `UnpauseGame` = sub_00021D00; gen/ reaches them only through that table
+(`PUSH32(esp, 0x21C90)` / `0x21D00` in the constructor). They bracket the paused session, sub-screens included.
+`hle_pause.c` sets a flag after each body; Back (wButtons 0x0020) while it is set opens the port's page
+(`scda/app/menu.cpp` `hppoa_PausePad`, called from `hle_input.c` after the trainer injection, before the
+MenuOpen suppression).
+
+Background runs (window off-screen, no focus; `poa_newgame.pad` + Start at 135 s, Back 140 s, Down x3, Right, B):
+w169 (1280x720, 16:9) and w43 (1024x768, 4:3): `[PAGE] PC Settings opened` / `closed`, the hint under the pause
+menu, the page centred in the 4:3 menu area, Right stepped Frame rate 60 -> 120, B closed it and the pause menu
+stayed on Resume Game (no press leaked into APT).

@@ -236,6 +236,7 @@ void sub_002C09CE(void)
 }
 
 extern int hppoa_MenuOpen(void);  /* scda/app/menu.cpp */
+extern void hppoa_PausePad(uint16_t *buttons, uint8_t *analog, int16_t *thumbs);  /* scda/app/menu.cpp */
 extern void app_InputPad(int port, XBOX_GAMEPAD *g);  /* scda/app/input.cpp */
 
 /* Stick range compensation (RECOMP_STICK_RANGE, default 0.65; 1 = off).
@@ -286,16 +287,19 @@ static void get_state_direct(void)
     } else if (pad_read((DWORD)g_h[h].port, &s) != 0) {
         g_eax = 1167;
     } else {
-        /* the F10 options panel has the pad while it is open: the game sees it at rest */
-        if (hppoa_MenuOpen()) memset(&s.Gamepad, 0, sizeof(s.Gamepad));
         /* the controls settings: remapping, deadzones, camera inversion, keyboard and mouse on port 0 */
         app_InputPad((int)g_h[h].port, &s.Gamepad);
         stick_compensate(&s.Gamepad.sThumbLX, &s.Gamepad.sThumbLY);
         stick_compensate(&s.Gamepad.sThumbRX, &s.Gamepad.sThumbRY);
         if (g_h[h].port == 0) {
             hppoa_TrainerInject(&s.Gamepad);
-            hppoa_SkipPad(&s.Gamepad);
+            /* Back while paused opens the PC Settings page, which reads the pad from here on (scda/app/menu.cpp) */
+            hppoa_PausePad(&s.Gamepad.wButtons, s.Gamepad.bAnalogButtons, &s.Gamepad.sThumbLX);
         }
+        /* the F10 options panel or the PC Settings page has the pad while it is open: the game sees it at rest
+         * (after the trainer too, so a scripted test drives the page, not the game) */
+        if (hppoa_MenuOpen()) memset(&s.Gamepad, 0, sizeof(s.Gamepad));
+        if (g_h[h].port == 0) hppoa_SkipPad(&s.Gamepad);
         hppoa_last_pad = s.Gamepad;
         /* the packet number moves only when something changed, as XAPI's does */
         if (memcmp(&s.Gamepad, &g_h[h].last, sizeof(s.Gamepad))) g_h[h].packet++;
