@@ -4,13 +4,15 @@ HARRY POTTER AND THE PRISONER OF AZKABAN - PC PORT (BETA)
 A native Windows port of the original Xbox game, made by static recompilation.
 It contains no game data: you need the files from your own copy of the Xbox disc.
 
-BETA (0.5.0). Tested from New Game through the Hogwarts Express and the
+BETA (0.5.1). Tested from New Game through the Hogwarts Express and the
 first level, with saving and loading, at 30 and 60 fps. Later levels have not
 been checked yet. Builds support the North American (NTSC-U) and European
-(PAL) discs; use a build made for your disc region.
+(PAL) discs; use the build made for your disc (the Barthes Launcher picks it).
 
-Not in this beta yet: "Quit To Desktop" in the menus (use Alt+F4), and cutscene fast-forward (its option is
-there but greyed out, as is the start-up logo skip).
+Not in this beta yet: "Quit To Desktop" in the menus (use Alt+F4), a
+settings page on the title menu (use F10 there), cutscene fast-forward and
+the start-up logo skip (their options are there but greyed out), and the
+Archipelago randomizer (coming soon).
 
 
 MINIMUM SYSTEM REQUIREMENTS
@@ -31,21 +33,42 @@ Windows "N" editions also need Microsoft's Media Feature Pack.
 INSTALLING
 ----------
 
-1. Put the port's files in a folder of your choice:
-       hppoa_launcher.exe
+The easiest way is the Barthes Launcher, one launcher for all three Barthes
+Recompiled Harry Potter ports:
+    https://github.com/Barthes-Recompiled/Barthes-Launcher/releases/latest
+It downloads this port, unpacks your disc image (.iso / .xiso) or copies an
+extracted disc, installs the build for your disc's edition (PAL or USA) and
+keeps it up to date. Your game folder, saves and settings are never touched
+by an update.
+
+To install by hand:
+
+1. Download the release for your disc from
+       https://github.com/Barthes-Recompiled/HP3-Recompiled/releases/latest
+   (PAL for a European disc, USA for a North American one) and unzip it
+   into a folder of its own, for example C:\Games\HP3. It holds:
        hppoa.exe
        README.txt
+       CHANGES.txt
        licenses\
        shadercache\base_shaders.bin
-2. Copy the game files from your disc or the .xiso file into a folder named "game" in the same folder with the executables.
+2. Make a folder named "game" beside hppoa.exe and put the files of your own
+   disc in it, so that game\default.xbe exists. A disc image (.iso / .xiso)
+   has to be extracted first: the Barthes Launcher does it for you, or use
+   a tool such as extract-xiso.
 
 Updating from an earlier version: replace the files above and keep your
 hppoa.toml, saves\ and shadercache\ (your settings, saved games and the
 shaders already built on your PC stay as they are).
 
 The port creates these itself on the first run:
-    hppoa.toml      your settings (the launcher and F10 change them)
-    saves\         your saved games
+    hppoa.toml     your settings (F10 and the in-game settings
+                   change them)
+    saves\         your saved games; saves\xbox holds the game's Xbox
+                   disk images, so the whole folder can be moved or backed
+                   up as it is
+    hppoa_run.log  what the game printed on its last start (send it
+                   with a problem report)
     shadercache\   shaders built on your PC (the first visit to an area
                    prepares them; later visits load at once)
 
@@ -53,13 +76,12 @@ The port creates these itself on the first run:
 PLAYING
 -------
 
-Start the game with hppoa_launcher.exe. Opening hppoa.exe directly only offers
-to open the launcher.
+Start hppoa.exe, or press Play in the Barthes Launcher.
 
-The launcher sets the aspect ratio (4:3 or 16:9), display, graphics and
-controls, then starts the game with Play. If you turn its page off, the
-launcher starts the game straight away; hold Shift while opening it to see
-the page again.
+On the first start, pick your aspect ratio (4:3 or 16:9), display mode,
+resolution and controls with F10 for every option, or PC Settings (Back
+while the game is paused) for the main ones. Aspect ratio and speaker
+changes apply at the next start.
 
 Only one copy of the game runs at a time: starting it again brings the
 running game to the front.
@@ -75,7 +97,7 @@ Controller
   An Xbox 360 / One / Series controller plays like the original Xbox pad.
   The original pad's White and Black buttons are LB and RB.
   To play with keyboard and mouse while a controller is connected, turn
-  off "Use controller" (launcher or F10 > Controls).
+  off "Use controller" (F10 > Controls).
 
 Keyboard and mouse (defaults; change them under F10 > Controls)
   Move                  W A S D
@@ -114,8 +136,7 @@ OPTIONS (F10)
 
 F10 opens the options over the game; most changes apply at once and are saved
 to hppoa.toml. "Defaults (this page)" resets the page you are on (Graphics,
-Controls, ...) and leaves the others; the aspect ratio stays. "Show the
-launcher at startup" turns the launcher's page on or off. Click the arrows
+Controls, ...) and leaves the others; the aspect ratio stays. Click the arrows
 or use left/right on a row to change its value. Descriptions wrap and the
 rows scroll above the footer, including in a 640x480 window.
 
@@ -229,7 +250,10 @@ list of third-party code are in the licenses folder beside this file.
 
 The complete source code, including that code and any changes made to it, is
 available at:
+    https://github.com/Barthes-Recompiled/HP3-Recompiled
+It is built on MiddleDucky's Philosopher's Stone and Chamber of Secrets ports:
     https://github.com/MiddleDucky/HP-PS-Xbox-Recomp
+    https://github.com/MiddleDucky/HP-COS-Xbox-Recomp
 
 The Harry Potter game itself is not included and is not covered by these
 licences.
