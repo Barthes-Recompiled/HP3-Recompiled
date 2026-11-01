@@ -1,5 +1,13 @@
 # Changes
 
+## 0.5.2 Beta (2026-11-01)
+
+- **hppoa.exe starts on its own.** Double-click it, use a shortcut, Quiver or the Barthes Launcher: it no longer needs
+  the separate `hppoa_launcher.exe`, which is gone (delete it from an older install if you like). Every start writes
+  `hppoa_run.log` beside the exe, with the crash report if the game crashes; send it with a problem report.
+- **A new icon:** volume III from the Barthes Launcher's shelf, drawn for the project (no game artwork).
+- Readme fixes: the Barthes Launcher download, and the settings and logs as they really are.
+
 ## 0.5.1 Beta (2026-11-01)
 
 Still standing entirely on **MiddleDucky's** Philosopher's Stone and Chamber of Secrets ports. Thank you, MiddleDucky.

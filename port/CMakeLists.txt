@@ -117,7 +117,7 @@ set(HPPOA_RC_ICON "1 ICON \"${CMAKE_CURRENT_SOURCE_DIR}/res/app.ico\"\n")
 # The exe also carries its version information (Explorer's Properties > Details)
 # HPPOA_VERSION: the release's version (tools/package_release.sh passes VERSION), in Properties > Details as the file
 # and product version; the description is the product's name, the copyright the port's author
-set(HPPOA_VERSION "0.0.1" CACHE STRING "the release version, major.minor.patch")
+set(HPPOA_VERSION "0.5.2" CACHE STRING "the release version, major.minor.patch")
 string(REGEX MATCHALL "[0-9]+" hppoa_ver_parts "${HPPOA_VERSION}.0.0.0")
 list(GET hppoa_ver_parts 0 hppoa_v0)
 list(GET hppoa_ver_parts 1 hppoa_v1)

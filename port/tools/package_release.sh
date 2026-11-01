@@ -22,7 +22,7 @@ fi
 # HPPOA_NO_ART: no game artwork inside the exes given to others (now always the case: the icon is res/app.ico)
 # HPPOA_FORTIFY=OFF: no _FORTIFY_SOURCE (a player's main-menu keyboard hitch on Windows, gone in a build without the
 # release hardening, 2026-10-25); the stack canaries stay
-cmake -S . -B build-release "${cross[@]}" -DCMAKE_BUILD_TYPE=Release -DHPPOA_RELEASE=ON -DHPPOA_NO_ART=ON -DHPPOA_FORTIFY=OFF -DHPPOA_VERSION="${VERSION:-0.2.1}" \
+cmake -S . -B build-release "${cross[@]}" -DCMAKE_BUILD_TYPE=Release -DHPPOA_RELEASE=ON -DHPPOA_NO_ART=ON -DHPPOA_FORTIFY=OFF -DHPPOA_VERSION="${VERSION:-0.5.2}" \
       > logs/build-release-config.log
 nice -n 10 cmake --build build-release -j"$(nproc)" --target hppoa > logs/build-release.log 2>&1 ||
     { tail -30 logs/build-release.log; exit 1; }

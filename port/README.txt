@@ -4,7 +4,7 @@ HARRY POTTER AND THE PRISONER OF AZKABAN - PC PORT (BETA)
 A native Windows port of the original Xbox game, made by static recompilation.
 It contains no game data: you need the files from your own copy of the Xbox disc.
 
-BETA (0.5.1). Tested from New Game through the Hogwarts Express and the
+BETA (0.5.2). Tested from New Game through the Hogwarts Express and the
 first level, with saving and loading, at 30 and 60 fps. Later levels have not
 been checked yet. Builds support the North American (NTSC-U) and European
 (PAL) discs; use the build made for your disc (the Barthes Launcher picks it).

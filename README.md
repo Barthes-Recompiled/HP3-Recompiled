@@ -7,7 +7,7 @@ Direct3D 8, DirectSound and input replaced by native code. No emulator. Part of
 [Philosopher's Stone](https://github.com/Barthes-Recompiled/HP1-Recompiled) and
 [Chamber of Secrets](https://github.com/Barthes-Recompiled/HP2-Recompiled).
 
-**Current release: 0.5.1 Beta**, for the USA and PAL discs. New Game plays through the Hogwarts Express into the
+**Current release: 0.5.2 Beta**, for the USA and PAL discs. New Game plays through the Hogwarts Express into the
 first level at 60 fps in true 16:9, with saving and loading; later levels haven't been checked yet (see
 [the beta notes](#beta-what-works-and-what-doesnt-yet)). It stands entirely on
 [MiddleDucky's work](#thank-you-middleducky).
