@@ -17,10 +17,10 @@ Xbox disc. The build regenerates the recompiled code from your `default.xbe`.
 
 ## Quick start
 
-1. Download **`barthes_launcher.exe`** from the
-   [Barthes Launcher releases](https://github.com/Barthes-Recompiled/Barthes-Launcher/releases/latest) and put it in
-   a folder of its own, for example `C:\Games\Barthes`.
-2. Start it, pick **Prisoner of Azkaban** on the shelf and press **Install**.
+1. Download **`BarthesLauncher-windows-<version>.zip`** from the
+   [Barthes Launcher releases](https://github.com/Barthes-Recompiled/Barthes-Launcher/releases/latest) and unzip it
+   somewhere of its own, for example `C:\Games` (it makes a `BarthesLauncher` folder).
+2. Start `barthes_launcher.exe`, pick **Prisoner of Azkaban** on the shelf and press **Install**.
 3. Press **Add disc image or folder...** and choose your `.iso` / `.xiso`, or the `default.xbe` of a disc you
    already extracted. The launcher checks that it is this game's disc, unpacks it and installs the build for your
    disc (PAL or USA).
