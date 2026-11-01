@@ -28,15 +28,14 @@ artwork. You need your own copy of the Xbox disc; the pipeline regenerates every
                           and the Python pipeline (xbe_parser, disasm, func_id, abi_analysis, recomp)
   cmake/ include/ docs/ tests/ LICENSES/   toolkit
   port/
-    CMakeLists.txt        the game: hppoa.exe, hppoa_launcher.exe, hppoa_trainer.exe
+    CMakeLists.txt        the game: hppoa.exe, hppoa_trainer.exe
     regen.sh              XBE -> port/src/recomp/gen/*.c (generated, ignored by git)
     icall_seeds.json      indirect-call targets the disassembler can't find by itself (regen.sh input)
     src/                  hand-written code
-      main.c              startup: single instance / launcher check, debug.env, settings, XBE load, kernel
+      main.c              startup: single instance, working folder + run log, debug.env, settings, XBE load, kernel
       hle_*.c             overrides of recompiled game/XDK functions (see 6.2)
       scda/               renderer (gpu/d3d12.cpp, shaders.cpp, pipeline_cache.cpp), XDK D3D8 HLE
                           (xdk/hle_d3d8.cpp), settings + F10 panel + input (app/)
-      launcher/           hppoa_launcher.exe (Dear ImGui over D3D11)
       trainer/            hppoa_trainer.exe, the debug trainer
       recomp/             recomp_types.h etc.; gen/ is generated
       difftest.c          Unicorn-based original-vs-lifted comparison (HPPOA_DIFFTEST builds)
@@ -130,21 +129,17 @@ cmake -S . -B build-win -G Ninja -DCMAKE_BUILD_TYPE=Release
 cmake --build build-win -j4
 ```
 
-Outputs in `port/build-win/`: `hppoa.exe`, `hppoa_launcher.exe`, `hppoa_trainer.exe`.
+Outputs in `port/build-win/`: `hppoa.exe`, `hppoa_trainer.exe`.
 
-* The exe icon is made at configure time from `game/default.xbe`'s title image (`$$XTIMAGE`) by
-  `tools/xbx_to_ico.py`. Without the XBE, and always in release builds (`HPPOA_NO_ART`), the port's own icon
-  `res/app.ico` is used instead: a wand and sparkle drawn from shapes by `tools/make_icon.py`, original artwork.
-  `-DHPPOA_GAME_XBE=<path>` points at another XBE.
-* The launcher shows `src/launcher/launcher_bg.png` behind its page when that file exists (not in the repo: game
-  art). One can be made from an F12 capture of the main menu (logo texture over the menu background).
+* The exe's icon is Barthes Recompiled's own `res/app.ico` in every build: volume III from the Barthes Launcher's
+  shelf, drawn from shapes by `tools/make_icon.py hp3` (Pillow; the same script is in the launcher's repo). No game
+  art goes into the exe.
 * Generated code is compiled at **-O2** on purpose: GCC 16 at -O3 hoisted the address of a thread-local array
   out of a loop, reading the TLS template instead of the thread's copy. The post-build step
   `tools/check_tls_refs.py` fails the build on any such access ("58 thread local variables, no global address
   reads" is the good result).
 * CMake options: `HPPOA_RELEASE` (players' build: hardening, SSE4.1, no debug keys), `HPPOA_NO_ART` (no game
-  artwork inside the exes: no icon, no launcher picture, the launcher shows the title as text in Windows' Georgia;
-  package_release.sh always sets it, so nothing of Warner Bros.' is in a release), `HPPOA_DIFFTEST` (see 7.4),
+  artwork inside the exes, now always the case; package_release.sh still sets it, so nothing of Warner Bros.' is in a release), `HPPOA_DIFFTEST` (see 7.4),
   `HPPOA_CALL_PROFILE` (per-target call counts, F7 dumps).
 
 
@@ -160,16 +155,18 @@ copy port\build-win\*.exe port\run\
 It creates `hppoa.toml` (settings), `saves\` (Xbox UDATA/TDATA, one folder per game, beside the exe) and
 `shadercache\` there.
 
-**Starting.** `hppoa.exe` only runs when started by `hppoa_launcher.exe` (which sets `HPPOA_LAUNCHER=1` and the
-`RECOMP_*` defaults the game expects, see `StartGame` in launcher.cpp). For scripted test runs set
-`HPPOA_LAUNCHER=1` yourself. Only one copy runs at a time (named mutex, `src/single_instance.h`); a second start
+**Starting.** `hppoa.exe` starts directly (Explorer, a shortcut, Quiver or the Barthes Launcher). It makes its
+own folder the working folder, writes its console output to `hppoa_run.log` when none was handed down, and sets
+the `RECOMP_*` defaults the game expects unless they are already set (`start_alone` / `set_default_env` in
+main.c). The upstream launcher (`hppoa_launcher.exe`) is gone.
+Only one copy runs at a time (named mutex, `src/single_instance.h`); a second start
 brings the running one forward. Alt+F4 ends the process at once (`fb_present.c`).
 
 **debug.env** beside the exe: `KEY=VALUE` lines set as environment variables however the game is started (an
 existing variable wins, `#` comments). This is how trace switches are turned on.
 
 **Logs.** Only with F10 > Debug > "Write debug logs" (`debug_logs = true` in hppoa.toml, from the next start):
-`hppoa_run.log` (the game's console output, written by the launcher) and `xbox_kernel.log` (kernel layer).
+`hppoa_run.log` (the game's console output, written by the game itself or the Barthes Launcher) and `xbox_kernel.log` (kernel layer).
 Crash reports (`[CRASH]` with symbolised guest functions; hppoa.exe keeps its symbol table) land in hppoa_run.log.
 
 **Shader cache.** Shaders are generated HLSL keyed by a hash of their source, compiled with D3DCompile and kept in
@@ -182,7 +179,7 @@ building are skipped (`async_shaders`), and such a frame is not shown: the last 
 stale entries are harmless but useless.
 
 **Release.** `bash port/tools/package_release.sh` (MSYS2) configures `build-release` with `HPPOA_RELEASE=ON`,
-builds, and fills `port/dist/hppoa-<date>/` with hppoa_launcher.exe, hppoa.exe, README.txt and
+builds, and fills `port/dist/hppoa-<date>/` with hppoa.exe, README.txt and
 `shadercache/base_shaders.bin`. It checks ASLR/NX/high-entropy, the stack protector, and that every imported DLL
 ships with Windows 10/11 (C/C++ runtimes are static; XInput is `xinput1_4`). **It never deletes the folder**
 (testers drop game files into it): only its own files are overwritten. Keep it that way.

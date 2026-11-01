@@ -79,8 +79,6 @@ const Entry kEntries[] = {
      "false: the controller is ignored while another window has the focus; true reads it anyway (as before)"},
     {"async_shaders", "RECOMP_ASYNC_SHADERS", Kind::Bool, FIELD(async_shaders), 0, 0,
      "a draw whose pipeline is still compiling is skipped instead of waited for"},
-    {"show_launcher", nullptr, Kind::Bool, FIELD(show_launcher), 0, 0,
-     "hppoa_launcher.exe shows its settings page; false starts the game at once (hold Shift to see it)"},
     {"start_menu", "RECOMP_START_MENU", Kind::Bool, FIELD(start_menu), 0, 0,
      "the settings page before the game starts (aspect ratio, resolution, quality)"},
     {"fps_limit", "RECOMP_FPS_LIMIT", Kind::Fps, FIELD(fps_limit), 0, 0,
