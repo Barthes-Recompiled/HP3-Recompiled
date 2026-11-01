@@ -28,6 +28,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "ap/bridge.h"
+
 /* the register names (eax, esp, ...) the runtime macros expand to */
 #define RECOMP_GENERATED_CODE
 #include "recomp/gen/recomp_types.h"
@@ -204,5 +206,8 @@ void sub_001A7450(void)
             steps = 0;
             real0 = now, game0 = MEM32(t + 4), frames0 = MEM32(t);
         }
+        /* Archipelago (src/ap/bridge.cpp): the frame timer is the title's one tick a frame, menus and play alike, so
+         * the bridge connects and drains its packets here; off (one cached getenv) without RECOMP_AP_SERVER/SLOT */
+        if (hppoa_ap_enabled()) hppoa_ap_frame();
     }
 }
