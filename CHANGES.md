@@ -1,9 +1,19 @@
 # Changes
 
-## Unreleased
+## 0.5.1 Beta (2026-11-01)
 
-- European (PAL) disc build profile (`poa-eur`): boots to its language screen and plays New Game into the Hogwarts Express. USA stays canonical.
-- One `[REGION]` log line after the first gameplay chapter loads checks the clock and D3D BSS state.
+Still standing entirely on **MiddleDucky's** Philosopher's Stone and Chamber of Secrets ports. Thank you, MiddleDucky.
+
+### New
+- **The European (PAL) disc works.** It boots to its language screen and plays New Game into the Hogwarts Express.
+  Each disc has its own download; the Barthes Launcher picks the right one for your disc.
+- **PC Settings from the pause menu:** while the game is paused, Back opens a page with the port's settings, drawn
+  over the game's own menu area. F10 now has the same tabs, rows and descriptions as the other two ports.
+
+### Fixes
+- **The game's Xbox disk images now live beside it**, in `saves\xbox`, instead of a folder shared by every port
+  (`%LOCALAPPDATA%\xboxrecomp`). Each port keeps its own, the folder stays portable, and a game started from a
+  packaged (MSIX) app no longer quits at boot because it can't open them.
 
 ## 0.5.0 Beta (2026-10-31): the first release
 
