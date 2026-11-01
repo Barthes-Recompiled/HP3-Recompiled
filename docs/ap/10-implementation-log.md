@@ -77,7 +77,7 @@ C:\Users\unowi\DecompProject\out\ap-python313\Scripts\python.exe apworld\hppoa\t
   The GCI carries `GUI_SAVE_TXT_013` / `GUI_TASKLIST_DAY6_*` tags and looks compressed. Diffing them against an Xbox
   save from the same day may pin the progress block (Phase 2/4). Keep them out of git.
 
-### Next three tasks (Phase 2)
+### Next three tasks (Phase 2, as planned at the end of Phase 1)
 
 1. **Bridge foundation:** port HP2's in-process bridge (WebSocket thread, frame coordinator, sidecar, offline queue),
    embed `catalog.json` at build time with the version fence, slot-data handshake. Done = connects to a local server,
@@ -86,3 +86,35 @@ C:\Users\unowi\DecompProject\out\ap-python313\Scripts\python.exe apworld\hppoa\t
    `0x376B44..50`. Done = travel between two chapters with no black screen, live with Austin.
 3. **Return to the common room (Floo retreat):** same loader to `GryffindorCommonRoom` or the chapter start, from
    pause and a shortcut, refused in cutscenes/loading/minigames. Done = retreat from a mission, live with Austin.
+
+## Phase 2.1: the bridge (2026-11-01, Claude)
+
+Branch `ap/bridge` (off `ap/impl`). No hook was added: the bridge rides the title's existing once-a-frame
+override, the frame timer `sub_001A7450` with `this = 0x38BA6C` (`hle_video.c`, already in regen.sh's
+`--exclude-manual`), which ticks in menus and in play.
+
+| Piece | Where |
+|---|---|
+| WebSocket client (WinHTTP; network thread only queues packets) | `port/src/ap/client.{h,cpp}`, HP2's, namespace renamed |
+| Bridge (game thread) | `port/src/ap/bridge.{h,cpp}`, ported from HP2 |
+| Catalog embedded at build time | `port/ap/embed.cmake` ? `build-win/ap_gen/catalog_data.inc` |
+| JSON | `port/third_party/nlohmann/json.hpp` 3.11.3 (MIT) |
+| Host test | `port/ap/test_bridge.cpp`, built by `port/ap/test_bridge.sh` (normal + bumped-catalog builds) |
+
+What the bridge does, beyond HP2's: refuses a slot whose `slot_data.catalog` differs from the embedded version
+(the 08 ?1 fence); ignores checks in groups the slot left out (`slot_data.groups`); checks the seeded chapter ends
+(`chapter:intro`, `chapter:hogwartsexpress`, `chapter:night0`) as soon as a slot binds; counts the catalog's start
+items as owned; lists travel entries (12 chapters in chapter-table order, then the 10 areas with their chapter).
+Off unless `RECOMP_AP_SERVER` and `RECOMP_AP_SLOT` are set; the password is read from
+`saves\archipelago\connection.toml`.
+
+**Host test (2026-11-01)** against `C:\ProgramData\Archipelago\ArchipelagoServer.exe` hosting the Phase 1 seed 31
+(slot Hermione, Minimal):
+- phase 1: a check made before connecting was kept pending and sent on connecting with the three seeded chapter
+  ends (4 checks); a later check went straight out; `card:1` (cards off in Minimal) was ignored; all 9 received items
+  were handed out once, start items included (AP sends the pre-collected items as received items).
+- phase 2 (new run, same slot): the session came back (5 checks, 9 items given) and nothing was given twice.
+- fence: the bumped-catalog build was refused ("slot built from catalog 6f022b02f338, this game has 000000000000").
+
+**Not done yet:** nothing in the game gives the received items or makes checks (Phase 3/4); the travel page and the
+retreat (Phase 2.2/2.3) need a live test with Austin.
