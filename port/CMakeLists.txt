@@ -108,36 +108,13 @@ set(GAME_SOURCES
 #   src/recomp/recomp_dispatch.h     - binary search dispatch table
 #   src/recomp/recomp_types.h        - register model, ICALL macros, MEM helpers
 
-# Game art is not kept in the repository. The exes' icon is made here from the player's own default.xbe (its title
-# image, section $$XTIMAGE) by tools/xbx_to_ico.py; the launcher's background is src/launcher/launcher_bg.png when
-# someone has made one (DEVELOPING.md). Without either the build goes on: default icon, plain launcher page.
-find_package(Python3 COMPONENTS Interpreter)
-# HPPOA_NO_ART: neither, whatever is on this PC: the builds that are given to others (tools/package_release.sh), so
-# no Warner Bros. artwork travels inside the exes; the launcher then shows the title as text
-option(HPPOA_NO_ART "Leave the game's artwork (icon, launcher picture) out of the exes" OFF)
-set(HPPOA_GAME_XBE "${XBOXRECOMP_DIR}/game/default.xbe" CACHE FILEPATH "the game's default.xbe, for the exe icon")
-set(HPPOA_ICON "${CMAKE_CURRENT_BINARY_DIR}/hppoa.ico")
-if(HPPOA_NO_ART)
-    file(REMOVE "${HPPOA_ICON}")
-elseif(WIN32 AND Python3_FOUND AND EXISTS "${HPPOA_GAME_XBE}" AND NOT EXISTS "${HPPOA_ICON}")
-    execute_process(COMMAND ${Python3_EXECUTABLE} -I ${CMAKE_CURRENT_SOURCE_DIR}/tools/xbx_to_ico.py
-                            "${HPPOA_GAME_XBE}" "${HPPOA_ICON}"
-                    RESULT_VARIABLE ico_result OUTPUT_QUIET)
-endif()
-set(HPPOA_RC_ICON "")
-if(EXISTS "${HPPOA_ICON}")
-    set(HPPOA_RC_ICON "1 ICON \"${HPPOA_ICON}\"\n")
-elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/res/app.ico")
-    # the port's own icon (tools/make_icon.py: drawn from shapes, no game art): releases, and builds without the XBE
-    set(HPPOA_RC_ICON "1 ICON \"${CMAKE_CURRENT_SOURCE_DIR}/res/app.ico\"\n")
-endif()
-set(HPPOA_RC_BG "")
-if(NOT HPPOA_NO_ART AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/launcher/launcher_bg.png")
-    set(HPPOA_RC_BG "1 RCDATA \"${CMAKE_CURRENT_SOURCE_DIR}/src/launcher/launcher_bg.png\"\n")
-endif()
-# resource 1: the icon (fb_present.c and the launcher load it for their windows); the launcher's RCDATA 1 its picture.
-# Each also carries its version information (Explorer's Properties > Details), which keeps the file from being
-# empty without art: windres refuses a resource script with no resources
+# No game art in the exes, in any build: the icon is Barthes Recompiled's own, res/app.ico (tools/make_icon.py hp3:
+# volume III from the Barthes Launcher's shelf, drawn from shapes), not one made from the XBE's title image.
+# HPPOA_NO_ART: kept so tools/package_release.sh's -DHPPOA_NO_ART=ON still configures; nothing depends on it now
+option(HPPOA_NO_ART "No game artwork in the exes (now always the case)" OFF)
+set(HPPOA_RC_ICON "1 ICON \"${CMAKE_CURRENT_SOURCE_DIR}/res/app.ico\"\n")
+# resource 1: the icon (fb_present.c loads it for the game's window; Explorer and shortcuts show it too).
+# The exe also carries its version information (Explorer's Properties > Details)
 # HPPOA_VERSION: the release's version (tools/package_release.sh passes VERSION), in Properties > Details as the file
 # and product version; the description is the product's name, the copyright the port's author
 set(HPPOA_VERSION "0.0.1" CACHE STRING "the release version, major.minor.patch")
@@ -148,14 +125,13 @@ list(GET hppoa_ver_parts 2 hppoa_v2)
 set(HPPOA_PRODUCT "Harry Potter and the Prisoner of Azkaban - unofficial PC port")
 function(hppoa_version_rc out file)
     set(v "${hppoa_v0},${hppoa_v1},${hppoa_v2},0")
-    set(${out} "1 VERSIONINFO\nFILEVERSION ${v}\nPRODUCTVERSION ${v}\nFILEOS 0x40004\nFILETYPE 1\nBEGIN\n  BLOCK \"StringFileInfo\"\n  BEGIN\n    BLOCK \"040904B0\"\n    BEGIN\n      VALUE \"CompanyName\", \"barthes_recompiled\"\n      VALUE \"FileDescription\", \"${HPPOA_PRODUCT}\"\n      VALUE \"ProductName\", \"${HPPOA_PRODUCT}\"\n      VALUE \"FileVersion\", \"${HPPOA_VERSION}\"\n      VALUE \"ProductVersion\", \"${HPPOA_VERSION}\"\n      VALUE \"LegalCopyright\", \"Copyright (C) 2026 MiddleDucky, barthes_recompiled contributors\"\n      VALUE \"OriginalFilename\", \"${file}\"\n      VALUE \"InternalName\", \"${file}\"\n    END\n  END\n  BLOCK \"VarFileInfo\"\n  BEGIN\n    VALUE \"Translation\", 0x409, 1200\n  END\nEND\n" PARENT_SCOPE)
+    set(${out} "1 VERSIONINFO\nFILEVERSION ${v}\nPRODUCTVERSION ${v}\nFILEOS 0x40004\nFILETYPE 1\nBEGIN\n  BLOCK \"StringFileInfo\"\n  BEGIN\n    BLOCK \"040904B0\"\n    BEGIN\n      VALUE \"CompanyName\", \"Barthes Recompiled\"\n      VALUE \"FileDescription\", \"${HPPOA_PRODUCT}\"\n      VALUE \"ProductName\", \"${HPPOA_PRODUCT}\"\n      VALUE \"FileVersion\", \"${HPPOA_VERSION}\"\n      VALUE \"ProductVersion\", \"${HPPOA_VERSION}\"\n      VALUE \"LegalCopyright\", \"Copyright (C) 2026 MiddleDucky, Barthes Recompiled contributors\"\n      VALUE \"OriginalFilename\", \"${file}\"\n      VALUE \"InternalName\", \"${file}\"\n    END\n  END\n  BLOCK \"VarFileInfo\"\n  BEGIN\n    VALUE \"Translation\", 0x409, 1200\n  END\nEND\n" PARENT_SCOPE)
 endfunction()
 hppoa_version_rc(HPPOA_RC_VERSION_GAME "hppoa.exe")
-hppoa_version_rc(HPPOA_RC_VERSION_LAUNCHER "hppoa_launcher.exe")
 file(CONFIGURE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/hppoa_res.rc"
      CONTENT "// generated by CMakeLists.txt\n${HPPOA_RC_ICON}${HPPOA_RC_VERSION_GAME}")
-file(CONFIGURE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/launcher_res.rc"
-     CONTENT "// generated by CMakeLists.txt\n${HPPOA_RC_ICON}${HPPOA_RC_BG}${HPPOA_RC_VERSION_LAUNCHER}")
+# the icon is named by this script, not part of it: without this a new res/app.ico left the old one in the exe
+set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/hppoa_res.rc" PROPERTIES OBJECT_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/res/app.ico")
 
 add_executable(${PROJECT_NAME} WIN32
     ${GAME_SOURCES}
@@ -274,22 +250,6 @@ if(HPPOA_DIFFTEST)
     target_sources(${PROJECT_NAME} PRIVATE src/difftest.c)
     target_include_directories(${PROJECT_NAME} PRIVATE third_party/unicorn)
     target_compile_definitions(${PROJECT_NAME} PRIVATE RECOMP_DIFFTEST)
-endif()
-
-# hppoa_launcher.exe: 4:3 or 16:9 and the graphics settings, then hppoa.exe (src/launcher/launcher.cpp)
-if(WIN32)
-    add_executable(hppoa_launcher WIN32
-        src/launcher/launcher.cpp
-        src/launcher/xiso.c  # unpacks a disc image in game\ before the first start
-        ${CMAKE_CURRENT_BINARY_DIR}/launcher_res.rc
-        ${IMGUI_DIR}/imgui.cpp ${IMGUI_DIR}/imgui_draw.cpp ${IMGUI_DIR}/imgui_tables.cpp
-        ${IMGUI_DIR}/imgui_widgets.cpp ${IMGUI_DIR}/backends/imgui_impl_win32.cpp
-        ${IMGUI_DIR}/backends/imgui_impl_dx11.cpp)
-    target_include_directories(hppoa_launcher PRIVATE ${IMGUI_DIR})
-    set_target_properties(hppoa_launcher PROPERTIES CXX_STANDARD 20 CXX_STANDARD_REQUIRED ON)
-    target_compile_options(hppoa_launcher PRIVATE -O2)
-    target_link_options(hppoa_launcher PRIVATE -static -static-libgcc -static-libstdc++ -mwindows)
-    target_link_libraries(hppoa_launcher PRIVATE d3d11 dxgi d3dcompiler windowscodecs ole32 imm32 dwmapi gdi32 xinput1_4)
 endif()
 
 # hppoa_trainer.exe: the debug trainer beside the game (noclip, spells, health, saved spots); src/trainer/trainer.c,

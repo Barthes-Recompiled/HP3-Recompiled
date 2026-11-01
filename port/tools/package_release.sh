@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # The build players get: configures build-release (HPPOA_RELEASE=ON: buffer-overflow hardening on the hand-written
-# code, SSE4.1, no debug keys), builds the game and the launcher, and puts in dist/hppoa-<date>/:
-#   hppoa_launcher.exe             setup: 4:3 / 16:9, graphics, controls; starts the game
+# code, SSE4.1, no debug keys), builds the game, and puts in dist/hppoa-<date>/:
 #   hppoa.exe                      the game
 #   shadercache\base_shaders.bin  shaders compiled ahead (read only; the player's own go in shaders.bin)
 #   README.txt                    requirements, installing, controls, the F10 options
@@ -20,20 +19,20 @@ else
     objdump=objdump
     nm=nm
 fi
-# HPPOA_NO_ART: no game artwork inside the exes given to others (no icon from the XBE, no launcher picture)
+# HPPOA_NO_ART: no game artwork inside the exes given to others (now always the case: the icon is res/app.ico)
 # HPPOA_FORTIFY=OFF: no _FORTIFY_SOURCE (a player's main-menu keyboard hitch on Windows, gone in a build without the
 # release hardening, 2026-10-25); the stack canaries stay
 cmake -S . -B build-release "${cross[@]}" -DCMAKE_BUILD_TYPE=Release -DHPPOA_RELEASE=ON -DHPPOA_NO_ART=ON -DHPPOA_FORTIFY=OFF -DHPPOA_VERSION="${VERSION:-0.2.1}" \
       > logs/build-release-config.log
-nice -n 10 cmake --build build-release -j"$(nproc)" --target hppoa hppoa_launcher > logs/build-release.log 2>&1 ||
+nice -n 10 cmake --build build-release -j"$(nproc)" --target hppoa > logs/build-release.log 2>&1 ||
     { tail -30 logs/build-release.log; exit 1; }
 
 dist="$port/dist/hppoa-$(date +%Y%m%d)"
-# Never delete the folder: players (and testers) drop game/, settings and saves into it. Only the two executables
-# are replaced; anything else found there is left alone. (2026-10-20 an rm -rf of this folder destroyed a game/
+# Never delete the folder: players (and testers) drop game/, settings and saves into it. Only the executable
+# is replaced; anything else found there is left alone. (2026-10-20 an rm -rf of this folder destroyed a game/
 # folder that had been moved into it for a test.)
 mkdir -p "$dist"
-cp -f build-release/hppoa.exe build-release/hppoa_launcher.exe "$dist/"
+cp -f build-release/hppoa.exe "$dist/"
 # players' readme: requirements, installing, controls, the F10 options; and what changed since the last release
 cp -f README.txt "$dist/"
 cp -f "$port/../CHANGES.md" "$dist/CHANGES.txt"

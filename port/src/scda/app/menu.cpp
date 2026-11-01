@@ -213,7 +213,6 @@ void DrawPanel(bool start) {
         ImGui::TextDisabled("Saved to hppoa.toml; F10 in game changes them too");
     } else {
         if (ImGui::Button("Close")) open = false;
-        if (ImGui::Checkbox("Show the launcher at startup", &s.show_launcher)) Changed();
         ImGui::TextDisabled("Saved to hppoa.toml");
     }
     ImGui::End();
