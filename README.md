@@ -97,7 +97,7 @@ Barthes Launcher.
 |---|---|
 | "Failed to load default.xbe" | The disc files are missing: check that `game\default.xbe` exists beside `hppoa.exe`. |
 | The game says it is the wrong disc | Download the other build (`PAL` or `USA`), or let the Barthes Launcher pick it. |
-| The game won't start or closes at once | Update your graphics driver (DirectX 12 is required). Turn on F10 > Debug > *Write debug logs*, start again, and send `hppoa_run.log` and `xbox_kernel.log` with your report. |
+| The game won't start or closes at once | Update your graphics driver (DirectX 12 is required). Every start writes `hppoa_run.log` beside `hppoa.exe`; send it with your report. For more detail turn on F10 > Debug > *Write debug logs* and start again. |
 | A short pause the first time you enter an area | Shaders are being built for your card, once per area; later starts prepare them ahead in the menus. |
 | Keyboard doesn't move Harry while a pad is plugged in | Turn off F10 > Controls > *Use controller*. |
 

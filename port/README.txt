@@ -67,6 +67,8 @@ The port creates these itself on the first run:
     saves\         your saved games; saves\xbox holds the game's Xbox
                    disk images, so the whole folder can be moved or backed
                    up as it is
+    hppoa_run.log  what the game printed on its last start (send it
+                   with a problem report)
     shadercache\   shaders built on your PC (the first visit to an area
                    prepares them; later visits load at once)
 
