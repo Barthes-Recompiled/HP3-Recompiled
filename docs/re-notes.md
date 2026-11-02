@@ -73,3 +73,32 @@ ActionScript in poa_startup_xbox.big near file offset 0x12394 or poa_fe.big near
   `frontend.pkgA`, `frontendspeech.pkgA`, `data/packages/plfs/frontend-startup.pkg`,
   `data/packages/scplfs/frontendaudio.pkg`, `data/packages/end.pkg`. `.pkg`/`.pkgA`/`.hpb` readers: not found yet.
 - `.sdt` names are built by `sub_0015D660`; music `<Music>fe.mpf`; movies `<Movie>%s.mad` (`sub_001AC0A0`).
+
+## Randomizer-relevant finds (2026-10-31, static)
+
+Full audit and design in [`docs/ap/`](ap/README.md). Addresses are USA; in this image `.rdata` virtual = file
+offset + 0x27C0.
+
+- **APT variable setter `sub_001AD3B0(name, value)`** — behind the pointer at `0x38A2F8`; 265 call sites;
+  definition `recomp_0011.c:14219`. Every UI state write goes through it: `WizardCards`, `Beans_Amount`,
+  `Housepoints`/`House_Points`, `FolioBrutiPagesCollected`, `Lost_And_Found`, `Task_Done_1…4`, `ChapterId`,
+  minigame availability. The cheapest check-detection hook in the game (passive, log-only).
+- **Cards**: 52 slots. The album gets a 52-character `'0'/'1'` string as `WizardCards`
+  (`sub_00020010…0034`, `recomp_0000.c:58859-59310`); ownership is two heap bit arrays whose pointers are
+  `0x3661C0`/`0x3661C4`, read by `sub_00071840(id)` (`recomp_0002.c:74938`). Ten sets; the narrator names 50
+  cards (5 per set); the two extra slots are unexplained (likely the rare shop cards).
+- **Chapter/room table**: `data/misc/system_chapterroom.hpb`, `Init` constant pool — chapter names
+  (Intro, HogwartsExpress, Night0…Day6, Minigames, duel clubs) and room names/ids. No Day4/Night4 despite the
+  speech banks.
+- **Travel/load**: `0x376B44` chapter, `0x376B48` room, `0x376B4C` start-point name, `0x376B50` pending flag;
+  loader `sub_00115390(chapter, room, startPoint, flag)` (`recomp_0000.c:73029-73175`). The debug menu's
+  `DM_Selection` (`sub_0001B800`) writes the same globals.
+- **Chapter lifecycle**: each chapter has `*_initialisechapter.hpb` (`InitialiseVars`, `InitialiseChapter`,
+  `DeinitialiseChapter`, `SetStartRoom`; `intro` also `AddSpells`) and `*_endchapter.hpb`
+  (`EndChapter_StartNextChapter`). `day3_chaptersavestate.hpb` / `night5_chaptersavestate.hpb` are explicit
+  start-state scripts (`_Support_InitCapabilitySets`, 952 bytes) — the model for AP's seeded chapter start.
+- **Tasks**: `GUI_TASKLIST_<chapter>_00N` in `Apt_Text.txt` — 35 tasks over 11 chapters; the Tasks page is driven
+  by `Task_Done_1…4` / `Task1_Display…4`.
+- **Still open**: the item-grant/inventory function (HP1 `sub_00041D20` / HP2 `sub_00081A10` analogue); the save
+  progress block (16 KB `SaveGame-0`, serialise/deserialise unmapped); the `.hpb` VM dispatcher (95,554 functions
+  called by name); pickup placements (`.pkgA` manifests list classes only).

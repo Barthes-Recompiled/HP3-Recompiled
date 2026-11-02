@@ -1,0 +1,5270 @@
+{
+ "version": "6f022b02f338",
+ "schema": 1,
+ "game": "Harry Potter and the Prisoner of Azkaban Recomp",
+ "ids": {
+  "location_base": 74300000,
+  "item_base": 74310000
+ },
+ "regions": {
+  "start": "Day1",
+  "chapters": [
+   "Intro",
+   "HogwartsExpress",
+   "Night0",
+   "Day1",
+   "Night1",
+   "Day2",
+   "Night2",
+   "Day3",
+   "Night3",
+   "Day5",
+   "Night5",
+   "Day6"
+  ],
+  "areas": [
+   "GlaciusChallenge",
+   "MaraudersChallenge",
+   "CarpeRetractumChallenge",
+   "ShriekingShack",
+   "PatronusChallenge",
+   "QuidditchMatch",
+   "DementorBattle",
+   "DarkTower",
+   "HouseCup",
+   "BonusActivities"
+  ],
+  "area_chapters": {
+   "GlaciusChallenge": "Day1",
+   "MaraudersChallenge": null,
+   "CarpeRetractumChallenge": "Day3",
+   "ShriekingShack": "Night3",
+   "PatronusChallenge": "Night3",
+   "QuidditchMatch": "Day5",
+   "DementorBattle": "Night5",
+   "DarkTower": "Night5",
+   "HouseCup": "Day6",
+   "BonusActivities": null
+  }
+ },
+ "goal": {
+  "region": "DarkTower",
+  "tokens_required": 8,
+  "requires": [
+   "Night 5 Pass",
+   "Dark Tower Pass",
+   "Expecto Patronum"
+  ]
+ },
+ "items": {
+  "Intro Pass": {
+   "kind": "chapter",
+   "class": "progression",
+   "region": "Intro",
+   "start": true,
+   "id": 74310001
+  },
+  "Hogwarts Express Pass": {
+   "kind": "chapter",
+   "class": "progression",
+   "region": "HogwartsExpress",
+   "start": true,
+   "id": 74310002
+  },
+  "Night 0 Pass": {
+   "kind": "chapter",
+   "class": "progression",
+   "region": "Night0",
+   "start": true,
+   "id": 74310003
+  },
+  "Day 1 Pass": {
+   "kind": "chapter",
+   "class": "progression",
+   "region": "Day1",
+   "start": true,
+   "id": 74310004
+  },
+  "Night 1 Pass": {
+   "kind": "chapter",
+   "class": "progression",
+   "region": "Night1",
+   "id": 74310005
+  },
+  "Day 2 Pass": {
+   "kind": "chapter",
+   "class": "progression",
+   "region": "Day2",
+   "id": 74310006
+  },
+  "Night 2 Pass": {
+   "kind": "chapter",
+   "class": "progression",
+   "region": "Night2",
+   "id": 74310007
+  },
+  "Day 3 Pass": {
+   "kind": "chapter",
+   "class": "progression",
+   "region": "Day3",
+   "id": 74310008
+  },
+  "Night 3 Pass": {
+   "kind": "chapter",
+   "class": "progression",
+   "region": "Night3",
+   "id": 74310009
+  },
+  "Day 5 Pass": {
+   "kind": "chapter",
+   "class": "progression",
+   "region": "Day5",
+   "id": 74310010
+  },
+  "Night 5 Pass": {
+   "kind": "chapter",
+   "class": "progression",
+   "region": "Night5",
+   "id": 74310011
+  },
+  "Day 6 Pass": {
+   "kind": "chapter",
+   "class": "progression",
+   "region": "Day6",
+   "id": 74310012
+  },
+  "Glacius Challenge Pass": {
+   "kind": "area",
+   "class": "progression",
+   "region": "GlaciusChallenge",
+   "chapter": "Day1",
+   "id": 74310013
+  },
+  "Marauder's Challenge Pass": {
+   "kind": "area",
+   "class": "progression",
+   "region": "MaraudersChallenge",
+   "chapter": null,
+   "id": 74310014
+  },
+  "Carpe Retractum Challenge Pass": {
+   "kind": "area",
+   "class": "progression",
+   "region": "CarpeRetractumChallenge",
+   "chapter": "Day3",
+   "id": 74310015
+  },
+  "Shrieking Shack Pass": {
+   "kind": "area",
+   "class": "progression",
+   "region": "ShriekingShack",
+   "chapter": "Night3",
+   "id": 74310016
+  },
+  "Patronus Challenge Pass": {
+   "kind": "area",
+   "class": "progression",
+   "region": "PatronusChallenge",
+   "chapter": "Night3",
+   "id": 74310017
+  },
+  "Quidditch Match Pass": {
+   "kind": "area",
+   "class": "progression",
+   "region": "QuidditchMatch",
+   "chapter": "Day5",
+   "id": 74310018
+  },
+  "Dementor Battle Pass": {
+   "kind": "area",
+   "class": "progression",
+   "region": "DementorBattle",
+   "chapter": "Night5",
+   "id": 74310019
+  },
+  "Dark Tower Pass": {
+   "kind": "area",
+   "class": "progression",
+   "region": "DarkTower",
+   "chapter": "Night5",
+   "id": 74310020
+  },
+  "House Cup Pass": {
+   "kind": "area",
+   "class": "progression",
+   "region": "HouseCup",
+   "chapter": "Day6",
+   "id": 74310021
+  },
+  "Bonus Activities Pass": {
+   "kind": "area",
+   "class": "progression",
+   "region": "BonusActivities",
+   "chapter": null,
+   "id": 74310022
+  },
+  "Flipendo": {
+   "kind": "spell",
+   "class": "progression",
+   "spell_id": 7,
+   "source": "start",
+   "start": true,
+   "id": 74310023
+  },
+  "Expelliarmus": {
+   "kind": "spell",
+   "class": "progression",
+   "spell_id": 9,
+   "source": "Night0",
+   "id": 74310024
+  },
+  "Lumos Duo": {
+   "kind": "spell",
+   "class": "progression",
+   "spell_id": 8,
+   "source": "Night1",
+   "id": 74310025
+  },
+  "Glacius": {
+   "kind": "spell",
+   "class": "progression",
+   "spell_id": 10,
+   "source": "Day1",
+   "id": 74310026
+  },
+  "Reparo": {
+   "kind": "spell",
+   "class": "progression",
+   "spell_id": 11,
+   "source": "Night2",
+   "id": 74310027
+  },
+  "Carpe Retractum": {
+   "kind": "spell",
+   "class": "progression",
+   "spell_id": 13,
+   "source": "Day3",
+   "id": 74310028
+  },
+  "Expecto Patronum": {
+   "kind": "spell",
+   "class": "progression",
+   "spell_id": 14,
+   "source": "Night3",
+   "id": 74310029
+  },
+  "Draconifors": {
+   "kind": "spell",
+   "class": "progression",
+   "spell_id": 15,
+   "source": "Night3",
+   "id": 74310030
+  },
+  "Snufflifors": {
+   "kind": "spell",
+   "class": "progression",
+   "spell_id": 12,
+   "source": "shop",
+   "id": 74310031
+  },
+  "Mucus Projectum": {
+   "kind": "spell",
+   "class": "progression",
+   "spell_id": 16,
+   "source": "shop",
+   "id": 74310032
+  },
+  "Story Token (Hogwarts Express)": {
+   "kind": "token",
+   "class": "progression",
+   "start": true,
+   "id": 74310033
+  },
+  "Story Token (Night 0)": {
+   "kind": "token",
+   "class": "progression",
+   "start": true,
+   "id": 74310034
+  },
+  "Story Token (Day 1)": {
+   "kind": "token",
+   "class": "progression",
+   "id": 74310035
+  },
+  "Story Token (Night 1)": {
+   "kind": "token",
+   "class": "progression",
+   "id": 74310036
+  },
+  "Story Token (Day 2)": {
+   "kind": "token",
+   "class": "progression",
+   "id": 74310037
+  },
+  "Story Token (Night 2)": {
+   "kind": "token",
+   "class": "progression",
+   "id": 74310038
+  },
+  "Story Token (Day 3)": {
+   "kind": "token",
+   "class": "progression",
+   "id": 74310039
+  },
+  "Story Token (Night 3)": {
+   "kind": "token",
+   "class": "progression",
+   "id": 74310040
+  },
+  "Story Token (Day 5)": {
+   "kind": "token",
+   "class": "progression",
+   "id": 74310041
+  },
+  "Story Token (Night 5)": {
+   "kind": "token",
+   "class": "progression",
+   "id": 74310042
+  },
+  "Story Token (Day 6)": {
+   "kind": "token",
+   "class": "progression",
+   "id": 74310043
+  },
+  "Gunhilda of Gorsemoor Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310044
+  },
+  "Morgan le Fay Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310045
+  },
+  "Queen Maeve Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310046
+  },
+  "Ignatia Wildsmith Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310047
+  },
+  "Beatrix Bloxam Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310048
+  },
+  "Albus Dumbledore Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310049
+  },
+  "Merlin Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310050
+  },
+  "Glanmore Peakes Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310051
+  },
+  "Herpo the Foul Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310052
+  },
+  "Edgar Stroulger Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310053
+  },
+  "Count Vlad Drakul Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310054
+  },
+  "Lady Carmilla Sanguina Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310055
+  },
+  "Amarillo Lestoat Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310056
+  },
+  "Sir Herbert Varney Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310057
+  },
+  "Blodwyn Bludd Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310058
+  },
+  "Gringott Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310059
+  },
+  "Eargit the Ugly Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310060
+  },
+  "Alguff the Awful Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310061
+  },
+  "Ug the Unreliable Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310062
+  },
+  "Urg the Unclean Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310063
+  },
+  "Cordelia Misericordia Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310064
+  },
+  "Babayaga Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310065
+  },
+  "Malodora Grymm Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310066
+  },
+  "Leticia Somnolens Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310067
+  },
+  "Old Mother Hubbard Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310068
+  },
+  "Hengist of Upper Barnton Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310069
+  },
+  "Bran the Bloodthirsty Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310070
+  },
+  "Cyclops Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310071
+  },
+  "Goliath Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310072
+  },
+  "Morholt Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310073
+  },
+  "Norwegian Ridgeback Dragon Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310074
+  },
+  "Common Welsh Green Dragon Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310075
+  },
+  "Hebridean Black Dragon Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310076
+  },
+  "Hungarian Horntail Dragon Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310077
+  },
+  "Romanian Longhorn Dragon Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310078
+  },
+  "Gnome Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310079
+  },
+  "Imp Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310080
+  },
+  "Doxy Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310081
+  },
+  "Bowtruckle Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310082
+  },
+  "Billywig Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310083
+  },
+  "Phoenix Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310084
+  },
+  "Giant Squid Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310085
+  },
+  "Manticore Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310086
+  },
+  "Unicorn Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310087
+  },
+  "Mountain Troll Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310088
+  },
+  "Barberus Bragge Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310089
+  },
+  "Cyprian Youdle Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310090
+  },
+  "Joscelind Wadcock Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310091
+  },
+  "Leopoldina Smethwyck Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310092
+  },
+  "Roderick Plumpton Card": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "card",
+   "pool": [
+    "cards"
+   ],
+   "id": 74310093
+  },
+  "Folio Bruti Page: Dementor": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "folio",
+   "pool": [
+    "folio"
+   ],
+   "id": 74310094
+  },
+  "Folio Bruti Page: Billywig": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "folio",
+   "pool": [
+    "folio"
+   ],
+   "id": 74310095
+  },
+  "Folio Bruti Page: Chizpurfle": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "folio",
+   "pool": [
+    "folio"
+   ],
+   "id": 74310096
+  },
+  "Folio Bruti Page: Doxy": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "folio",
+   "pool": [
+    "folio"
+   ],
+   "id": 74310097
+  },
+  "Folio Bruti Page: Dragonfly": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "folio",
+   "pool": [
+    "folio"
+   ],
+   "id": 74310098
+  },
+  "Folio Bruti Page: Fairy": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "folio",
+   "pool": [
+    "folio"
+   ],
+   "id": 74310099
+  },
+  "Folio Bruti Page: Fire Seed Bush": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "folio",
+   "pool": [
+    "folio"
+   ],
+   "id": 74310100
+  },
+  "Folio Bruti Page: Flying Seahorse": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "folio",
+   "pool": [
+    "folio"
+   ],
+   "id": 74310101
+  },
+  "Folio Bruti Page: Ghoul": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "folio",
+   "pool": [
+    "folio"
+   ],
+   "id": 74310102
+  },
+  "Folio Bruti Page: Hinkypunk": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "folio",
+   "pool": [
+    "folio"
+   ],
+   "id": 74310103
+  },
+  "Folio Bruti Page: Hippogriff": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "folio",
+   "pool": [
+    "folio"
+   ],
+   "id": 74310104
+  },
+  "Folio Bruti Page: Pixie": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "folio",
+   "pool": [
+    "folio"
+   ],
+   "id": 74310105
+  },
+  "Folio Bruti Page: Red Cap": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "folio",
+   "pool": [
+    "folio"
+   ],
+   "id": 74310106
+  },
+  "Folio Bruti Page: Salamander": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "folio",
+   "pool": [
+    "folio"
+   ],
+   "id": 74310107
+  },
+  "Folio Bruti Page: Troll": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "folio",
+   "pool": [
+    "folio"
+   ],
+   "id": 74310108
+  },
+  "Folio Bruti Page: Venemous Tentacula": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "folio",
+   "pool": [
+    "folio"
+   ],
+   "id": 74310109
+  },
+  "Prefect Badge": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "lost_and_found",
+   "pool": [
+    "lost_and_found"
+   ],
+   "id": 74310110
+  },
+  "Remembrall": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "lost_and_found",
+   "pool": [
+    "lost_and_found"
+   ],
+   "id": 74310111
+  },
+  "Potion Vial Case": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "lost_and_found",
+   "pool": [
+    "lost_and_found"
+   ],
+   "id": 74310112
+  },
+  "Dragon-hide Gloves": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "lost_and_found",
+   "pool": [
+    "lost_and_found"
+   ],
+   "id": 74310113
+  },
+  "Owl Post Parcel": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "lost_and_found",
+   "pool": [
+    "lost_and_found"
+   ],
+   "id": 74310114
+  },
+  "Key": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "lost_and_found",
+   "pool": [
+    "lost_and_found"
+   ],
+   "id": 74310115
+  },
+  "Telescope": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "lost_and_found",
+   "pool": [
+    "lost_and_found"
+   ],
+   "id": 74310116
+  },
+  "Daily Prophet": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "lost_and_found",
+   "pool": [
+    "lost_and_found"
+   ],
+   "id": 74310117
+  },
+  "Brass Scales": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "lost_and_found",
+   "pool": [
+    "lost_and_found"
+   ],
+   "id": 74310118
+  },
+  "Potion Jar": {
+   "kind": "upgrade",
+   "class": "useful",
+   "collect": "lost_and_found",
+   "pool": [
+    "lost_and_found"
+   ],
+   "id": 74310119
+  },
+  "Endurance Upgrade": {
+   "kind": "upgrade",
+   "class": "useful",
+   "count": 6,
+   "pool": [
+    "card_sets"
+   ],
+   "id": 74310120
+  },
+  "Dark Forces Chapter": {
+   "kind": "upgrade",
+   "class": "useful",
+   "count": 3,
+   "pool": [
+    "shop"
+   ],
+   "id": 74310121
+  },
+  "Owl Care Kit": {
+   "kind": "upgrade",
+   "class": "useful",
+   "pool": [
+    "shop"
+   ],
+   "id": 74310122
+  },
+  "Broom Handle Polish": {
+   "kind": "upgrade",
+   "class": "useful",
+   "pool": [
+    "shop"
+   ],
+   "id": 74310123
+  },
+  "Brass Compass": {
+   "kind": "upgrade",
+   "class": "useful",
+   "pool": [
+    "shop"
+   ],
+   "id": 74310124
+  },
+  "Silver Tail-Twig Clippers": {
+   "kind": "upgrade",
+   "class": "useful",
+   "pool": [
+    "shop"
+   ],
+   "id": 74310125
+  },
+  "Stink Pellet Bag": {
+   "kind": "upgrade",
+   "class": "useful",
+   "pool": [
+    "shop"
+   ],
+   "id": 74310126
+  },
+  "Dungbomb Case": {
+   "kind": "upgrade",
+   "class": "useful",
+   "pool": [
+    "shop"
+   ],
+   "id": 74310127
+  },
+  "25 Beans": {
+   "kind": "filler",
+   "class": "filler",
+   "id": 74310128
+  },
+  "50 Beans": {
+   "kind": "filler",
+   "class": "filler",
+   "id": 74310129
+  },
+  "10 House Points": {
+   "kind": "filler",
+   "class": "filler",
+   "id": 74310130
+  },
+  "Wiggenweld Potion": {
+   "kind": "filler",
+   "class": "filler",
+   "id": 74310131
+  },
+  "Antidote to Uncommon Poisons": {
+   "kind": "filler",
+   "class": "filler",
+   "id": 74310132
+  },
+  "Girding Potion": {
+   "kind": "filler",
+   "class": "filler",
+   "id": 74310133
+  },
+  "Dungbombs": {
+   "kind": "filler",
+   "class": "filler",
+   "id": 74310134
+  },
+  "Stink Pellets": {
+   "kind": "filler",
+   "class": "filler",
+   "id": 74310135
+  },
+  "Chocolate Frog": {
+   "kind": "filler",
+   "class": "filler",
+   "id": 74310136
+  },
+  "Cauldron Cake": {
+   "kind": "filler",
+   "class": "filler",
+   "id": 74310137
+  }
+ },
+ "locations": [
+  {
+   "key": "task:day1:dada",
+   "name": "Day1: Go to the Defense Against the Dark Arts classroom on the third floor",
+   "region": "Day1",
+   "group": "tasks",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Day 1 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300001
+  },
+  {
+   "key": "task:day1:glacius",
+   "name": "Day1: Collect the Glacius spellbook",
+   "region": "GlaciusChallenge",
+   "group": "tasks",
+   "reward_class": "progression-spell",
+   "swap": {
+    "grant": "spell_grant",
+    "arg": 10,
+    "item": "Glacius"
+   },
+   "access": {
+    "chapter": "Day 1 Pass",
+    "areas": [
+     "Glacius Challenge Pass"
+    ],
+    "spells": [],
+    "prereq": [
+     "task:day1:dada"
+    ]
+   },
+   "id": 74300002
+  },
+  {
+   "key": "task:day1:potions",
+   "name": "Day1: Attend Potions class in the Dungeons to learn about the Wiggenweld Potion",
+   "region": "Day1",
+   "group": "tasks",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Day 1 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300003
+  },
+  {
+   "key": "task:day1:broom",
+   "name": "Day1: Go to the Broom Flying class in the grounds",
+   "region": "Day1",
+   "group": "tasks",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Day 1 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300004
+  },
+  {
+   "key": "task:night1:neville",
+   "name": "Night1: Rescue Neville from the ghoul on the fifth floor",
+   "region": "Night1",
+   "group": "tasks",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Night 1 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300005
+  },
+  {
+   "key": "task:night1:common_room",
+   "name": "Night1: Return to the Gryffindor common room",
+   "region": "Night1",
+   "group": "tasks",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Night 1 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": [
+     "task:night1:neville"
+    ]
+   },
+   "id": 74300006
+  },
+  {
+   "key": "task:day2:comc",
+   "name": "Day2: Attend Care of Magical Creatures class in the grounds",
+   "region": "Day2",
+   "group": "tasks",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Day 2 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300007
+  },
+  {
+   "key": "task:night2:follow_ron",
+   "name": "Night2: Follow Ron into the Dungeons",
+   "region": "Night2",
+   "group": "tasks",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Night 2 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300008
+  },
+  {
+   "key": "task:night2:escape",
+   "name": "Night2: Escape from the Dungeons to the Entrance Hall",
+   "region": "Night2",
+   "group": "tasks",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Night 2 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": [
+     "task:night2:follow_ron"
+    ]
+   },
+   "id": 74300009
+  },
+  {
+   "key": "task:day3:antidote_ingredients",
+   "name": "Day3: Collect ingredients for the Antidote to Uncommon Poisons",
+   "region": "Day3",
+   "group": "tasks",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Day 3 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300010
+  },
+  {
+   "key": "task:day3:mix_antidote",
+   "name": "Day3: Go to Potions class to mix the Antidote to Uncommon Poisons",
+   "region": "Day3",
+   "group": "tasks",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Day 3 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": [
+     "task:day3:antidote_ingredients"
+    ]
+   },
+   "id": 74300011
+  },
+  {
+   "key": "task:day3:charms",
+   "name": "Day3: Attend the Charms class on the second floor",
+   "region": "Day3",
+   "group": "tasks",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Day 3 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300012
+  },
+  {
+   "key": "task:day3:carpe",
+   "name": "Day3: Collect the Carpe Retractum spellbook",
+   "region": "CarpeRetractumChallenge",
+   "group": "tasks",
+   "reward_class": "progression-spell",
+   "swap": {
+    "grant": "spell_grant",
+    "arg": 13,
+    "item": "Carpe Retractum"
+   },
+   "access": {
+    "chapter": "Day 3 Pass",
+    "areas": [
+     "Carpe Retractum Challenge Pass"
+    ],
+    "spells": [],
+    "prereq": [
+     "task:day3:charms"
+    ]
+   },
+   "id": 74300013
+  },
+  {
+   "key": "task:night3:lupin",
+   "name": "Night3: Meet Professor Lupin in the History of Magic classroom on the fourth floor",
+   "region": "Night3",
+   "group": "tasks",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Night 3 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300014
+  },
+  {
+   "key": "task:night3:patronus",
+   "name": "Night3: Get the Expecto Patronum spellbook",
+   "region": "PatronusChallenge",
+   "group": "tasks",
+   "reward_class": "progression-spell",
+   "swap": {
+    "grant": "spell_grant",
+    "arg": 14,
+    "item": "Expecto Patronum"
+   },
+   "access": {
+    "chapter": "Night 3 Pass",
+    "areas": [
+     "Patronus Challenge Pass"
+    ],
+    "spells": [],
+    "prereq": [
+     "task:night3:lupin"
+    ]
+   },
+   "id": 74300015
+  },
+  {
+   "key": "task:night3:gunhilda",
+   "name": "Night3: Open and enter the Gunhilda of Gorsemoor statue on the third floor",
+   "region": "Night3",
+   "group": "tasks",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Night 3 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300016
+  },
+  {
+   "key": "task:night3:common_room",
+   "name": "Night3: Return to the Gryffindor common room",
+   "region": "Night3",
+   "group": "tasks",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Night 3 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": [
+     "task:night3:gunhilda"
+    ]
+   },
+   "id": 74300017
+  },
+  {
+   "key": "task:day5:girding_ingredients",
+   "name": "Day5: Collect ingredients for the Girding Potion",
+   "region": "Day5",
+   "group": "tasks",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Day 5 Pass",
+    "areas": [],
+    "spells": [
+     "Carpe Retractum"
+    ],
+    "prereq": []
+   },
+   "id": 74300018
+  },
+  {
+   "key": "task:day5:mix_girding",
+   "name": "Day5: Go to Potions class to mix the Girding Potion",
+   "region": "Day5",
+   "group": "tasks",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Day 5 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": [
+     "task:day5:girding_ingredients"
+    ]
+   },
+   "id": 74300019
+  },
+  {
+   "key": "task:day5:crate",
+   "name": "Day5: Collect the Quidditch ball crate from the courtyard in front of the Clock Tower",
+   "region": "Day5",
+   "group": "tasks",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Day 5 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300020
+  },
+  {
+   "key": "task:day5:stadium",
+   "name": "Day5: Take the Quidditch ball crate to the Quidditch stadium",
+   "region": "QuidditchMatch",
+   "group": "tasks",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Day 5 Pass",
+    "areas": [
+     "Quidditch Match Pass"
+    ],
+    "spells": [],
+    "prereq": [
+     "task:day5:crate"
+    ]
+   },
+   "id": 74300021
+  },
+  {
+   "key": "task:night5:hagrid",
+   "name": "Night5: Visit Hagrid at his hut in the grounds",
+   "region": "Night5",
+   "group": "tasks",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Night 5 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300022
+  },
+  {
+   "key": "task:night5:protect_sirius",
+   "name": "Night5: Protect Sirius from the Dementors",
+   "region": "DementorBattle",
+   "group": "tasks",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Night 5 Pass",
+    "areas": [
+     "Dementor Battle Pass"
+    ],
+    "spells": [
+     "Expecto Patronum"
+    ],
+    "prereq": [
+     "task:night5:hagrid"
+    ]
+   },
+   "id": 74300023
+  },
+  {
+   "key": "task:night5:repel",
+   "name": "Night5: Repel the Dementors",
+   "region": "DementorBattle",
+   "group": "tasks",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Night 5 Pass",
+    "areas": [
+     "Dementor Battle Pass"
+    ],
+    "spells": [
+     "Expecto Patronum"
+    ],
+    "prereq": [
+     "task:night5:protect_sirius"
+    ]
+   },
+   "id": 74300024
+  },
+  {
+   "key": "task:night5:buckbeak",
+   "name": "Night5: Fly Buckbeak to the Dark Tower and rescue Sirius",
+   "region": "DarkTower",
+   "group": "tasks",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Night 5 Pass",
+    "areas": [
+     "Dark Tower Pass"
+    ],
+    "spells": [],
+    "prereq": [
+     "task:night5:repel"
+    ]
+   },
+   "id": 74300025
+  },
+  {
+   "key": "task:day6:cards",
+   "name": "Day6: Complete your collection of collector's cards",
+   "region": "Day6",
+   "group": "tasks",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Day 6 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300026
+  },
+  {
+   "key": "task:day6:house_points",
+   "name": "Day6: Earn as many house points as you can",
+   "region": "Day6",
+   "group": "tasks",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Day 6 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300027
+  },
+  {
+   "key": "task:day6:house_cup",
+   "name": "Day6: Attend the House Cup ceremony in the Great Hall",
+   "region": "HouseCup",
+   "group": "tasks",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Day 6 Pass",
+    "areas": [
+     "House Cup Pass"
+    ],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300028
+  },
+  {
+   "key": "chapter:intro",
+   "name": "Intro: Chapter Complete",
+   "region": "Intro",
+   "group": "chapters",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Intro Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300029
+  },
+  {
+   "key": "chapter:hogwartsexpress",
+   "name": "HogwartsExpress: Chapter Complete",
+   "region": "HogwartsExpress",
+   "group": "chapters",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Hogwarts Express Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300030
+  },
+  {
+   "key": "chapter:night0",
+   "name": "Night0: Chapter Complete",
+   "region": "Night0",
+   "group": "chapters",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Night 0 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300031
+  },
+  {
+   "key": "chapter:day1",
+   "name": "Day1: Chapter Complete",
+   "region": "Day1",
+   "group": "chapters",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Day 1 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": [
+     "task:day1:dada",
+     "task:day1:glacius",
+     "task:day1:potions",
+     "task:day1:broom"
+    ]
+   },
+   "id": 74300032
+  },
+  {
+   "key": "chapter:night1",
+   "name": "Night1: Chapter Complete",
+   "region": "Night1",
+   "group": "chapters",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Night 1 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": [
+     "task:night1:neville",
+     "task:night1:common_room"
+    ]
+   },
+   "id": 74300033
+  },
+  {
+   "key": "chapter:day2",
+   "name": "Day2: Chapter Complete",
+   "region": "Day2",
+   "group": "chapters",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Day 2 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": [
+     "task:day2:comc"
+    ]
+   },
+   "id": 74300034
+  },
+  {
+   "key": "chapter:night2",
+   "name": "Night2: Chapter Complete",
+   "region": "Night2",
+   "group": "chapters",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Night 2 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": [
+     "task:night2:follow_ron",
+     "task:night2:escape"
+    ]
+   },
+   "id": 74300035
+  },
+  {
+   "key": "chapter:day3",
+   "name": "Day3: Chapter Complete",
+   "region": "Day3",
+   "group": "chapters",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Day 3 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": [
+     "task:day3:antidote_ingredients",
+     "task:day3:mix_antidote",
+     "task:day3:charms",
+     "task:day3:carpe"
+    ]
+   },
+   "id": 74300036
+  },
+  {
+   "key": "chapter:night3",
+   "name": "Night3: Chapter Complete",
+   "region": "ShriekingShack",
+   "group": "chapters",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Night 3 Pass",
+    "areas": [
+     "Shrieking Shack Pass"
+    ],
+    "spells": [],
+    "prereq": [
+     "task:night3:lupin",
+     "task:night3:patronus",
+     "task:night3:gunhilda",
+     "task:night3:common_room"
+    ]
+   },
+   "id": 74300037
+  },
+  {
+   "key": "chapter:day5",
+   "name": "Day5: Chapter Complete",
+   "region": "Day5",
+   "group": "chapters",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Day 5 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": [
+     "task:day5:girding_ingredients",
+     "task:day5:mix_girding",
+     "task:day5:crate",
+     "task:day5:stadium"
+    ]
+   },
+   "id": 74300038
+  },
+  {
+   "key": "chapter:night5",
+   "name": "Night5: Chapter Complete",
+   "region": "DarkTower",
+   "group": "chapters",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Night 5 Pass",
+    "areas": [
+     "Dark Tower Pass"
+    ],
+    "spells": [],
+    "prereq": [
+     "task:night5:hagrid",
+     "task:night5:protect_sirius",
+     "task:night5:repel",
+     "task:night5:buckbeak"
+    ]
+   },
+   "id": 74300039
+  },
+  {
+   "key": "chapter:day6",
+   "name": "Day6: Chapter Complete",
+   "region": "Day6",
+   "group": "chapters",
+   "reward_class": "progression-story",
+   "swap": null,
+   "access": {
+    "chapter": "Day 6 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": [
+     "task:day6:cards",
+     "task:day6:house_points",
+     "task:day6:house_cup"
+    ]
+   },
+   "id": 74300040
+  },
+  {
+   "key": "spellbook:expelliarmus",
+   "name": "Night0: Peeves' Spellbook",
+   "region": "Night0",
+   "group": "spellbooks",
+   "reward_class": "progression-spell",
+   "swap": {
+    "grant": "spell_grant",
+    "arg": 9,
+    "item": "Expelliarmus"
+   },
+   "access": {
+    "chapter": "Night 0 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300041
+  },
+  {
+   "key": "spellbook:lumos_duo",
+   "name": "Night1: Muggle Studies Spellbook",
+   "region": "Night1",
+   "group": "spellbooks",
+   "reward_class": "progression-spell",
+   "swap": {
+    "grant": "spell_grant",
+    "arg": 8,
+    "item": "Lumos Duo"
+   },
+   "access": {
+    "chapter": "Night 1 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300042
+  },
+  {
+   "key": "spellbook:reparo",
+   "name": "Night2: Lower Dungeon Spellbook",
+   "region": "Night2",
+   "group": "spellbooks",
+   "reward_class": "progression-spell",
+   "swap": {
+    "grant": "spell_grant",
+    "arg": 11,
+    "item": "Reparo"
+   },
+   "access": {
+    "chapter": "Night 2 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300043
+  },
+  {
+   "key": "spellbook:draconifors",
+   "name": "Night3: Hermione's Second Spellbook",
+   "region": "Night3",
+   "group": "spellbooks",
+   "reward_class": "progression-spell",
+   "swap": {
+    "grant": "spell_grant",
+    "arg": 15,
+    "item": "Draconifors"
+   },
+   "access": {
+    "chapter": "Night 3 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300044
+  },
+  {
+   "key": "card:1",
+   "name": "Card 1: Gunhilda of Gorsemoor",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 1,
+    "item": "Gunhilda of Gorsemoor Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300045
+  },
+  {
+   "key": "card:2",
+   "name": "Card 2: Morgan le Fay",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 2,
+    "item": "Morgan le Fay Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300046
+  },
+  {
+   "key": "card:3",
+   "name": "Card 3: Queen Maeve",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 3,
+    "item": "Queen Maeve Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300047
+  },
+  {
+   "key": "card:4",
+   "name": "Card 4: Ignatia Wildsmith",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 4,
+    "item": "Ignatia Wildsmith Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300048
+  },
+  {
+   "key": "card:5",
+   "name": "Card 5: Beatrix Bloxam",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 5,
+    "item": "Beatrix Bloxam Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300049
+  },
+  {
+   "key": "card:6",
+   "name": "Card 6: Albus Dumbledore",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 6,
+    "item": "Albus Dumbledore Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300050
+  },
+  {
+   "key": "card:7",
+   "name": "Card 7: Merlin",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 7,
+    "item": "Merlin Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300051
+  },
+  {
+   "key": "card:8",
+   "name": "Card 8: Glanmore Peakes",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 8,
+    "item": "Glanmore Peakes Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300052
+  },
+  {
+   "key": "card:9",
+   "name": "Card 9: Herpo the Foul",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 9,
+    "item": "Herpo the Foul Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300053
+  },
+  {
+   "key": "card:10",
+   "name": "Card 10: Edgar Stroulger",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 10,
+    "item": "Edgar Stroulger Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300054
+  },
+  {
+   "key": "card:11",
+   "name": "Card 11: Count Vlad Drakul",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 11,
+    "item": "Count Vlad Drakul Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300055
+  },
+  {
+   "key": "card:12",
+   "name": "Card 12: Lady Carmilla Sanguina",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 12,
+    "item": "Lady Carmilla Sanguina Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300056
+  },
+  {
+   "key": "card:13",
+   "name": "Card 13: Amarillo Lestoat",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 13,
+    "item": "Amarillo Lestoat Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300057
+  },
+  {
+   "key": "card:14",
+   "name": "Card 14: Sir Herbert Varney",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 14,
+    "item": "Sir Herbert Varney Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300058
+  },
+  {
+   "key": "card:15",
+   "name": "Card 15: Blodwyn Bludd",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 15,
+    "item": "Blodwyn Bludd Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300059
+  },
+  {
+   "key": "card:16",
+   "name": "Card 16: Gringott",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 16,
+    "item": "Gringott Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300060
+  },
+  {
+   "key": "card:17",
+   "name": "Card 17: Eargit the Ugly",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 17,
+    "item": "Eargit the Ugly Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300061
+  },
+  {
+   "key": "card:18",
+   "name": "Card 18: Alguff the Awful",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 18,
+    "item": "Alguff the Awful Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300062
+  },
+  {
+   "key": "card:19",
+   "name": "Card 19: Ug the Unreliable",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 19,
+    "item": "Ug the Unreliable Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300063
+  },
+  {
+   "key": "card:20",
+   "name": "Card 20: Urg the Unclean",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 20,
+    "item": "Urg the Unclean Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300064
+  },
+  {
+   "key": "card:21",
+   "name": "Card 21: Cordelia Misericordia",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 21,
+    "item": "Cordelia Misericordia Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300065
+  },
+  {
+   "key": "card:22",
+   "name": "Card 22: Babayaga",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 22,
+    "item": "Babayaga Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300066
+  },
+  {
+   "key": "card:23",
+   "name": "Card 23: Malodora Grymm",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 23,
+    "item": "Malodora Grymm Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300067
+  },
+  {
+   "key": "card:24",
+   "name": "Card 24: Leticia Somnolens",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 24,
+    "item": "Leticia Somnolens Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300068
+  },
+  {
+   "key": "card:25",
+   "name": "Card 25: Old Mother Hubbard",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 25,
+    "item": "Old Mother Hubbard Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300069
+  },
+  {
+   "key": "card:26",
+   "name": "Card 26: Hengist of Upper Barnton",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 26,
+    "item": "Hengist of Upper Barnton Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300070
+  },
+  {
+   "key": "card:27",
+   "name": "Card 27: Bran the Bloodthirsty",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 27,
+    "item": "Bran the Bloodthirsty Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300071
+  },
+  {
+   "key": "card:28",
+   "name": "Card 28: Cyclops",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 28,
+    "item": "Cyclops Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300072
+  },
+  {
+   "key": "card:29",
+   "name": "Card 29: Goliath",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 29,
+    "item": "Goliath Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300073
+  },
+  {
+   "key": "card:30",
+   "name": "Card 30: Morholt",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 30,
+    "item": "Morholt Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300074
+  },
+  {
+   "key": "card:31",
+   "name": "Card 31: Norwegian Ridgeback Dragon",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 31,
+    "item": "Norwegian Ridgeback Dragon Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300075
+  },
+  {
+   "key": "card:32",
+   "name": "Card 32: Common Welsh Green Dragon",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 32,
+    "item": "Common Welsh Green Dragon Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300076
+  },
+  {
+   "key": "card:33",
+   "name": "Card 33: Hebridean Black Dragon",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 33,
+    "item": "Hebridean Black Dragon Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300077
+  },
+  {
+   "key": "card:34",
+   "name": "Card 34: Hungarian Horntail Dragon",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 34,
+    "item": "Hungarian Horntail Dragon Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300078
+  },
+  {
+   "key": "card:35",
+   "name": "Card 35: Romanian Longhorn Dragon",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 35,
+    "item": "Romanian Longhorn Dragon Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300079
+  },
+  {
+   "key": "card:36",
+   "name": "Card 36: Gnome",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 36,
+    "item": "Gnome Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300080
+  },
+  {
+   "key": "card:37",
+   "name": "Card 37: Imp",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 37,
+    "item": "Imp Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300081
+  },
+  {
+   "key": "card:38",
+   "name": "Card 38: Doxy",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 38,
+    "item": "Doxy Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300082
+  },
+  {
+   "key": "card:39",
+   "name": "Card 39: Bowtruckle",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 39,
+    "item": "Bowtruckle Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300083
+  },
+  {
+   "key": "card:40",
+   "name": "Card 40: Billywig",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 40,
+    "item": "Billywig Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300084
+  },
+  {
+   "key": "card:41",
+   "name": "Card 41: Phoenix",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 41,
+    "item": "Phoenix Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300085
+  },
+  {
+   "key": "card:42",
+   "name": "Card 42: Giant Squid",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 42,
+    "item": "Giant Squid Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300086
+  },
+  {
+   "key": "card:43",
+   "name": "Card 43: Manticore",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 43,
+    "item": "Manticore Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300087
+  },
+  {
+   "key": "card:44",
+   "name": "Card 44: Unicorn",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 44,
+    "item": "Unicorn Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300088
+  },
+  {
+   "key": "card:45",
+   "name": "Card 45: Mountain Troll",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 45,
+    "item": "Mountain Troll Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300089
+  },
+  {
+   "key": "card:46",
+   "name": "Card 46: Barberus Bragge",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 46,
+    "item": "Barberus Bragge Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300090
+  },
+  {
+   "key": "card:47",
+   "name": "Card 47: Cyprian Youdle",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 47,
+    "item": "Cyprian Youdle Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300091
+  },
+  {
+   "key": "card:48",
+   "name": "Card 48: Joscelind Wadcock",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 48,
+    "item": "Joscelind Wadcock Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300092
+  },
+  {
+   "key": "card:49",
+   "name": "Card 49: Leopoldina Smethwyck",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 49,
+    "item": "Leopoldina Smethwyck Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300093
+  },
+  {
+   "key": "card:50",
+   "name": "Card 50: Roderick Plumpton",
+   "region": "Hogwarts",
+   "group": "cards",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "card_bit",
+    "arg": 50,
+    "item": "Roderick Plumpton Card"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300094
+  },
+  {
+   "key": "card_set:witches",
+   "name": "Card Set: Witches",
+   "region": "Hogwarts",
+   "group": "card_sets",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Endurance Upgrade"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "cards": [
+     "Gunhilda of Gorsemoor Card",
+     "Morgan le Fay Card",
+     "Queen Maeve Card",
+     "Ignatia Wildsmith Card",
+     "Beatrix Bloxam Card"
+    ]
+   },
+   "id": 74300095
+  },
+  {
+   "key": "card_set:wizards",
+   "name": "Card Set: Wizards",
+   "region": "Hogwarts",
+   "group": "card_sets",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Endurance Upgrade"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "cards": [
+     "Albus Dumbledore Card",
+     "Merlin Card",
+     "Glanmore Peakes Card",
+     "Herpo the Foul Card",
+     "Edgar Stroulger Card"
+    ]
+   },
+   "id": 74300096
+  },
+  {
+   "key": "card_set:vampires",
+   "name": "Card Set: Vampires",
+   "region": "Hogwarts",
+   "group": "card_sets",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "cards": [
+     "Count Vlad Drakul Card",
+     "Lady Carmilla Sanguina Card",
+     "Amarillo Lestoat Card",
+     "Sir Herbert Varney Card",
+     "Blodwyn Bludd Card"
+    ]
+   },
+   "id": 74300097
+  },
+  {
+   "key": "card_set:goblins",
+   "name": "Card Set: Goblins",
+   "region": "Hogwarts",
+   "group": "card_sets",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "cards": [
+     "Gringott Card",
+     "Eargit the Ugly Card",
+     "Alguff the Awful Card",
+     "Ug the Unreliable Card",
+     "Urg the Unclean Card"
+    ]
+   },
+   "id": 74300098
+  },
+  {
+   "key": "card_set:hags",
+   "name": "Card Set: Hags",
+   "region": "Hogwarts",
+   "group": "card_sets",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Endurance Upgrade"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "cards": [
+     "Cordelia Misericordia Card",
+     "Babayaga Card",
+     "Malodora Grymm Card",
+     "Leticia Somnolens Card",
+     "Old Mother Hubbard Card"
+    ]
+   },
+   "id": 74300099
+  },
+  {
+   "key": "card_set:giants",
+   "name": "Card Set: Giants",
+   "region": "Hogwarts",
+   "group": "card_sets",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "cards": [
+     "Hengist of Upper Barnton Card",
+     "Bran the Bloodthirsty Card",
+     "Cyclops Card",
+     "Goliath Card",
+     "Morholt Card"
+    ]
+   },
+   "id": 74300100
+  },
+  {
+   "key": "card_set:dragons",
+   "name": "Card Set: Dragons",
+   "region": "Hogwarts",
+   "group": "card_sets",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Endurance Upgrade"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "cards": [
+     "Norwegian Ridgeback Dragon Card",
+     "Common Welsh Green Dragon Card",
+     "Hebridean Black Dragon Card",
+     "Hungarian Horntail Dragon Card",
+     "Romanian Longhorn Dragon Card"
+    ]
+   },
+   "id": 74300101
+  },
+  {
+   "key": "card_set:beasts",
+   "name": "Card Set: Beasts",
+   "region": "Hogwarts",
+   "group": "card_sets",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "cards": [
+     "Gnome Card",
+     "Imp Card",
+     "Doxy Card",
+     "Bowtruckle Card",
+     "Billywig Card"
+    ]
+   },
+   "id": 74300102
+  },
+  {
+   "key": "card_set:classical_beasts",
+   "name": "Card Set: Classical Beasts",
+   "region": "Hogwarts",
+   "group": "card_sets",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Endurance Upgrade"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "cards": [
+     "Phoenix Card",
+     "Giant Squid Card",
+     "Manticore Card",
+     "Unicorn Card",
+     "Mountain Troll Card"
+    ]
+   },
+   "id": 74300103
+  },
+  {
+   "key": "card_set:quidditch",
+   "name": "Card Set: Quidditch",
+   "region": "Hogwarts",
+   "group": "card_sets",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Endurance Upgrade"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "cards": [
+     "Barberus Bragge Card",
+     "Cyprian Youdle Card",
+     "Joscelind Wadcock Card",
+     "Leopoldina Smethwyck Card",
+     "Roderick Plumpton Card"
+    ]
+   },
+   "id": 74300104
+  },
+  {
+   "key": "folio:1",
+   "name": "Folio Bruti 1: Dementor",
+   "region": "Hogwarts",
+   "group": "folio",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Folio Bruti Page: Dementor"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300105
+  },
+  {
+   "key": "folio:2",
+   "name": "Folio Bruti 2: Billywig",
+   "region": "Hogwarts",
+   "group": "folio",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Folio Bruti Page: Billywig"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300106
+  },
+  {
+   "key": "folio:3",
+   "name": "Folio Bruti 3: Chizpurfle",
+   "region": "Hogwarts",
+   "group": "folio",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Folio Bruti Page: Chizpurfle"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300107
+  },
+  {
+   "key": "folio:4",
+   "name": "Folio Bruti 4: Doxy",
+   "region": "Hogwarts",
+   "group": "folio",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Folio Bruti Page: Doxy"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300108
+  },
+  {
+   "key": "folio:5",
+   "name": "Folio Bruti 5: Dragonfly",
+   "region": "Hogwarts",
+   "group": "folio",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Folio Bruti Page: Dragonfly"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300109
+  },
+  {
+   "key": "folio:6",
+   "name": "Folio Bruti 6: Fairy",
+   "region": "Hogwarts",
+   "group": "folio",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Folio Bruti Page: Fairy"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300110
+  },
+  {
+   "key": "folio:7",
+   "name": "Folio Bruti 7: Fire Seed Bush",
+   "region": "Hogwarts",
+   "group": "folio",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Folio Bruti Page: Fire Seed Bush"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300111
+  },
+  {
+   "key": "folio:8",
+   "name": "Folio Bruti 8: Flying Seahorse",
+   "region": "Hogwarts",
+   "group": "folio",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Folio Bruti Page: Flying Seahorse"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300112
+  },
+  {
+   "key": "folio:9",
+   "name": "Folio Bruti 9: Ghoul",
+   "region": "Hogwarts",
+   "group": "folio",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Folio Bruti Page: Ghoul"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300113
+  },
+  {
+   "key": "folio:10",
+   "name": "Folio Bruti 10: Hinkypunk",
+   "region": "Hogwarts",
+   "group": "folio",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Folio Bruti Page: Hinkypunk"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300114
+  },
+  {
+   "key": "folio:11",
+   "name": "Folio Bruti 11: Hippogriff",
+   "region": "Hogwarts",
+   "group": "folio",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Folio Bruti Page: Hippogriff"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300115
+  },
+  {
+   "key": "folio:12",
+   "name": "Folio Bruti 12: Pixie",
+   "region": "Hogwarts",
+   "group": "folio",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Folio Bruti Page: Pixie"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300116
+  },
+  {
+   "key": "folio:13",
+   "name": "Folio Bruti 13: Red Cap",
+   "region": "Hogwarts",
+   "group": "folio",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Folio Bruti Page: Red Cap"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300117
+  },
+  {
+   "key": "folio:14",
+   "name": "Folio Bruti 14: Salamander",
+   "region": "Hogwarts",
+   "group": "folio",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Folio Bruti Page: Salamander"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300118
+  },
+  {
+   "key": "folio:15",
+   "name": "Folio Bruti 15: Troll",
+   "region": "Hogwarts",
+   "group": "folio",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Folio Bruti Page: Troll"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300119
+  },
+  {
+   "key": "folio:16",
+   "name": "Folio Bruti 16: Venemous Tentacula",
+   "region": "Hogwarts",
+   "group": "folio",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Folio Bruti Page: Venemous Tentacula"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300120
+  },
+  {
+   "key": "laf:prefect_badge",
+   "name": "Lost and Found: Prefect Badge",
+   "region": "Hogwarts",
+   "group": "lost_and_found",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Prefect Badge"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300121
+  },
+  {
+   "key": "laf:remembrall",
+   "name": "Lost and Found: Remembrall",
+   "region": "Hogwarts",
+   "group": "lost_and_found",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Remembrall"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300122
+  },
+  {
+   "key": "laf:potion_vial_case",
+   "name": "Lost and Found: Potion Vial Case",
+   "region": "Hogwarts",
+   "group": "lost_and_found",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Potion Vial Case"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300123
+  },
+  {
+   "key": "laf:dragon_hide_gloves",
+   "name": "Lost and Found: Dragon-hide Gloves",
+   "region": "Hogwarts",
+   "group": "lost_and_found",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Dragon-hide Gloves"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300124
+  },
+  {
+   "key": "laf:owl_post_parcel",
+   "name": "Lost and Found: Owl Post Parcel",
+   "region": "Hogwarts",
+   "group": "lost_and_found",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Owl Post Parcel"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300125
+  },
+  {
+   "key": "laf:key",
+   "name": "Lost and Found: Key",
+   "region": "Hogwarts",
+   "group": "lost_and_found",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Key"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300126
+  },
+  {
+   "key": "laf:telescope",
+   "name": "Lost and Found: Telescope",
+   "region": "Hogwarts",
+   "group": "lost_and_found",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Telescope"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300127
+  },
+  {
+   "key": "laf:daily_prophet",
+   "name": "Lost and Found: Daily Prophet",
+   "region": "Hogwarts",
+   "group": "lost_and_found",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Daily Prophet"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300128
+  },
+  {
+   "key": "laf:brass_scales",
+   "name": "Lost and Found: Brass Scales",
+   "region": "Hogwarts",
+   "group": "lost_and_found",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Brass Scales"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300129
+  },
+  {
+   "key": "laf:potion_jar",
+   "name": "Lost and Found: Potion Jar",
+   "region": "Hogwarts",
+   "group": "lost_and_found",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Potion Jar"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300130
+  },
+  {
+   "key": "statue:bridget_wenlock",
+   "name": "Statue: Bridget Wenlock",
+   "region": "Hogwarts",
+   "group": "statues",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300131
+  },
+  {
+   "key": "statue:glanmore_peakes",
+   "name": "Statue: Glanmore Peakes",
+   "region": "Hogwarts",
+   "group": "statues",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300132
+  },
+  {
+   "key": "statue:hengist_of_woodcroft",
+   "name": "Statue: Hengist of Woodcroft",
+   "region": "Hogwarts",
+   "group": "statues",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300133
+  },
+  {
+   "key": "statue:gondoline_oliphant",
+   "name": "Statue: Gondoline Oliphant",
+   "region": "Hogwarts",
+   "group": "statues",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300134
+  },
+  {
+   "key": "statue:beaumont_marjoribanks",
+   "name": "Statue: Beaumont Marjoribanks",
+   "region": "Hogwarts",
+   "group": "statues",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300135
+  },
+  {
+   "key": "statue:gunhilda_of_gorsemoor",
+   "name": "Statue: Gunhilda of Gorsemoor",
+   "region": "Hogwarts",
+   "group": "statues",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300136
+  },
+  {
+   "key": "statue:gregory_the_smarmy",
+   "name": "Statue: Gregory the Smarmy",
+   "region": "Hogwarts",
+   "group": "statues",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300137
+  },
+  {
+   "key": "statue:jocunda_sykes",
+   "name": "Statue: Jocunda Sykes",
+   "region": "Hogwarts",
+   "group": "statues",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300138
+  },
+  {
+   "key": "statue:hooky_the_house_elf",
+   "name": "Statue: Hooky the House Elf",
+   "region": "Hogwarts",
+   "group": "statues",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300139
+  },
+  {
+   "key": "ingredient:fire_seeds",
+   "name": "Day3: Ingredient Fire Seeds",
+   "region": "Day3",
+   "group": "potions",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": "Day 3 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300140
+  },
+  {
+   "key": "ingredient:chizpurfle",
+   "name": "Day3: Ingredient Chizpurfle Carapaces",
+   "region": "Day3",
+   "group": "potions",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": "Day 3 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300141
+  },
+  {
+   "key": "ingredient:graphorn_horn",
+   "name": "Day3: Ingredient Graphorn Horn",
+   "region": "Day3",
+   "group": "potions",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": "Day 3 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300142
+  },
+  {
+   "key": "ingredient:billywig_stings",
+   "name": "Day3: Ingredient Billywig Stings",
+   "region": "Day3",
+   "group": "potions",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": "Day 3 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300143
+  },
+  {
+   "key": "ingredient:flying_seahorses",
+   "name": "Day5: Ingredient Flying Seahorses",
+   "region": "Day5",
+   "group": "potions",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": "Day 5 Pass",
+    "areas": [],
+    "spells": [
+     "Carpe Retractum"
+    ],
+    "prereq": []
+   },
+   "id": 74300144
+  },
+  {
+   "key": "ingredient:dragonfly_thoraxes",
+   "name": "Day5: Ingredient Dragonfly Thoraxes",
+   "region": "Day5",
+   "group": "potions",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": "Day 5 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300145
+  },
+  {
+   "key": "ingredient:doxy_eggs",
+   "name": "Day5: Ingredient Doxy Eggs",
+   "region": "Day5",
+   "group": "potions",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": "Day 5 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300146
+  },
+  {
+   "key": "ingredient:fairy_wings",
+   "name": "Day5: Ingredient Fairy Wings",
+   "region": "Day5",
+   "group": "potions",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": "Day 5 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300147
+  },
+  {
+   "key": "potion:wiggenweld",
+   "name": "Day1: Mix Wiggenweld Potion",
+   "region": "Day1",
+   "group": "potions",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": "Day 1 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300148
+  },
+  {
+   "key": "potion:antidote",
+   "name": "Day3: Mix Antidote to Uncommon Poisons",
+   "region": "Day3",
+   "group": "potions",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": "Day 3 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": [
+     "task:day3:antidote_ingredients"
+    ]
+   },
+   "id": 74300149
+  },
+  {
+   "key": "potion:girding",
+   "name": "Day5: Mix Girding Potion",
+   "region": "Day5",
+   "group": "potions",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": "Day 5 Pass",
+    "areas": [],
+    "spells": [],
+    "prereq": [
+     "task:day5:girding_ingredients"
+    ]
+   },
+   "id": 74300150
+  },
+  {
+   "key": "minigame:broom_flight:complete",
+   "name": "Bonus: Broom Flight Challenge",
+   "region": "BonusActivities",
+   "group": "minigames",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [
+     "Bonus Activities Pass"
+    ],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300151
+  },
+  {
+   "key": "minigame:advanced_broom_flight:complete",
+   "name": "Bonus: Advanced Broom Flight Challenge",
+   "region": "BonusActivities",
+   "group": "minigames",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [
+     "Bonus Activities Pass"
+    ],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300152
+  },
+  {
+   "key": "minigame:dragon_statues:complete",
+   "name": "Bonus: Dragon Statues",
+   "region": "BonusActivities",
+   "group": "minigames",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [
+     "Bonus Activities Pass"
+    ],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300153
+  },
+  {
+   "key": "minigame:hippogriff_flight:complete",
+   "name": "Bonus: Hippogriff Flight Challenge",
+   "region": "BonusActivities",
+   "group": "minigames",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [
+     "Bonus Activities Pass"
+    ],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300154
+  },
+  {
+   "key": "minigame:owl_racing:complete",
+   "name": "Bonus: Owl Racing",
+   "region": "BonusActivities",
+   "group": "minigames",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [
+     "Bonus Activities Pass"
+    ],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300155
+  },
+  {
+   "key": "minigame:seahorse_fishing:complete",
+   "name": "Bonus: Flying Seahorse Fishing",
+   "region": "BonusActivities",
+   "group": "minigames",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [
+     "Bonus Activities Pass"
+    ],
+    "spells": [
+     "Carpe Retractum"
+    ],
+    "prereq": []
+   },
+   "id": 74300156
+  },
+  {
+   "key": "minigame:duelling_club:complete",
+   "name": "Bonus: Dueling Club",
+   "region": "BonusActivities",
+   "group": "minigames",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [
+     "Bonus Activities Pass"
+    ],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300157
+  },
+  {
+   "key": "minigame:snot_slinging:complete",
+   "name": "Bonus: Fred and George's Snot Slinging",
+   "region": "BonusActivities",
+   "group": "minigames",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [
+     "Bonus Activities Pass"
+    ],
+    "spells": [
+     "Mucus Projectum"
+    ],
+    "prereq": []
+   },
+   "id": 74300158
+  },
+  {
+   "key": "marauder:night0",
+   "name": "Night0: Marauder's Challenge",
+   "region": "MaraudersChallenge",
+   "group": "marauders_challenge",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": "Night 0 Pass",
+    "areas": [
+     "Marauder's Challenge Pass"
+    ],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300159
+  },
+  {
+   "key": "marauder:day1",
+   "name": "Day1: Marauder's Challenge",
+   "region": "MaraudersChallenge",
+   "group": "marauders_challenge",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": "Day 1 Pass",
+    "areas": [
+     "Marauder's Challenge Pass"
+    ],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300160
+  },
+  {
+   "key": "marauder:night1",
+   "name": "Night1: Marauder's Challenge",
+   "region": "MaraudersChallenge",
+   "group": "marauders_challenge",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": "Night 1 Pass",
+    "areas": [
+     "Marauder's Challenge Pass"
+    ],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300161
+  },
+  {
+   "key": "marauder:day2",
+   "name": "Day2: Marauder's Challenge",
+   "region": "MaraudersChallenge",
+   "group": "marauders_challenge",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": "Day 2 Pass",
+    "areas": [
+     "Marauder's Challenge Pass"
+    ],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300162
+  },
+  {
+   "key": "marauder:night2",
+   "name": "Night2: Marauder's Challenge",
+   "region": "MaraudersChallenge",
+   "group": "marauders_challenge",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": "Night 2 Pass",
+    "areas": [
+     "Marauder's Challenge Pass"
+    ],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300163
+  },
+  {
+   "key": "marauder:day3",
+   "name": "Day3: Marauder's Challenge",
+   "region": "MaraudersChallenge",
+   "group": "marauders_challenge",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": "Day 3 Pass",
+    "areas": [
+     "Marauder's Challenge Pass"
+    ],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300164
+  },
+  {
+   "key": "marauder:night3",
+   "name": "Night3: Marauder's Challenge",
+   "region": "MaraudersChallenge",
+   "group": "marauders_challenge",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": "Night 3 Pass",
+    "areas": [
+     "Marauder's Challenge Pass"
+    ],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300165
+  },
+  {
+   "key": "marauder:day5",
+   "name": "Day5: Marauder's Challenge",
+   "region": "MaraudersChallenge",
+   "group": "marauders_challenge",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": "Day 5 Pass",
+    "areas": [
+     "Marauder's Challenge Pass"
+    ],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300166
+  },
+  {
+   "key": "marauder:night5",
+   "name": "Night5: Marauder's Challenge",
+   "region": "MaraudersChallenge",
+   "group": "marauders_challenge",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": "Night 5 Pass",
+    "areas": [
+     "Marauder's Challenge Pass"
+    ],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300167
+  },
+  {
+   "key": "marauder:day6",
+   "name": "Day6: Marauder's Challenge",
+   "region": "MaraudersChallenge",
+   "group": "marauders_challenge",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": "Day 6 Pass",
+    "areas": [
+     "Marauder's Challenge Pass"
+    ],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300168
+  },
+  {
+   "key": "fg:statues:3",
+   "name": "Fred and George: Statue Challenge: 3 Statues",
+   "region": "Hogwarts",
+   "group": "fred_and_george",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300169
+  },
+  {
+   "key": "fg:statues:6",
+   "name": "Fred and George: Statue Challenge: 6 Statues",
+   "region": "Hogwarts",
+   "group": "fred_and_george",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300170
+  },
+  {
+   "key": "fg:statues:9",
+   "name": "Fred and George: Statue Challenge: 9 Statues",
+   "region": "Hogwarts",
+   "group": "fred_and_george",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300171
+  },
+  {
+   "key": "fg:dungbomb:5",
+   "name": "Fred and George: Dungbomb Challenge: 5 Targets",
+   "region": "Hogwarts",
+   "group": "fred_and_george",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300172
+  },
+  {
+   "key": "fg:dungbomb:10",
+   "name": "Fred and George: Dungbomb Challenge: 10 Targets",
+   "region": "Hogwarts",
+   "group": "fred_and_george",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300173
+  },
+  {
+   "key": "fg:dungbomb:15",
+   "name": "Fred and George: Dungbomb Challenge: 15 Targets",
+   "region": "Hogwarts",
+   "group": "fred_and_george",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300174
+  },
+  {
+   "key": "fg:dungbomb:20",
+   "name": "Fred and George: Dungbomb Challenge: 20 Targets",
+   "region": "Hogwarts",
+   "group": "fred_and_george",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300175
+  },
+  {
+   "key": "fg:snot:1",
+   "name": "Fred and George: Snot Slinging Busts",
+   "region": "Hogwarts",
+   "group": "fred_and_george",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [
+     "Mucus Projectum"
+    ],
+    "prereq": []
+   },
+   "id": 74300176
+  },
+  {
+   "key": "fg:confiscated:1",
+   "name": "Fred and George: Confiscated Items: 1 of 4",
+   "region": "Hogwarts",
+   "group": "fred_and_george",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300177
+  },
+  {
+   "key": "fg:confiscated:2",
+   "name": "Fred and George: Confiscated Items: 2 of 4",
+   "region": "Hogwarts",
+   "group": "fred_and_george",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300178
+  },
+  {
+   "key": "fg:confiscated:3",
+   "name": "Fred and George: Confiscated Items: 3 of 4",
+   "region": "Hogwarts",
+   "group": "fred_and_george",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300179
+  },
+  {
+   "key": "fg:confiscated:4",
+   "name": "Fred and George: Confiscated Items: 4 of 4",
+   "region": "Hogwarts",
+   "group": "fred_and_george",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300180
+  },
+  {
+   "key": "shop:rare_card_1",
+   "name": "Shop: Rare Collector's Card (1)",
+   "region": "Hogwarts",
+   "group": "shop",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 2
+   },
+   "id": 74300181
+  },
+  {
+   "key": "shop:rare_card_2",
+   "name": "Shop: Rare Collector's Card (2)",
+   "region": "Hogwarts",
+   "group": "shop",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 4
+   },
+   "id": 74300182
+  },
+  {
+   "key": "shop:owl_care_kit",
+   "name": "Shop: Owl Care Kit",
+   "region": "Hogwarts",
+   "group": "shop",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Owl Care Kit"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 1
+   },
+   "id": 74300183
+  },
+  {
+   "key": "shop:broom_handle_polish",
+   "name": "Shop: Broom Handle Polish",
+   "region": "Hogwarts",
+   "group": "shop",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Broom Handle Polish"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 1
+   },
+   "id": 74300184
+  },
+  {
+   "key": "shop:brass_compass",
+   "name": "Shop: Brass Compass",
+   "region": "Hogwarts",
+   "group": "shop",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Brass Compass"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 2
+   },
+   "id": 74300185
+  },
+  {
+   "key": "shop:tail_twig_clippers",
+   "name": "Shop: Silver Tail-Twig Clippers",
+   "region": "Hogwarts",
+   "group": "shop",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Silver Tail-Twig Clippers"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 2
+   },
+   "id": 74300186
+  },
+  {
+   "key": "shop:snufflifors",
+   "name": "Shop: Snufflifors Spellbook",
+   "region": "Hogwarts",
+   "group": "shop",
+   "reward_class": "progression-spell",
+   "swap": {
+    "grant": "spell_grant",
+    "arg": 12,
+    "item": "Snufflifors"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 1
+   },
+   "id": 74300187
+  },
+  {
+   "key": "shop:mucus_projectum",
+   "name": "Shop: Mucus Projectum Spellbook",
+   "region": "Hogwarts",
+   "group": "shop",
+   "reward_class": "progression-spell",
+   "swap": {
+    "grant": "spell_grant",
+    "arg": 16,
+    "item": "Mucus Projectum"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 2
+   },
+   "id": 74300188
+  },
+  {
+   "key": "shop:dark_forces_1",
+   "name": "Shop: Dark Forces: A Guide to Self Protection - Chapter 1",
+   "region": "Hogwarts",
+   "group": "shop",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Dark Forces Chapter"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 1
+   },
+   "id": 74300189
+  },
+  {
+   "key": "shop:dark_forces_2",
+   "name": "Shop: Dark Forces: A Guide to Self Protection - Chapter 2",
+   "region": "Hogwarts",
+   "group": "shop",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Dark Forces Chapter"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 3
+   },
+   "id": 74300190
+  },
+  {
+   "key": "shop:dark_forces_3",
+   "name": "Shop: Dark Forces: A Guide to Self Protection - Chapter 3",
+   "region": "Hogwarts",
+   "group": "shop",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Dark Forces Chapter"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 5
+   },
+   "id": 74300191
+  },
+  {
+   "key": "shop:stink_pellet_bag",
+   "name": "Shop: Stink Pellet Bag",
+   "region": "Hogwarts",
+   "group": "shop",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Stink Pellet Bag"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 1
+   },
+   "id": 74300192
+  },
+  {
+   "key": "shop:dungbomb_case",
+   "name": "Shop: Dungbomb Case",
+   "region": "Hogwarts",
+   "group": "shop",
+   "reward_class": "reward",
+   "swap": {
+    "grant": "item_add",
+    "arg": null,
+    "item": "Dungbomb Case"
+   },
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 1
+   },
+   "id": 74300193
+  },
+  {
+   "key": "secret:enthall_003",
+   "name": "Secret: Broom Cupboard (Entrance Hall)",
+   "region": "Hogwarts",
+   "group": "secrets",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300194
+  },
+  {
+   "key": "secret:floor2_002",
+   "name": "Secret: Secret Way to the Fourth Floor (Second Floor)",
+   "region": "Hogwarts",
+   "group": "secrets",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300195
+  },
+  {
+   "key": "secret:floor2_003",
+   "name": "Secret: Secret Passageway (Second Floor)",
+   "region": "Hogwarts",
+   "group": "secrets",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300196
+  },
+  {
+   "key": "secret:floor4_004",
+   "name": "Secret: Secret Way to the Second Floor (Fourth Floor)",
+   "region": "Hogwarts",
+   "group": "secrets",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300197
+  },
+  {
+   "key": "secret:floor4_006",
+   "name": "Secret: Secret Passageway (Fourth Floor)",
+   "region": "Hogwarts",
+   "group": "secrets",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300198
+  },
+  {
+   "key": "secret:floor4_007",
+   "name": "Secret: Secret Room (Fourth Floor)",
+   "region": "Hogwarts",
+   "group": "secrets",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300199
+  },
+  {
+   "key": "secret:floor7_006",
+   "name": "Secret: Secret Passageway (Seventh Floor)",
+   "region": "Hogwarts",
+   "group": "secrets",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300200
+  },
+  {
+   "key": "point:50",
+   "name": "House Points: 50",
+   "region": "Hogwarts",
+   "group": "house_points",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300201
+  },
+  {
+   "key": "point:100",
+   "name": "House Points: 100",
+   "region": "Hogwarts",
+   "group": "house_points",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 1
+   },
+   "id": 74300202
+  },
+  {
+   "key": "point:150",
+   "name": "House Points: 150",
+   "region": "Hogwarts",
+   "group": "house_points",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 1
+   },
+   "id": 74300203
+  },
+  {
+   "key": "point:200",
+   "name": "House Points: 200",
+   "region": "Hogwarts",
+   "group": "house_points",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 2
+   },
+   "id": 74300204
+  },
+  {
+   "key": "point:250",
+   "name": "House Points: 250",
+   "region": "Hogwarts",
+   "group": "house_points",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 2
+   },
+   "id": 74300205
+  },
+  {
+   "key": "point:300",
+   "name": "House Points: 300",
+   "region": "Hogwarts",
+   "group": "house_points",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 3
+   },
+   "id": 74300206
+  },
+  {
+   "key": "point:350",
+   "name": "House Points: 350",
+   "region": "Hogwarts",
+   "group": "house_points",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 3
+   },
+   "id": 74300207
+  },
+  {
+   "key": "point:400",
+   "name": "House Points: 400",
+   "region": "Hogwarts",
+   "group": "house_points",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 4
+   },
+   "id": 74300208
+  },
+  {
+   "key": "point:450",
+   "name": "House Points: 450",
+   "region": "Hogwarts",
+   "group": "house_points",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 4
+   },
+   "id": 74300209
+  },
+  {
+   "key": "point:500",
+   "name": "House Points: 500",
+   "region": "Hogwarts",
+   "group": "house_points",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 5
+   },
+   "id": 74300210
+  },
+  {
+   "key": "bean:50",
+   "name": "Beans: 50",
+   "region": "Hogwarts",
+   "group": "bean_milestones",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300211
+  },
+  {
+   "key": "bean:100",
+   "name": "Beans: 100",
+   "region": "Hogwarts",
+   "group": "bean_milestones",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300212
+  },
+  {
+   "key": "bean:200",
+   "name": "Beans: 200",
+   "region": "Hogwarts",
+   "group": "bean_milestones",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": []
+   },
+   "id": 74300213
+  },
+  {
+   "key": "bean:300",
+   "name": "Beans: 300",
+   "region": "Hogwarts",
+   "group": "bean_milestones",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 1
+   },
+   "id": 74300214
+  },
+  {
+   "key": "bean:400",
+   "name": "Beans: 400",
+   "region": "Hogwarts",
+   "group": "bean_milestones",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 1
+   },
+   "id": 74300215
+  },
+  {
+   "key": "bean:500",
+   "name": "Beans: 500",
+   "region": "Hogwarts",
+   "group": "bean_milestones",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 2
+   },
+   "id": 74300216
+  },
+  {
+   "key": "bean:750",
+   "name": "Beans: 750",
+   "region": "Hogwarts",
+   "group": "bean_milestones",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 3
+   },
+   "id": 74300217
+  },
+  {
+   "key": "bean:1000",
+   "name": "Beans: 1000",
+   "region": "Hogwarts",
+   "group": "bean_milestones",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 4
+   },
+   "id": 74300218
+  },
+  {
+   "key": "bean:1250",
+   "name": "Beans: 1250",
+   "region": "Hogwarts",
+   "group": "bean_milestones",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 5
+   },
+   "id": 74300219
+  },
+  {
+   "key": "bean:1500",
+   "name": "Beans: 1500",
+   "region": "Hogwarts",
+   "group": "bean_milestones",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 6
+   },
+   "id": 74300220
+  },
+  {
+   "key": "bean:2000",
+   "name": "Beans: 2000",
+   "region": "Hogwarts",
+   "group": "bean_milestones",
+   "reward_class": "reward",
+   "swap": null,
+   "access": {
+    "chapter": null,
+    "areas": [],
+    "spells": [],
+    "prereq": [],
+    "passes": 8
+   },
+   "id": 74300221
+  }
+ ],
+ "groups": {
+  "tasks": {
+   "preset": [
+    "minimal",
+    "standard",
+    "maximum"
+   ],
+   "option": null,
+   "count": 28
+  },
+  "chapters": {
+   "preset": [
+    "minimal",
+    "standard",
+    "maximum"
+   ],
+   "option": null,
+   "count": 12
+  },
+  "spellbooks": {
+   "preset": [
+    "minimal",
+    "standard",
+    "maximum"
+   ],
+   "option": null,
+   "count": 4
+  },
+  "cards": {
+   "preset": [
+    "standard",
+    "maximum"
+   ],
+   "option": "include_cards",
+   "count": 50
+  },
+  "card_sets": {
+   "preset": [
+    "standard",
+    "maximum"
+   ],
+   "option": "include_card_sets",
+   "count": 10
+  },
+  "folio": {
+   "preset": [
+    "standard",
+    "maximum"
+   ],
+   "option": "include_folio",
+   "count": 16
+  },
+  "lost_and_found": {
+   "preset": [
+    "standard",
+    "maximum"
+   ],
+   "option": "include_lost_and_found",
+   "count": 10
+  },
+  "statues": {
+   "preset": [
+    "standard",
+    "maximum"
+   ],
+   "option": "include_statues",
+   "count": 9
+  },
+  "potions": {
+   "preset": [
+    "standard",
+    "maximum"
+   ],
+   "option": "include_potions",
+   "count": 11
+  },
+  "minigames": {
+   "preset": [
+    "standard",
+    "maximum"
+   ],
+   "option": "include_minigames",
+   "count": 8
+  },
+  "marauders_challenge": {
+   "preset": [
+    "standard",
+    "maximum"
+   ],
+   "option": "include_marauders_challenge",
+   "count": 10
+  },
+  "fred_and_george": {
+   "preset": [
+    "standard",
+    "maximum"
+   ],
+   "option": "include_fred_and_george",
+   "count": 12
+  },
+  "shop": {
+   "preset": [
+    "standard",
+    "maximum"
+   ],
+   "option": "include_shop",
+   "count": 13
+  },
+  "secrets": {
+   "preset": [
+    "standard",
+    "maximum"
+   ],
+   "option": "include_secrets",
+   "count": 7
+  },
+  "challenge_shields": {
+   "preset": [
+    "standard",
+    "maximum"
+   ],
+   "option": "include_challenge_shields",
+   "count": 0
+  },
+  "house_points": {
+   "preset": [
+    "standard",
+    "maximum"
+   ],
+   "option": "include_house_points",
+   "count": 10
+  },
+  "bean_milestones": {
+   "preset": [
+    "standard",
+    "maximum"
+   ],
+   "option": "include_bean_milestones",
+   "count": 11
+  },
+  "pickups": {
+   "preset": [
+    "maximum"
+   ],
+   "option": "include_pickups",
+   "count": 0
+  },
+  "loose_pickups": {
+   "preset": [
+    "maximum"
+   ],
+   "option": "include_loose_pickups",
+   "count": 0
+  },
+  "enemies": {
+   "preset": [
+    "maximum"
+   ],
+   "option": "include_enemies",
+   "count": 0
+  },
+  "talks": {
+   "preset": [
+    "maximum"
+   ],
+   "option": "include_talks",
+   "count": 0
+  },
+  "pursuits": {
+   "preset": [
+    "maximum"
+   ],
+   "option": "include_pursuits",
+   "count": 0
+  },
+  "intro_memories": {
+   "preset": [
+    "maximum"
+   ],
+   "option": "include_intro_memories",
+   "count": 0
+  }
+ }
+}
